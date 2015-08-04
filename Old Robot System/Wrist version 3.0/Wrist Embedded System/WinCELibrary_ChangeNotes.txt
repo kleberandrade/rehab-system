@@ -1,0 +1,181 @@
+Toradex Windows CE Library - Change Notes
+-----------------------------------------
+
+Use of this software is subject to an End user License Agreement
+which can be viewed here: 
+
+http://docs.toradex.com/100286-toradex-end-user-license-agreement.pdf
+
+
+
+Current Library Version: V1.4.0
+
+
+Contents:
+
+
+Directory  |  Contents                                              |
+-----------+--------------------------------------------------------+
+           |                                                        |
+demos      |  Demos and example source code                         |
+           |                                                        |
+inc        |  Library and Library support header files              |
+           |                                                        |
+libs/dll   |  Debug and Release versions of libraries in DLL format |
+           |                                                        |
+libs/lib   |  Debug and Release versions of libraries in lib format |
+           |                                                        |
+-----------+--------------------------------------------------------+
+
+
+Library Versions:
+
+ADCLib          V2.1.2
+
+CANLib-SJ1000   V3.3.2
+
+CANLib-MCP2515  V1.5.0
+
+CLKLib          V3.2.0
+
+CLOUDLib        V1.0.2
+
+COPROCLib       V2.1.0
+
+DMALIb          V1.3.1
+
+FREQLib         V2.0.1
+
+GPIOLib         V2.2.1
+
+I2CLib          V4.0.0
+
+IMGINFOLib      V1.4.0
+
+INTLib          V2.4.0
+
+MAPREGLib       V1.1.1
+
+MEMLib          V1.0.1
+
+OVERLAYLib      V0.2.1
+
+PWMLib          V2.1.2
+
+SPIDMALib       V4.1.0
+
+SPILib          v4.1.0
+
+STOREMGRLib     v2.0.0
+
+SYSINFOLib      V1.3.2
+
+UPDATELib       V1.4.0
+
+WATCHDOGLib     V1.0.0
+
+
+
+Revision History:
+
+23-09-2013  V1.4.0
+
+- ADCLib            Change default SDK to Colibri600
+
+- CANLib-SJ1000   	Change default SDK to Colibri600
+
+- CANLib-MCP2515  	Change default SDK to Colibri600
+					Workaround for Silicon Erratum that could lead to duplicated CAN messages (use RTS command to send messages)
+					
+- CLKLib          	Change default SDK to Colibri600
+					Extend T30 support
+					
+- CLOUDLib        	Change default SDK to Colibri600
+                    
+- COPROCLib         Change default SDK to Colibri600
+                    
+- DMALIb            Change default SDK to Colibri600
+                    
+- FREQLib           Change default SDK to Colibri600
+                    
+- GPIOLib           Change default SDK to Colibri600
+                    Fix mapping of GPIO BB0
+					
+- I2CLib            Change default SDK to Colibri600
+                    
+- IMGINFOLib        Change default SDK to Colibri600
+                    
+- INTLib            Change default SDK to Colibri600
+                    Replace OAL_INTR_FORCE_STATIC by OAL_INTR_TRANSLATE and added some fixes to allow reusing the same SysIntr IDs.
+					
+- MAPREGLib         Change default SDK to Colibri600
+                    
+- MEMLib            Change default SDK to Colibri600
+                    
+- OVERLAYLib        Change default SDK to Colibri600
+                    
+- PWMLib            Change default SDK to Colibri600
+                    
+- SPIDMALib         Change default SDK to Colibri600
+                    Added support for T30's SPI5 and SPI6
+					
+- SPILib            Change default SDK to Colibri600
+                    Added support for T30's SPI5 and SPI6
+					
+- STOREMGRLib       Change default SDK to Colibri600
+                    
+- SYSINFOLib        Change default SDK to Colibri600
+                    
+- UPDATELib         Change default SDK to Colibri600
+                    Added support for Wiping the FlashDisk
+					
+- WATCHDOGLib       Change default SDK to Colibri600
+
+
+12-08-2013  V1.3.0
+
+- CANLib-SJ1000     Added support for T30
+
+- CANLib-MCP2515    Changed MCP2515 Interrupt to be level triggered rather than edge triggered
+
+- FREQLib           Added functionality to get and set system clocks for Tegra processors
+
+- GPIOLib           Fixed GPIO Input enable issue on T30, Added support for Apalis family
+
+- INTLib            Fixed __GetUserKData() link error under WinCE5, changed scope of internal variables to be internal only
+
+- SPIDMALib         Improved performance of SPIReadWritePolling(), SPIReadPolling() and SPIWritePolling() on Tegra processors
+
+- SPILib            Improved performance of SPIReadWritePolling(), SPIReadPolling() and SPIWritePolling() on Tegra processors
+
+- SYSINFOLib        Fixed getSystemSpeeds() to output correct CPU Speed on Tegra processors
+
+- UPDATELib         Fixed issue with ClearRegistry() on Tegra on CE6/7
+
+
+24-06-2013  V1.2.0
+
+- INTLib:           Fixed __GetUserKData() link error under Windows CE 5 
+
+- ADCLib:           Added support for Colibri PXA300XT
+
+- CoProcLib:        Added support for Colibri PXA300XT
+
+- PWMLib:           Added parameter type definition to DeInitPWM()
+
+
+17-06-2013  V1.1.0:
+
+- CANLib-SJA1000:   Added CANReInitialise() to DLL Definition File
+
+- CoProcLib:        Updated to work with Apalis T30
+
+- GPIOLib:          Updated to work with Apalis T30
+
+- MapRegLib:        Updated to work with Apalis T30
+
+- PWMLib:           Updated to work with Apalis T30
+
+12-06-2013  V1.0.0:
+
+- First release as a consolidated library 

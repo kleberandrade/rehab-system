@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WristEmbeddedSystem", "WristEmbeddedSystem.vcproj", "{A6824F3E-C6CA-421B-814D-8B1A907177E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|SDK2wince7 (ARMv4I) = Debug|SDK2wince7 (ARMv4I)
+		Release|SDK2wince7 (ARMv4I) = Release|SDK2wince7 (ARMv4I)
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Debug|SDK2wince7 (ARMv4I).ActiveCfg = Debug|SDK2wince7 (ARMv4I)
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Debug|SDK2wince7 (ARMv4I).Build.0 = Debug|SDK2wince7 (ARMv4I)
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Debug|SDK2wince7 (ARMv4I).Deploy.0 = Debug|SDK2wince7 (ARMv4I)
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Release|SDK2wince7 (ARMv4I).ActiveCfg = Release|SDK2wince7 (ARMv4I)
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Release|SDK2wince7 (ARMv4I).Build.0 = Release|SDK2wince7 (ARMv4I)
+		{A6824F3E-C6CA-421B-814D-8B1A907177E2}.Release|SDK2wince7 (ARMv4I).Deploy.0 = Release|SDK2wince7 (ARMv4I)
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

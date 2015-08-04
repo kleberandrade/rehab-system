@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RehabCore", "RehabCore\RehabCore.vcproj", "{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Toradex_CE700 (ARMv4I) = Debug|Toradex_CE700 (ARMv4I)
+		Debug|Win32 = Debug|Win32
+		Release|Toradex_CE700 (ARMv4I) = Release|Toradex_CE700 (ARMv4I)
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Debug|Toradex_CE700 (ARMv4I).ActiveCfg = Debug|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Debug|Toradex_CE700 (ARMv4I).Build.0 = Debug|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Debug|Toradex_CE700 (ARMv4I).Deploy.0 = Debug|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Debug|Win32.Build.0 = Debug|Win32
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Release|Toradex_CE700 (ARMv4I).ActiveCfg = Release|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Release|Toradex_CE700 (ARMv4I).Build.0 = Release|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Release|Toradex_CE700 (ARMv4I).Deploy.0 = Release|Toradex_CE700 (ARMv4I)
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Release|Win32.ActiveCfg = Release|Win32
+		{DCD93FD0-FE2F-4B8B-9A0E-D4F986FBDB03}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
