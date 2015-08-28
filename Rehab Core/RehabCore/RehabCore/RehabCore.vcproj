@@ -491,6 +491,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Toradex"
+			>
+			<File
+				RelativePath=".\src\Toradex\CAN.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Toradex\IO.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
