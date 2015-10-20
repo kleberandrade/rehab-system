@@ -31,15 +31,15 @@ public class ToAnkleRobot : MonoBehaviour {
 	private Vector2 desloc;
 //	private float dh, dv;
 
-	public GameObject point, back;
+	public GameObject point, background, space;
+	private RectTransform r_point, r_background, r_space;
 //	public float px, py, sx, sy;
-	public float scalePoint;
 
 	public Vector2 input;
 
 	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFileAnkle.txt";
 
-	void Start () 
+	void Awake () 
 	{
 		player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
 		enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyController>();
@@ -53,8 +53,15 @@ public class ToAnkleRobot : MonoBehaviour {
 
 
 		//scalePoint = back.GetComponentInParent<RectTransform>().sizeDelta.x;
-		Debug.Log (back.GetComponentInParent<RectTransform> ().sizeDelta)
 	}
+
+	void Start()
+	{
+		r_point = point.GetComponent<RectTransform> ();
+		r_background = background.GetComponent<RectTransform> ();
+		r_space = space.GetComponent<RectTransform> ();
+	}
+
 	 
 
 	void Update () 
@@ -66,9 +73,9 @@ public class ToAnkleRobot : MonoBehaviour {
 		//	connection.SetStatus (HORIZONTAL, position.x * dh_max, Connection.POSITION);
 
 			Vector3 velocity = new Vector3(
-								player.horizontalWalls[0].GetComponent<Rigidbody> ().velocity.x / player.speed,
+								player.horizontalWalls[0].velocity.x / player.speed,
 								0,
-								player.verticalWalls[0].GetComponent<Rigidbody> ().velocity.z / player.speed
+								player.verticalWalls[0].velocity.z / player.speed
 								);
 		//	connection.SetStatus (VERTICAL, velocity.z * sv_max, Connection.VELOCITY);
 		//	connection.SetStatus (HORIZONTAL, velocity.x * sh_max, Connection.VELOCITY);
@@ -85,8 +92,8 @@ public class ToAnkleRobot : MonoBehaviour {
 			(
 //			connection.ReadStatus(HORIZONTAL, Connection.POSITION),
 //			connection.ReadStatus(VERTICAL, Connection.POSITION)
-			player.horizontalWalls [0].GetComponent<Rigidbody> ().position.x/10f,
-			player.verticalWalls [0].GetComponent<Rigidbody> ().position.z/10f
+			player.horizontalWalls [0].position.x/10f,
+			player.verticalWalls [0].position.z/10f
 			);
 
 		File.AppendAllText(textFile, input.x + "\t" + input.y  + "\t"
@@ -96,10 +103,12 @@ public class ToAnkleRobot : MonoBehaviour {
 //		player.SetWalls(ElipseToSquare(input));
 //		}
 	
-		point.GetComponent<RectTransform> ().anchoredPosition = input*scalePoint*elipseScale;
-		back.GetComponent<RectTransform> ().anchoredPosition = origin*scalePoint;
-		back.GetComponent<RectTransform> ().localScale = bases;
+		r_point.anchoredPosition = input*elipseScale*r_space.rect.width;
+		r_background.anchoredPosition = origin;
+		r_background.localScale = bases;
 	}
+
+
 
 	void Calibration(Vector2 position)
 	{

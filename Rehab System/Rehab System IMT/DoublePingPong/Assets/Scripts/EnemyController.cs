@@ -15,6 +15,13 @@ public class EnemyController : MonoBehaviour {
 	private float pickUpTimeCount;
 	private float multiHitCheck;
 
+	private Rigidbody m_Rigidbody;
+
+	void Awake(){
+		m_Rigidbody = GetComponent<Rigidbody> ();
+		pickUpMask = LayerMask.GetMask ("PickUp");
+	}
+
 
 	void Start () 
 	{
@@ -22,16 +29,16 @@ public class EnemyController : MonoBehaviour {
 		rand_aux = rand_aux.normalized;
 
 		initialVelocity = new Vector3(rand_aux.x * speed,0f, rand_aux.y * speed);
-		GetComponent<Rigidbody>().velocity = initialVelocity;
+		m_Rigidbody.velocity = initialVelocity;
 
-		pickUpMask = LayerMask.GetMask ("PickUp");
+
 		multiHitCheck = Time.time;
 		pickUpTimeCount = 0f;
 	}
 
 	void FixedUpdate()
 	{
-		GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity.normalized * speed;
+		m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * speed;
 		pickUpTimeCount += Time.deltaTime;
 		if (pickUpTimeCount > timeDelay)
 		{
@@ -51,23 +58,23 @@ public class EnemyController : MonoBehaviour {
 	{
 		if (multiHitCheck == Time.time)
 		{
-			GetComponent<Rigidbody>().velocity = new Vector3(-GetComponent<Rigidbody>().position.x, 0f, -GetComponent<Rigidbody>().position.z);
+			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.position.x, 0f, -m_Rigidbody.position.z);
 			return;
 		}
 		switch (wall)
 		{
 		case "Vertical":
-			GetComponent<Rigidbody>().velocity = new Vector3(-GetComponent<Rigidbody>().velocity.x, 0f, Random.Range(-speed, speed));
+			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.velocity.x, 0f, Random.Range(-speed, speed));
 			break;
 		case "Horizontal": 
-			GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-speed, speed), 0f, -GetComponent<Rigidbody>().velocity.z);
+			m_Rigidbody.velocity = new Vector3(Random.Range(-speed, speed), 0f, -m_Rigidbody.velocity.z);
 			break;
 		case "Tower":
-			GetComponent<Rigidbody>().velocity = new Vector3(-GetComponent<Rigidbody>().velocity.x, 0f, -GetComponent<Rigidbody>().velocity.z);
+			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.velocity.x, 0f, -m_Rigidbody.velocity.z);
 			break;
 		}
 		multiHitCheck = Time.time;
-		GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity.normalized * speed;
+		m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * speed;
 		pickUpTimeCount = 0f;
 	}
 
@@ -91,7 +98,7 @@ public class EnemyController : MonoBehaviour {
 
 	public RaycastHit FindImpact(int mask)
 	{
-		Ray ballTrack = new Ray(GetComponent<Rigidbody>().position, GetComponent<Rigidbody>().velocity.normalized);
+		Ray ballTrack = new Ray(m_Rigidbody.position, m_Rigidbody.velocity.normalized);
 		RaycastHit boundaryHit;
 
 		Physics.Raycast (ballTrack, out boundaryHit, 60f, mask);
@@ -112,6 +119,6 @@ public class EnemyController : MonoBehaviour {
 			v = 1f;
 		if (Input.GetKey (KeyCode.K))
 			v = -1f;
-		GetComponent<Rigidbody>().velocity = new Vector3 (h, 0f, v);
+		m_Rigidbody.velocity = new Vector3 (h, 0f, v);
 	}
 }

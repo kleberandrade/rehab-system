@@ -24,30 +24,30 @@ public class PlayerController : MonoBehaviour
 
 	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFilePos.txt";
 
-	[HideInInspector] public GameObject[] horizontalWalls;
-	[HideInInspector] public GameObject[] verticalWalls;
+	[HideInInspector] public Rigidbody[] horizontalWalls;
+	[HideInInspector] public Rigidbody[] verticalWalls;
 	[HideInInspector] public bool controlActive;
 
-	void Start ()
+	void Awake()
 	{
 		GameObject[] hw_aux = GameObject.FindGameObjectsWithTag("Horizontal");
 		GameObject[] vw_aux = GameObject.FindGameObjectsWithTag("Vertical");
-		enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyController>();
-		controlActive = false;
 
-		horizontalWalls = new GameObject[hw_aux.Length];
-		verticalWalls = new GameObject[vw_aux.Length];
-		targetMask = LayerMask.GetMask ("Target");
+		horizontalWalls = new Rigidbody[hw_aux.Length];
+		verticalWalls = new Rigidbody[vw_aux.Length];
 
 		for (int i = 0; i < horizontalWalls.Length; i++) 
 		{
-			horizontalWalls[i] = hw_aux[i];
+			horizontalWalls[i] = hw_aux[i].GetComponent<Rigidbody>();
 		}
 		for (int i = 0; i < verticalWalls.Length; i++) 
 		{
-			verticalWalls[i] = vw_aux[i];
+			verticalWalls[i] = vw_aux[i].GetComponent<Rigidbody>();
 		}
-
+		targetMask = LayerMask.GetMask ("Target");
+		enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyController>();
+		controlActive = false;
+		
 		playerScoreText.text = "Player\n0";
 		machineScoreText.text = "Machine\n0";
 		lazyScoreText.text = "Lazy Time\n0";
@@ -55,6 +55,10 @@ public class PlayerController : MonoBehaviour
 		machineScore = 0;
 		lazyScore = 0;
 
+	}
+
+	void Start ()
+	{
 		if (File.Exists (textFile)) 
 		{
 			File.Delete (textFile);
@@ -68,12 +72,12 @@ public class PlayerController : MonoBehaviour
 		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
 		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
 		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
-		File.AppendAllText(textFile, horizontalWalls[0].GetComponent<Rigidbody>().position.x + "\t" + verticalWalls[0].GetComponent<Rigidbody>().position.z + Environment.NewLine);
+		File.AppendAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
 	}
 
 	void FixedUpdate()
 	{
-		ReadInput ();
+		MoveWalls(ReadInput ());
 //		ControlPosition ();
 	}
 
@@ -81,22 +85,22 @@ public class PlayerController : MonoBehaviour
 	{
 		for (int i = 0; i < horizontalWalls.Length; i++) 
 		{
-			horizontalWalls[i].GetComponent<Rigidbody>().velocity = new Vector3 (direction.x*speed, 0f, 0f);
-			horizontalWalls[i].GetComponent<Rigidbody>().position = new Vector3
+			horizontalWalls[i].velocity = new Vector3 (direction.x*speed, 0f, 0f);
+			horizontalWalls[i].position = new Vector3
 				(
-				Mathf.Clamp (horizontalWalls[i].GetComponent<Rigidbody>().position.x, -boundary, boundary),
+				Mathf.Clamp (horizontalWalls[i].position.x, -boundary, boundary),
 				0.0f,
-				horizontalWalls[i].GetComponent<Rigidbody>().position.z
+				horizontalWalls[i].position.z
 				);
 		}
 		for (int i = 0; i < verticalWalls.Length; i++) 
 		{
-			verticalWalls[i].GetComponent<Rigidbody>().velocity = new Vector3 (0f, 0f, direction.y*speed);
-			verticalWalls[i].GetComponent<Rigidbody>().position = new Vector3
+			verticalWalls[i].velocity = new Vector3 (0f, 0f, direction.y*speed);
+			verticalWalls[i].position = new Vector3
 				(
-				verticalWalls[i].GetComponent<Rigidbody>().position.x,
+				verticalWalls[i].position.x,
 				0.0f,
-				Mathf.Clamp (verticalWalls[i].GetComponent<Rigidbody>().position.z, -boundary, boundary)
+				Mathf.Clamp (verticalWalls[i].position.z, -boundary, boundary)
 				);
 		}
 	}
@@ -105,18 +109,18 @@ public class PlayerController : MonoBehaviour
 	{
 		for (int i = 0; i < horizontalWalls.Length; i++) 
 		{
-			horizontalWalls[i].GetComponent<Rigidbody>().position = new Vector3
+			horizontalWalls[i].position = new Vector3
 				(
 					Mathf.Clamp (position.x*boundary, -boundary, boundary),
 					0.0f,
-					horizontalWalls[i].GetComponent<Rigidbody>().position.z
+					horizontalWalls[i].position.z
 				);
 		}
 		for (int i = 0; i < verticalWalls.Length; i++) 
 		{
-			verticalWalls[i].GetComponent<Rigidbody>().position = new Vector3
+			verticalWalls[i].position = new Vector3
 				(
-					verticalWalls[i].GetComponent<Rigidbody>().position.x,
+					verticalWalls[i].position.x,
 					0.0f,
 					Mathf.Clamp (position.y*boundary, -boundary, boundary)
 				);
@@ -125,11 +129,11 @@ public class PlayerController : MonoBehaviour
 
 	Vector3 GetPosition()
 	{
-		Vector3 position = new Vector3(horizontalWalls[0].GetComponent<Rigidbody>().position.x, 0f, verticalWalls[0].GetComponent<Rigidbody>().position.z);
+		Vector3 position = new Vector3(horizontalWalls[0].position.x, 0f, verticalWalls[0].position.z);
 		return position;
 	}
 
-	void ReadInput()
+	Vector2 ReadInput()
 	{
 
 		Vector2 direction = new Vector2 (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
@@ -137,7 +141,7 @@ public class PlayerController : MonoBehaviour
 		if (direction != Vector2.zero)
 			playerScore += speed * Time.deltaTime;
 		
-		MoveWalls (direction);
+		return direction;
 	}
 
 	void ControlPosition()

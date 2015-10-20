@@ -387,8 +387,8 @@ MonoBehaviour:
   K: 10
   D: .100000001
   point: {fileID: 1302535180}
-  back: {fileID: 384886956}
-  scalePoint: 100
+  background: {fileID: 384886956}
+  space: {fileID: 504723230}
   input: {x: 0, y: 0}
 --- !u!114 &236470448
 MonoBehaviour:
@@ -733,7 +733,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &384886957
 RectTransform:
   m_ObjectHideFlags: 0
@@ -763,7 +763,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: .294117659, g: .48627454, b: .650980413, a: .533999979}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -935,11 +935,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillCenter: 0
+  m_FillMethod: 2
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -962,6 +962,7 @@ GameObject:
   - 124: {fileID: 550079180}
   - 81: {fileID: 550079179}
   - 45: {fileID: 550079184}
+  - 114: {fileID: 550079185}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1044,6 +1045,24 @@ Skybox:
   m_GameObject: {fileID: 550079178}
   m_Enabled: 1
   m_CustomSkybox: {fileID: 2100000, guid: 53412155bc1016547b1a77b2333c0380, type: 2}
+--- !u!114 &550079185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 550079178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 699c1e0593249ce44b0d6bd057f27f99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
+  startVertex: {x: 0, y: 0, z: 0}
+  mousePos: {x: 0, y: 0, z: 0}
+  space: {fileID: 504723231}
+  origin: {x: 0, y: 0}
+  size: {x: 0, y: 0}
+  lenght: 0
 --- !u!1 &554284936
 GameObject:
   m_ObjectHideFlags: 0
@@ -1691,7 +1710,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1302535181
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1721,7 +1740,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2153,7 +2172,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 3
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
