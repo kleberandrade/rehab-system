@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AnklePackage : MonoBehaviour {
 	
@@ -9,19 +10,27 @@ public class AnklePackage : MonoBehaviour {
 
 	public RectTransform space;
 
-	public Vector2 origin, size;
-	public float lenght;
+	public Vector2 origin, size, point;
+	private float lenght;
 
-	private ToAnkleRobot package;
+	public ToAnkleRobot package;
 
-	void Awake()
-	{
-		package = GameObject.FindGameObjectWithTag("Connection").GetComponent<ToAnkleRobot>();
-	}
+	private List<Vector3> ankleTrack;
 
-//	void Update() 
+	private float colorRate, colorAlpha;
+
+//	void Awake()
 //	{
+////		package = GameObject.FindGameObjectWithTag("Connection").GetComponent<ToAnkleRobot>();
 //	}
+
+
+	void Start() 
+	{
+		ankleTrack = new List<Vector3> ();
+		colorRate = 0.01f;
+		colorAlpha = 0.3f;
+	}
 
 	void OnPostRender() 
 	{
@@ -29,46 +38,63 @@ public class AnklePackage : MonoBehaviour {
 		{
 			Debug.LogError("Please Assign a material on the inspector");
 			return;
-		}
-
+		}	
+		// Start Graph plot
 		GL.PushMatrix();
 		mat.SetPass(0);
 		GL.LoadOrtho();
 		GL.Begin(GL.LINES);
-		GL.Color(Color.black);
 
+		// Scale of space plot
 		size = new Vector2 (
 			space.rect.width * space.localScale.x,
 			space.rect.height * space.localScale.y);
 
+		// Center of space plot
 		origin = space.position; // + size / 2;
 		origin += Vector2.Scale(size, new Vector2(1, -1)) / 2;
+		point = origin + Vector2.Scale (package.origin, size);
 
+		// Black Rectangle for space
+		GL.Color(Color.black);
 		RectForm (space.position, size);
 		CrossForm (origin, size);
 
+		// Blue Elipse for package
 		GL.Color(Color.blue);
+		ElipseForm (point, Vector2.Scale(package.bases, size));
+		ElipseForm (point, Vector2.Scale(package.bases, size)*package.elipseScale);
+		CrossForm (point, 0.1f*size);
 
-		ElipseForm (origin + Vector2.Scale(package.origin, size), Vector2.Scale(package.bases, size));
-		CrossForm (origin + Vector2.Scale(package.origin, size), Vector2.Scale(package.bases, size) * 2);
+		point = origin + Vector2.Scale (package.input, size);
 
+		// Red Dot for position
 		GL.Color(Color.red);
+		ElipseForm (point, 0.02f*size);
 
-		ElipseForm (origin + Vector2.Scale(package.input, size), Vector2.Scale(new Vector2(0.05f, 0.05f), size));
+		ankleTrack.Add (new Vector3 (
+			point.x / Screen.width, 
+			point.y / Screen.height, 0));
 
-//		for (int i = 0; i < 360; i++)
-//		{
-//			GL.Vertex(origin + new Vector3(
-//				Mathf.Sin(i*Mathf.Deg2Rad)*(lenght + space.rect.width)/Screen.width, 
-//				Mathf.Cos(i*Mathf.Deg2Rad)*(lenght + space.rect.height)/Screen.height, 0));
-//			GL.Vertex(origin + new Vector3(
-//				Mathf.Sin((i + 1)*Mathf.Deg2Rad)*(lenght + space.rect.width)/Screen.width, 
-//				Mathf.Cos((i + 1)*Mathf.Deg2Rad)*(lenght + space.rect.height)/Screen.height, 0));
-//		}
+		GL.Color (Color.black);
+
+
+		if (ankleTrack.Count > 1)
+		{
+			float aux = 1f;
+			for (int i = ankleTrack.Count - 1; i > 0 ; i--)
+				{
+				GL.Color(new Color (0f, 0f, 0f, aux));
+				GL.Vertex(ankleTrack[i - 1]);
+				GL.Vertex(ankleTrack[i]);
+				if (aux > colorAlpha)
+					aux -= colorRate;
+				}
+		}
 		GL.End();
 		GL.PopMatrix();
 	}
-
+	
 	void RectForm(Vector3 startEdge, Vector3 sizes)
 	{
 		startEdge = new Vector3 (
@@ -122,5 +148,10 @@ public class AnklePackage : MonoBehaviour {
 				Mathf.Sin((i + 1)*Mathf.Deg2Rad)*(sizes.x), 
 				Mathf.Cos((i + 1)*Mathf.Deg2Rad)*(sizes.y), 0));
 		}
+	}
+
+	void Vertex2(Vector2 v)
+	{
+		GL.Vertex (v);
 	}
 }

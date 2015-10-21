@@ -36,7 +36,7 @@ public class Connection : MonoBehaviour {
 	void Start()
 	{
 		timeDelay = 0.01f;
-		clientHere.Connect ("192.168.0.66", 8080, 0); // Here 192.168.0.67
+		clientHere.Connect ("192.168.0.66", 8010, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();
 		InitializeVariables (2); // Entre com o numero de robos
@@ -104,7 +104,6 @@ public class Connection : MonoBehaviour {
 		mask_size = (BIT_SIZE * n_robots) / 8 < 0 ? 1 : (BIT_SIZE * n_robots) / 8;
 
 		activeMask = new byte[mask_size];
-		Debug.Log ("Inicializado?");
 
 		gameStade = new byte[n_robots][][];
 		robotStade = new float[n_robots][];

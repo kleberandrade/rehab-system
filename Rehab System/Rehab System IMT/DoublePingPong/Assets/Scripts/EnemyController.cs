@@ -3,78 +3,72 @@ using System.Collections;
 
 public class EnemyController : MonoBehaviour {
 
-	public float speed;
-	public float timeDelay = 0.5f;
+	public float speed;	// Enemy speed
+	public float timeDelay = 0.5f;	// Delay for creating another "pickup"
 
-	public GameObject pickUp;
+	public GameObject pickUp;		// Pickup will appear on the next impact point
 	public RaycastHit enemyTrack;
 
-	private int pickUpMask;
-	private Vector3 initialVelocity;
+	private int pickUpMask;			// Mask for the playe where "pickup" will appear
 
-	private float pickUpTimeCount;
-	private float multiHitCheck;
+	private float pickUpTimeCount;	// Delay for next "pickup" placing
+	private float multiHitCheck;	// Variable auxiliar for checking multiple impact
 
-	private Rigidbody m_Rigidbody;
+	private Rigidbody enemyBody;		// Enemy rigid body
 
 	void Awake(){
-		m_Rigidbody = GetComponent<Rigidbody> ();
+		enemyBody = GetComponent<Rigidbody> ();
 		pickUpMask = LayerMask.GetMask ("PickUp");
 	}
 
-
 	void Start () 
 	{
-		Vector2 rand_aux = Random.insideUnitCircle;
-		rand_aux = rand_aux.normalized;
-
-		initialVelocity = new Vector3(rand_aux.x * speed,0f, rand_aux.y * speed);
-		m_Rigidbody.velocity = initialVelocity;
-
-
+		enemyBody.velocity = RandVectOnGround();	// Inicialize with a random velocity
 		multiHitCheck = Time.time;
 		pickUpTimeCount = 0f;
 	}
 
 	void FixedUpdate()
 	{
-		m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * speed;
-		pickUpTimeCount += Time.deltaTime;
-		if (pickUpTimeCount > timeDelay)
+		float vy = enemyBody.velocity.y;
+		enemyBody.velocity = enemyBody.velocity.normalized * speed;	// Even setting drag to zero, body still losing energy, so this keep the speed
+		enemyBody.velocity = new Vector3(enemyBody.velocity.x, vy, enemyBody.velocity.z);
+
+		// Counting delay for new "pickup" 
+		pickUpTimeCount += Time.deltaTime;	
+		if (pickUpTimeCount > timeDelay)	
 		{
 			enemyTrack = FindImpact(pickUpMask);
-			Instantiate(pickUp, enemyTrack.point, Quaternion.identity);
+			Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
 			pickUpTimeCount = -100f;
 
 		}
 
-		if (Input.GetKey(KeyCode.J) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L) || Input.GetKey(KeyCode.I))
-		{
-			MoveEnemy();
-		}
+		// Alternative enemy control for testing
+		MoveEnemy();
 	}
 
 	void HitWall(string wall)
 	{
-		if (multiHitCheck == Time.time)
+		if (Mathf.Abs(multiHitCheck - Time.time) <= Mathf.Epsilon)
 		{
-			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.position.x, 0f, -m_Rigidbody.position.z);
+			enemyBody.velocity = new Vector3(-enemyBody.position.x, 0f, -enemyBody.position.z);
 			return;
 		}
 		switch (wall)
 		{
 		case "Vertical":
-			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.velocity.x, 0f, Random.Range(-speed, speed));
+			enemyBody.velocity = new Vector3(-enemyBody.velocity.x, 0f, Random.Range(-speed, speed));
 			break;
 		case "Horizontal": 
-			m_Rigidbody.velocity = new Vector3(Random.Range(-speed, speed), 0f, -m_Rigidbody.velocity.z);
+			enemyBody.velocity = new Vector3(Random.Range(-speed, speed), 0f, -enemyBody.velocity.z);
 			break;
 		case "Tower":
-			m_Rigidbody.velocity = new Vector3(-m_Rigidbody.velocity.x, 0f, -m_Rigidbody.velocity.z);
+			enemyBody.velocity = new Vector3(-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
 			break;
 		}
 		multiHitCheck = Time.time;
-		m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * speed;
+		enemyBody.velocity = enemyBody.velocity.normalized * speed;
 		pickUpTimeCount = 0f;
 	}
 
@@ -91,14 +85,15 @@ public class EnemyController : MonoBehaviour {
 			Destroy(other.gameObject);
 			break;
 		case "Sky":
-			Application.LoadLevel (Application.loadedLevel);
+			enemyBody.position = new Vector3(0f, 23.5f, 0f); // Vector3.zero;
+			enemyBody.velocity = RandVectOnGround();
 			break;
 		}
 	}
 
 	public RaycastHit FindImpact(int mask)
 	{
-		Ray ballTrack = new Ray(m_Rigidbody.position, m_Rigidbody.velocity.normalized);
+		Ray ballTrack = new Ray(enemyBody.position, enemyBody.velocity.normalized);
 		RaycastHit boundaryHit;
 
 		Physics.Raycast (ballTrack, out boundaryHit, 60f, mask);
@@ -106,19 +101,28 @@ public class EnemyController : MonoBehaviour {
 		return boundaryHit;
 	}
 
+	Vector3 RandVectOnGround()
+	{
+		float rand = Random.Range (0f, Mathf.PI * 2);
+		return new Vector3(Mathf.Cos(rand), 0f, Mathf.Sin(rand)); 
+	}
+
 	void MoveEnemy()
 	{
-		float h = 0f;
-		float v = 0f;
+		if (Input.GetKey (KeyCode.J) || Input.GetKey (KeyCode.K) || Input.GetKey (KeyCode.L) || Input.GetKey (KeyCode.I)) 
+		{
+			float h = 0f;
+			float v = 0f;
 
-		if (Input.GetKey (KeyCode.L))
-			h = 1f;
-		if (Input.GetKey (KeyCode.J))
-			h = -1f;
-		if (Input.GetKey (KeyCode.I))
-			v = 1f;
-		if (Input.GetKey (KeyCode.K))
-			v = -1f;
-		m_Rigidbody.velocity = new Vector3 (h, 0f, v);
+			if (Input.GetKey (KeyCode.L))
+				h = 1f;
+			if (Input.GetKey (KeyCode.J))
+				h = -1f;
+			if (Input.GetKey (KeyCode.I))
+				v = 1f;
+			if (Input.GetKey (KeyCode.K))
+				v = -1f;
+			enemyBody.velocity = new Vector3 (h, 0f, v);
+		}
 	}
 }

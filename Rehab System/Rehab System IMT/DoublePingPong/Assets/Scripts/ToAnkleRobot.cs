@@ -7,108 +7,77 @@ using System.Text;
 
 public class ToAnkleRobot : MonoBehaviour {
 
+	private const int VERTICAL = 0;		// or RIGHT?
+	private const int HORIZONTAL = 1;	// or LEFT?
+	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
-//	private const int ESQUERDO = 0;
-//	private const int DIREITO = 1;
-
-	private const int VERTICAL = 0;		// ou ESQUERDO?
-	private const int HORIZONTAL = 1;	// ou DIREITO?
-	private const float QUADRANTES = 0.70710678118654752440084436210485f;
-
-//	public float desloc_max, speed_max;
-//	public float ang_max, rot_max;
+	public bool activeConnection;
 
 	// Envelope do movimento
-	public Vector2 max, min;		// Dados de entrada da Elipse
-	public Vector2 bases, origin;	// Parametros da Elipse
-	public float elipseScale;
+	public Vector2 max, min;		// Input for elipse
+	public Vector2 bases, origin;	// Elipse's parameters
+	public float elipseScale;		// Scale for fitting the moves
 
-	public float K, D;
-
-	private PlayerController player;
-	private EnemyController enemy;
+	// Communication with another scripts
+	public PlayerController player;
+	public EnemyController enemy;
 	private Connection connection;
-	private Vector2 desloc;
-//	private float dh, dv;
 
-	public GameObject point, background, space;
-	private RectTransform r_point, r_background, r_space;
-//	public float px, py, sx, sy;
-
+	// Communication
 	public Vector2 input;
+
+	[Space]
+
+	public Vector2 centerSpring;
+	public Vector2 freeSpace;
+	public float K, D;				// Stiffness and Damping
 
 	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFileAnkle.txt";
 
 	void Awake () 
 	{
-		player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-		enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyController>();
-		connection = GameObject.FindGameObjectWithTag("Connection").GetComponent<Connection>();
+		connection = GetComponent<Connection>();
 		File.WriteAllText (textFile, "Horizoltal\tVertical\tH_Elipse\tV_Elipse" + Environment.NewLine);
-
-//		px = point.GetComponent<RectTransform> ().anchoredPosition.x;
-//		py = point.GetComponent<RectTransform> ().anchoredPosition.y;
-//		sx = back.GetComponent<RectTransform> ().localScale.x;
-//		sy = back.GetComponent<RectTransform> ().localScale.y;
-
-
-		//scalePoint = back.GetComponentInParent<RectTransform>().sizeDelta.x;
 	}
 
-	void Start()
-	{
-		r_point = point.GetComponent<RectTransform> ();
-		r_background = background.GetComponent<RectTransform> ();
-		r_space = space.GetComponent<RectTransform> ();
-	}
-
-	 
+//	void Start()
+//	{
+//	}
 
 	void Update () 
 	{
-//		if (player.controlActive)
-//		{
-			Vector3 position = enemy.enemyTrack.point / player.boundary;
-		//	connection.SetStatus (VERTICAL, position.z * dv_max, Connection.POSITION);
-		//	connection.SetStatus (HORIZONTAL, position.x * dh_max, Connection.POSITION);
+		if (activeConnection)
+		{
+			input = new Vector2
+				(
+				connection.ReadStatus(HORIZONTAL, Connection.POSITION),
+				connection.ReadStatus(VERTICAL, Connection.POSITION)
+				);
+			File.AppendAllText(textFile, input.x + "\t" + input.y  + "\t"
+			                   + ElipseToSquare(input).x + "\t" + ElipseToSquare(input).y + Environment.NewLine);
+			player.SetWalls(ElipseToSquare(input));
 
-			Vector3 velocity = new Vector3(
-								player.horizontalWalls[0].velocity.x / player.speed,
-								0,
-								player.verticalWalls[0].velocity.z / player.speed
-								);
-		//	connection.SetStatus (VERTICAL, velocity.z * sv_max, Connection.VELOCITY);
-		//	connection.SetStatus (HORIZONTAL, velocity.x * sh_max, Connection.VELOCITY);
+			connection.SetStatus (VERTICAL, centerSpring.y, Connection.POSITION);
+			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.POSITION);
+			connection.SetStatus (VERTICAL, freeSpace.y, Connection.VELOCITY);
+			connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.VELOCITY);
 
 			connection.SetStatus (VERTICAL, K, Connection.STIFF);
 			connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
-//		}
-//		else
-//		{
-
-		input = new Vector2
-			(
-//			connection.ReadStatus(HORIZONTAL, Connection.POSITION),
-//			connection.ReadStatus(VERTICAL, Connection.POSITION)
-			player.horizontalWalls [0].position.x/10f,
-			player.verticalWalls [0].position.z/10f
-			);
-
-		File.AppendAllText(textFile, input.x + "\t" + input.y  + "\t"
-		                   + ElipseToSquare(input).x + "\t" + ElipseToSquare(input).y + Environment.NewLine);
-
+		} else {
+			player.MoveWalls(player.ReadInput());
+			input = new Vector2
+				(
+				player.horizontalWalls [0].position.x/10f,
+				player.verticalWalls [0].position.z/10f
+				);
+		}
 		Calibration (input);
 //		player.SetWalls(ElipseToSquare(input));
 //		}
-	
-		r_point.anchoredPosition = input*elipseScale*r_space.rect.width;
-		r_background.anchoredPosition = origin;
-		r_background.localScale = bases;
 	}
-
-
 
 	void Calibration(Vector2 position)
 	{
@@ -143,7 +112,7 @@ public class ToAnkleRobot : MonoBehaviour {
 					// (X - OX)/COS(T)/BX
 			range = ((elipse.x - origin.x)/cosAng/bases.x);
 
-		if (Mathf.Abs(cosAng) < QUADRANTES)
+		if (Mathf.Abs(cosAng) < QUADRANTS)
 		{
 			r = Mathf.Abs(1f/sinAng);
 			square.x = range*r*cosAng;
