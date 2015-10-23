@@ -66,13 +66,15 @@ public class ToAnkleRobot : MonoBehaviour {
 			connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
-		} else {
+		} else 
+		{
 			player.MoveWalls(player.ReadInput());
 			input = new Vector2
 				(
 				player.horizontalWalls [0].position.x/10f,
 				player.verticalWalls [0].position.z/10f
 				);
+			centerSpring = SquareToElipse(new Vector2(enemy.enemyBody.position.x, enemy.enemyBody.position.z));
 		}
 		Calibration (input);
 //		player.SetWalls(ElipseToSquare(input));
@@ -91,6 +93,17 @@ public class ToAnkleRobot : MonoBehaviour {
 			min.x = position.x;
 		bases = elipseScale * (max - min) / 2;
 		origin = (max + min) / 2;
+	}
+
+	void PlayerHelper()
+	{
+		RaycastHit enemyImpact = enemy.FindImpact (player.targetMask);
+	//	Vector3 playerTrack = enemyImpact.point - player.GetPosition ();
+		float distance = enemyImpact.distance / enemy.speed * player.speed;
+
+		centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
+		if (distance > 2f)
+			freeSpace = SquareToElipse (new Vector2 (distance, distance));
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)
@@ -125,6 +138,28 @@ public class ToAnkleRobot : MonoBehaviour {
 			square.y = range*r*sinAng;
 		}
 		return (square);
+	}
+
+	
+	Vector2 SquareToElipse(Vector2 square)
+	{
+		float range;
+		float cosAng, sinAng;
+		Vector2 elipse = Vector2.zero;
+		
+		// ATAN2(((X-OX)*BY);((Y-OY)*BX))
+		float ang = Mathf.Atan2 (square.y, square.x);
+
+		cosAng = Mathf.Cos(ang);
+		sinAng = Mathf.Sin(ang);
+
+		range = Mathf.Abs(square.x) > Mathf.Abs(square.y) ?
+			square.x / player.boundary :
+			square.y / player.boundary;
+
+		elipse.x = origin.x + range * cosAng * bases.x;
+		elipse.y = origin.y + range * sinAng * bases.y;
+		return (elipse);
 	}
 
 }

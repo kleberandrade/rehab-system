@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 	private float playerScore, machineScore, lazyScore;				// Value Scores
 
-	private int targetMask;
+	[HideInInspector] public int targetMask;
 
 	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFilePos.txt";
 

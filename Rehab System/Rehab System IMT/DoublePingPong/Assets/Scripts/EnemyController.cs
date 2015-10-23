@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour {
 	private float pickUpTimeCount;	// Delay for next "pickup" placing
 	private float multiHitCheck;	// Variable auxiliar for checking multiple impact
 
-	private Rigidbody enemyBody;		// Enemy rigid body
+	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
 	void Awake(){
 		enemyBody = GetComponent<Rigidbody> ();
