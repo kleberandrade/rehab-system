@@ -53,7 +53,6 @@ public class AnklePackage : MonoBehaviour {
 		// Center of space plot
 		origin = space.position; // + size / 2;
 		origin += Vector2.Scale(size, new Vector2(1, -1)) / 2;
-		point = origin + Vector2.Scale (package.origin, size);
 
 		// Black Rectangle for space
 		GL.Color(Color.black);
@@ -62,23 +61,28 @@ public class AnklePackage : MonoBehaviour {
 
 		// Blue Elipse for package
 		GL.Color(Color.blue);
+		point = origin + Vector2.Scale (package.origin, size);
 		ElipseForm (point, Vector2.Scale(package.bases, size));
 		ElipseForm (point, Vector2.Scale(package.bases, size)*package.elipseScale);
 		CrossForm (point, 0.1f*size);
 
-		point = origin + Vector2.Scale (package.input, size);
 
-		// Red Dot for position
-		GL.Color(Color.red);
+		// Green Dot for position
+		GL.Color(Color.green);
+		point = origin + Vector2.Scale (package.input, size);
 		ElipseForm (point, 0.02f*size);
 
+		// Red Dot for enemy
+		GL.Color(Color.red);
+		ElipseForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
+
+		// Record the track
 		ankleTrack.Add (new Vector3 (
 			point.x / Screen.width, 
 			point.y / Screen.height, 0));
-
+		
+		// Black changing alpha for track
 		GL.Color (Color.black);
-
-
 		if (ankleTrack.Count > 1)
 		{
 			float aux = 1f;

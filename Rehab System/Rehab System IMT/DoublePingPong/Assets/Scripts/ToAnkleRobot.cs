@@ -11,7 +11,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	private const int HORIZONTAL = 1;	// or LEFT?
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
-	public bool activeConnection;
+	public bool activeConnection, activeHelper;
 
 	// Envelope do movimento
 	public Vector2 max, min;		// Input for elipse
@@ -24,7 +24,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	private Connection connection;
 
 	// Communication
-	public Vector2 input;
+	public Vector2 input, enemyPos;
 
 	[Space]
 
@@ -71,12 +71,21 @@ public class ToAnkleRobot : MonoBehaviour {
 			player.MoveWalls(player.ReadInput());
 			input = new Vector2
 				(
-				player.horizontalWalls [0].position.x/10f,
-				player.verticalWalls [0].position.z/10f
+				player.horizontalWalls [0].position.x/player.boundary,
+				player.verticalWalls [0].position.z/player.boundary
 				);
-			centerSpring = SquareToElipse(new Vector2(enemy.enemyBody.position.x, enemy.enemyBody.position.z));
+	//		centerSpring = SquareToElipse(new Vector2(enemy.enemyBody.position.x, enemy.enemyBody.position.z));
 		}
+		if (activeHelper)
+			PlayerHelper ();
+//		else 
+//		{ 
+//			K = 0;
+//			D = 0;
+//		}
 		Calibration (input);
+		enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
+		enemyPos = SquareToElipse (enemyPos);
 //		player.SetWalls(ElipseToSquare(input));
 //		}
 	}
@@ -102,8 +111,10 @@ public class ToAnkleRobot : MonoBehaviour {
 		float distance = enemyImpact.distance / enemy.speed * player.speed;
 
 		centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
-		if (distance > 2f)
+		if (distance > 0.5f)
 			freeSpace = SquareToElipse (new Vector2 (distance, distance));
+		else if (distance < 0.05f)
+			freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)
@@ -154,11 +165,11 @@ public class ToAnkleRobot : MonoBehaviour {
 		sinAng = Mathf.Sin(ang);
 
 		range = Mathf.Abs(square.x) > Mathf.Abs(square.y) ?
-			square.x / player.boundary :
-			square.y / player.boundary;
+			Mathf.Abs(square.x / player.boundaryDist) :
+			Mathf.Abs(square.y / player.boundaryDist);
 
-		elipse.x = origin.x + range * cosAng * bases.x;
-		elipse.y = origin.y + range * sinAng * bases.y;
+		elipse.x = origin.x + range * cosAng * bases.x / elipseScale;
+		elipse.y = origin.y + range * sinAng * bases.y / elipseScale;
 		return (elipse);
 	}
 

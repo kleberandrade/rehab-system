@@ -12,8 +12,8 @@ public class PlayerController : MonoBehaviour
 	public EnemyController enemy;		// The ball
 
 	[HideInInspector] public float boundary = 7.25f; 	// Boundary player movement
+	[HideInInspector] public float boundaryDist = 10f;	// Distance between boundary
 	private float outCut = 2f;			// Gap for helper control
-	private float boundaryDist = 10f;	// Distance between boundary
 
 	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 	private float playerScore, machineScore, lazyScore;				// Value Scores

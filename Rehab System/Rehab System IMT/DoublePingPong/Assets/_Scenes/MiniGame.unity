@@ -342,7 +342,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11495086, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: speed
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 122690, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: m_IsActive
@@ -379,7 +379,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab4d20c6ad4e6c4e8edfb9969cd3f23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeConnection: 0
+  activeConnection: 1
+  activeHelper: 0
   max: {x: .100000001, y: .100000001}
   min: {x: -.100000001, y: -.100000001}
   bases: {x: .100000001, y: .100000001}
@@ -388,6 +389,7 @@ MonoBehaviour:
   player: {fileID: 1489253699}
   enemy: {fileID: 475464696}
   input: {x: 0, y: 0}
+  enemyPos: {x: 0, y: 0}
   centerSpring: {x: 0, y: 0}
   freeSpace: {x: 0, y: 0}
   K: 1
@@ -1044,7 +1046,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!45 &550079184
 Skybox:
   m_ObjectHideFlags: 0
@@ -1208,7 +1210,7 @@ RectTransform:
   - {fileID: 1381727665}
   - {fileID: 1716501751}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -1388,6 +1390,10 @@ Prefab:
       propertyPath: lazyScoreText
       value: 
       objectReference: {fileID: 1381727666}
+    - target: {fileID: 11467016, guid: e51704ee401db0741b58dec47d505f63, type: 2}
+      propertyPath: speed
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e51704ee401db0741b58dec47d505f63, type: 2}
   m_IsPrefabParent: 0
