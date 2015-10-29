@@ -1,4 +1,4 @@
-﻿susing UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 using System.Text;
@@ -16,7 +16,7 @@ public class Connection : MonoBehaviour {
 	public const int ACC = 2;			// Robo
 	public const int FORCE = 3;			// Robo
 
-	private const int N_VAR = 4; 		// Numero de variaveis envolvidas
+	public const int N_VAR = 4; 		// Numero de variaveis envolvidas
 	private const int BIT_SIZE = 4; 	// Numero de bit da mascara; Deve ser multiplo de 2
 	private const int INFO_SIZE = 4;	// 4 Float; 8 Double
 	
