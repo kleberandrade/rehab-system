@@ -15,6 +15,7 @@ TagManager:
   - Sky
   - PickUp
   - Connection
+  - PickUpWall
   layers:
   - Default
   - TransparentFX

@@ -98,7 +98,7 @@ GameObject:
   - 65: {fileID: 84593778}
   m_Layer: 8
   m_Name: South Wall
-  m_TagString: Untagged
+  m_TagString: PickUpWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -118,8 +118,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 84593775}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -9}
-  m_LocalScale: {x: 18, y: 2, z: .200000003}
+  m_LocalPosition: {x: 0, y: 0, z: -9.35000038}
+  m_LocalScale: {x: 18.5, y: 2, z: .200000003}
   m_Children: []
   m_Father: {fileID: 2041219598}
   m_RootOrder: 2
@@ -302,7 +302,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 422690, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 25.5
+      value: 23.7999992
       objectReference: {fileID: 0}
     - target: {fileID: 422690, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: m_LocalPosition.z
@@ -342,7 +342,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11495086, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: speed
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 122690, guid: dd0b665c7434a7d4fb118902e2195109, type: 2}
       propertyPath: m_IsActive
@@ -515,7 +515,7 @@ Transform:
   - {fileID: 2022830671}
   - {fileID: 940547539}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
 --- !u!1 &351389717
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,7 +818,7 @@ Transform:
   - {fileID: 248662998}
   - {fileID: 817622842}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 5
 --- !u!1 &449410629
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,7 +1102,7 @@ Transform:
   - {fileID: 2042796276}
   - {fileID: 351389719}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 7
 --- !u!1 &679087807
 GameObject:
   m_ObjectHideFlags: 0
@@ -1483,7 +1483,7 @@ GameObject:
   - 65: {fileID: 978472729}
   m_Layer: 8
   m_Name: East Wall
-  m_TagString: Untagged
+  m_TagString: PickUpWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1503,8 +1503,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 978472726}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9, y: 0, z: 0}
-  m_LocalScale: {x: .200000003, y: 2, z: 18}
+  m_LocalPosition: {x: 9.35000038, y: 0, z: 0}
+  m_LocalScale: {x: .200000003, y: 2, z: 18.5}
   m_Children: []
   m_Father: {fileID: 2041219598}
   m_RootOrder: 1
@@ -1964,7 +1964,7 @@ GameObject:
   - 65: {fileID: 1490754714}
   m_Layer: 8
   m_Name: West Wall
-  m_TagString: Untagged
+  m_TagString: PickUpWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1984,8 +1984,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1490754711}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9, y: 0, z: 0}
-  m_LocalScale: {x: .200000003, y: 2, z: 18}
+  m_LocalPosition: {x: -9.35000038, y: 0, z: 0}
+  m_LocalScale: {x: .200000003, y: 2, z: 18.5}
   m_Children: []
   m_Father: {fileID: 2041219598}
   m_RootOrder: 0
@@ -2223,7 +2223,7 @@ GameObject:
   - 65: {fileID: 1720749927}
   m_Layer: 8
   m_Name: North Wall
-  m_TagString: Untagged
+  m_TagString: PickUpWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -2243,8 +2243,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1720749924}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 9}
-  m_LocalScale: {x: 18, y: 2, z: .200000003}
+  m_LocalPosition: {x: 0, y: 0, z: 9.35000038}
+  m_LocalScale: {x: 18.5, y: 2, z: .200000003}
   m_Children: []
   m_Father: {fileID: 2041219598}
   m_RootOrder: 3
@@ -2358,7 +2358,7 @@ GameObject:
   - 4: {fileID: 2041219598}
   m_Layer: 8
   m_Name: Boundary Pick Up
-  m_TagString: Untagged
+  m_TagString: PickUpWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -2378,7 +2378,7 @@ Transform:
   - {fileID: 84593777}
   - {fileID: 1720749926}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
 --- !u!1 &2042796275
 GameObject:
   m_ObjectHideFlags: 0

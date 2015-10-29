@@ -25,6 +25,7 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	// Communication
 	public Vector2 input, enemyPos;
+	private float timeFree;
 
 	[Space]
 
@@ -38,6 +39,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		connection = GetComponent<Connection>();
 		File.WriteAllText (textFile, "Horizoltal\tVertical\tH_Elipse\tV_Elipse" + Environment.NewLine);
+		timeFree = -100f;
 	}
 
 //	void Start()
@@ -110,11 +112,18 @@ public class ToAnkleRobot : MonoBehaviour {
 	//	Vector3 playerTrack = enemyImpact.point - player.GetPosition ();
 		float distance = enemyImpact.distance / enemy.speed * player.speed;
 
-		centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
-		if (distance > 0.5f)
-			freeSpace = SquareToElipse (new Vector2 (distance, distance));
-		else if (distance < 0.05f)
-			freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
+		timeFree += Time.deltaTime;
+		if (timeFree > 0f)
+		{
+			centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
+			if (distance > 0.5f)
+				freeSpace = SquareToElipse (new Vector2 (distance, distance));
+			else if (distance < 0.05f)
+				{
+				freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
+				timeFree = -100f;
+				}
+		}
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)

@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyController : MonoBehaviour {
 
 	public float speed;	// Enemy speed
-	public float timeDelay = 0.5f;	// Delay for creating another "pickup"
+//	public float timeDelay = 0.5f;	// Delay for creating another "pickup"
 
 	public GameObject pickUp;		// Pickup will appear on the next impact point
 	public RaycastHit enemyTrack;
@@ -16,33 +16,52 @@ public class EnemyController : MonoBehaviour {
 
 	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
+	public int onTagPickUp, onWallHit;
+	public Collider show;
+
 	void Awake(){
 		enemyBody = GetComponent<Rigidbody> ();
-		pickUpMask = LayerMask.GetMask ("PickUp");
 	}
 
 	void Start () 
 	{
-		enemyBody.velocity = RandVectOnGround();	// Inicialize with a random velocity
+//		enemyBody.velocity = RandVectOnGround()*speed;	// Inicialize with a random velocity
+		enemyBody.velocity = 0.2f * Vector3.down;
 		multiHitCheck = Time.time;
 		pickUpTimeCount = 0f;
+		onTagPickUp = 0;
+		onWallHit = 0;
+		pickUpMask = LayerMask.GetMask ("PickUp");
 	}
 
 	void FixedUpdate()
 	{
-		float vy = enemyBody.velocity.y;
-		enemyBody.velocity = enemyBody.velocity.normalized * speed;	// Even setting drag to zero, body still losing energy, so this keep the speed
-		enemyBody.velocity = new Vector3(enemyBody.velocity.x, vy, enemyBody.velocity.z);
+		if (Mathf.Abs(enemyBody.velocity.y) < Mathf.Epsilon)
+		{
+			if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
+			{
+				enemyBody.velocity = RandVectOnGround()*speed;
+				if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
+					Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+			}
+			else
+			{
+				enemyBody.velocity = enemyBody.velocity.normalized * speed;
+			}
+		}
 
 		// Counting delay for new "pickup" 
-		pickUpTimeCount += Time.deltaTime;	
-		if (pickUpTimeCount > timeDelay)	
-		{
-			enemyTrack = FindImpact(pickUpMask);
-			Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
-			pickUpTimeCount = -100f;
+//		pickUpTimeCount += Time.deltaTime;	
 
-		}
+	//	GameObject aux = GameObject.FindGameObjectsWithTag("PickUp")
+		//if (GameObject.FindGameObjectWithTag("PickUp") == null)
+	//	if (pickUpTimeCount > 0f)
+//		{
+//			enemyTrack = FindImpact(pickUpMask);
+//			Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+//			pickUpTimeCount = -3f;
+//
+//		}
 
 		// Alternative enemy control for testing
 		MoveEnemy();
@@ -50,35 +69,41 @@ public class EnemyController : MonoBehaviour {
 
 	void HitWall(string wall)
 	{
-		if (Mathf.Abs(multiHitCheck - Time.time) <= Mathf.Epsilon)
+//		if (Mathf.Abs(multiHitCheck - Time.time) <= Mathf.Epsilon)
+//		{
+//			enemyBody.velocity = new Vector3(-enemyBody.position.x, 0f, -enemyBody.position.z);
+//			return;
+//		}
+		if (onWallHit > 1)
+			enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
+		else 
 		{
-			enemyBody.velocity = new Vector3(-enemyBody.position.x, 0f, -enemyBody.position.z);
-			return;
+			switch (wall) {
+			case "Vertical":
+				enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, Random.Range (-speed, speed));
+				break;
+			case "Horizontal": 
+				enemyBody.velocity = new Vector3 (Random.Range (-speed, speed), 0f, -enemyBody.velocity.z);
+				break;
+			case "Tower":
+				enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
+				break;
+			}
 		}
-		switch (wall)
-		{
-		case "Vertical":
-			enemyBody.velocity = new Vector3(-enemyBody.velocity.x, 0f, Random.Range(-speed, speed));
-			break;
-		case "Horizontal": 
-			enemyBody.velocity = new Vector3(Random.Range(-speed, speed), 0f, -enemyBody.velocity.z);
-			break;
-		case "Tower":
-			enemyBody.velocity = new Vector3(-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
-			break;
-		}
-		multiHitCheck = Time.time;
-		enemyBody.velocity = enemyBody.velocity.normalized * speed;
-		pickUpTimeCount = 0f;
+	//	multiHitCheck = Time.time;
+		enemyBody.velocity = enemyBody.velocity.normalized*speed;
+//		pickUpTimeCount = 0f;
 	}
 
 	void OnTriggerEnter(Collider other)
 	{
+		show = other;
 		switch (other.gameObject.tag) 
 		{
 		case "Vertical":
 		case "Horizontal":
 		case "Tower":
+			onWallHit ++;
 			HitWall(other.gameObject.tag); 
 			break;
 		case "PickUp":
@@ -86,17 +111,39 @@ public class EnemyController : MonoBehaviour {
 			break;
 		case "Sky":
 			enemyBody.position = new Vector3(0f, 23.5f, 0f); // Vector3.zero;
-			enemyBody.velocity = RandVectOnGround();
+			enemyBody.velocity = Vector3.zero;
+			break;
+		case "PickUpWall":
+			onTagPickUp ++;
+			break;
+		}
+	}
+
+	void OnTriggerExit(Collider other)
+	{
+		switch (other.gameObject.tag) 
+		{
+		case "Vertical":
+		case "Horizontal":
+		case "Tower":
+			onWallHit --;
+			break;
+		case "PickUpWall":
+			onTagPickUp --;
+			if (onTagPickUp == 0)
+			{
+				enemyTrack = FindImpact(pickUpMask);
+				Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+			}
 			break;
 		}
 	}
 
 	public RaycastHit FindImpact(int mask)
 	{
-		Ray ballTrack = new Ray(enemyBody.position, enemyBody.velocity.normalized);
 		RaycastHit boundaryHit;
 
-		Physics.Raycast (ballTrack, out boundaryHit, 60f, mask);
+		Physics.Raycast(enemyBody.position, enemyBody.velocity, out boundaryHit, 60f, mask);
 		
 		return boundaryHit;
 	}
