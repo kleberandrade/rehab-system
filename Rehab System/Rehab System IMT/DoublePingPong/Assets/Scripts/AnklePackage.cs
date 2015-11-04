@@ -75,7 +75,7 @@ public class AnklePackage : MonoBehaviour {
 		CrossForm (point, 0.02f*size);
 
 		// Green Lines for helper
-		GL.Color(new Color(0.0f, 0.7f, 0.0f, 1.0f));
+		GL.Color(new Color(0.0f, 0.4f, 0.0f, 1.0f));
 		ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
 		CrossForm (origin + Vector2.Scale (package.centerSpring, size), 0.02f*size);
 
@@ -162,8 +162,4 @@ public class AnklePackage : MonoBehaviour {
 		}
 	}
 
-	void Vertex2(Vector2 v)
-	{
-		GL.Vertex (v);
-	}
 }

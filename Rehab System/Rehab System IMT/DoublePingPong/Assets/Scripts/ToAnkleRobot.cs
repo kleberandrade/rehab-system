@@ -133,39 +133,25 @@ public class ToAnkleRobot : MonoBehaviour {
 		origin = (max + min) / 2;
 	}
 
-	[Space]
-	public Vector2 impactPointSquare;
-	public Vector2 impactPointElipse;
-	public float distance;
 
 	void PlayerHelper()
 	{
-		RaycastHit enemyImpact = enemy.FindImpact (targetMask);
-	//	Vector3 playerTrack = enemyImpact.point - player.GetPosition ();
+		Vector2 impact, safeArea, track, distance;
+		impact = new Vector2 (
+			enemy.FindImpact(targetMask).point.x, 
+			enemy.FindImpact(targetMask).point.z);
 
-		impactPointSquare = new Vector2 (enemyImpact.point.x, enemyImpact.point.z);
-		impactPointElipse = SquareToElipse (impactPointSquare);
+		safeArea = new Vector2 (
+			player.boundaryDist - Mathf.Abs (impact.y) + 0.2f,
+			player.boundaryDist - Mathf.Abs (impact.x) + 0.2f);
 
-		timeFree += Time.deltaTime;
-		if (timeFree > 0f)
-		{
-			distance = enemyImpact.distance / enemy.speed * player.speed;
-			centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
-	
+		track = new Vector2	(
+			Mathf.Abs(enemy.enemyBody.position.x - impact.x),
+			Mathf.Abs(enemy.enemyBody.position.z - impact.y));
 
-			if (distance > 0.5f)
-				freeSpace = SquareToElipse (new Vector2 (distance, distance));
-			else if (enemy.missWall || (distance < 0.05f))
-					{
-	//				freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
-					timeFree = -3.0f;
-					}
-		}
-		else 
-		{
-			float fade = Mathf.Lerp(distance, player.boundaryDist / enemy.speed * player.speed, (3f + timeFree)/3f);
-			freeSpace = SquareToElipse (new Vector2 (fade, fade));
-		}
+		distance = (track + safeArea) / enemy.speed * player.speed;
+		centerSpring = SquareToElipse (impact);
+		freeSpace = SquareToElipse (distance);
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)
