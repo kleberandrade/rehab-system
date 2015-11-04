@@ -28,6 +28,9 @@ public class ToAnkleRobot : MonoBehaviour {
 	public Vector2 input, enemyPos;
 	private float timeFree;
 
+	// Control
+	private int targetMask;
+
 	[Space]
 
 	public Vector2 centerSpring;
@@ -49,14 +52,15 @@ public class ToAnkleRobot : MonoBehaviour {
 									 "Vel\t\t" +
 									 "Torque" +
 		                   			Environment.NewLine);
-		timeFree = -100f;
+		targetMask = LayerMask.GetMask ("Target");
+		timeFree = 0f;
 	}
 
 //	void Start()
 //	{
 //	}
 
-	void Update () 
+	void FixedUpdate () 
 	{
 		if (activeConnection)
 		{
@@ -107,6 +111,7 @@ public class ToAnkleRobot : MonoBehaviour {
 
 		if (activeHelper)
 			PlayerHelper ();
+
 		if (followBall)
 			centerSpring = enemyPos;
 
@@ -128,23 +133,38 @@ public class ToAnkleRobot : MonoBehaviour {
 		origin = (max + min) / 2;
 	}
 
+	[Space]
+	public Vector2 impactPointSquare;
+	public Vector2 impactPointElipse;
+	public float distance;
+
 	void PlayerHelper()
 	{
-		RaycastHit enemyImpact = enemy.FindImpact (player.targetMask);
+		RaycastHit enemyImpact = enemy.FindImpact (targetMask);
 	//	Vector3 playerTrack = enemyImpact.point - player.GetPosition ();
-		float distance = enemyImpact.distance / enemy.speed * player.speed;
+
+		impactPointSquare = new Vector2 (enemyImpact.point.x, enemyImpact.point.z);
+		impactPointElipse = SquareToElipse (impactPointSquare);
 
 		timeFree += Time.deltaTime;
 		if (timeFree > 0f)
 		{
+			distance = enemyImpact.distance / enemy.speed * player.speed;
 			centerSpring = SquareToElipse (new Vector2 (enemyImpact.point.x, enemyImpact.point.z));
+	
+
 			if (distance > 0.5f)
 				freeSpace = SquareToElipse (new Vector2 (distance, distance));
-			else if (distance < 0.05f)
-				{
-				freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
-				timeFree = -100f;
-				}
+			else if (enemy.missWall || (distance < 0.05f))
+					{
+	//				freeSpace = SquareToElipse (new Vector2 (player.boundaryDist, player.boundaryDist));
+					timeFree = -3.0f;
+					}
+		}
+		else 
+		{
+			float fade = Mathf.Lerp(distance, player.boundaryDist / enemy.speed * player.speed, (3f + timeFree)/3f);
+			freeSpace = SquareToElipse (new Vector2 (fade, fade));
 		}
 	}
 

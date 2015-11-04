@@ -67,14 +67,22 @@ public class AnklePackage : MonoBehaviour {
 		CrossForm (point, 0.1f*size);
 
 
-		// Green Dot for position
-		GL.Color(Color.green);
+		// Black Dot for position
+		GL.Color(Color.black);
 		point = origin + Vector2.Scale (package.input, size);
 		ElipseForm (point, 0.02f*size);
+		ElipseForm (point, 0.03f*size);
+		CrossForm (point, 0.02f*size);
+
+		// Green Lines for helper
+		GL.Color(new Color(0.0f, 0.7f, 0.0f, 1.0f));
+		ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
+		CrossForm (origin + Vector2.Scale (package.centerSpring, size), 0.02f*size);
 
 		// Red Dot for enemy
 		GL.Color(Color.red);
 		ElipseForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
+		CrossForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (

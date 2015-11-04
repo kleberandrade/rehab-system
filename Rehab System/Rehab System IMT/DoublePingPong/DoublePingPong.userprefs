@@ -2,11 +2,11 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\ToAnkleRobot.cs">
     <Files>
-      <File FileName="Assets\Scripts\AnklePackage.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\EnemyController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Rotator.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\ToAnkleRobot.cs" Line="37" Column="134" />
+      <File FileName="Assets\Scripts\ToAnkleRobot.cs" Line="156" Column="12" />
       <File FileName="Assets\Scripts\Connection.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\AnklePackage.cs" Line="78" Column="31" />
+      <File FileName="Assets\Scripts\EnemyController.cs" Line="145" Column="20" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="21" Column="9" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

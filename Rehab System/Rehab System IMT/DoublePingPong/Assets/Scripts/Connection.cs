@@ -36,23 +36,28 @@ public class Connection : MonoBehaviour {
 	void Start()
 	{
 		timeDelay = 0.01f;
-		clientHere.Connect ("192.168.0.66", 8010, 0); // Here 192.168.0.67
+		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();
 		InitializeVariables (2); // Entre com o numero de robos
 	//	ClearMask ();
-	//	StartCoroutine(SendReceive ());
+//		StartCoroutine(ConnectionUpdate());
 	}
 
-	void Update()
+//	private IEnumerator ConnectionUpdate()
+	void FixedUpdate()
 	{
-		if (delayCount > timeDelay) {
+//	while (true)
+//		{
+//		if (delayCount > timeDelay) {
 			SendMsg ();
 			ClearMask ();
 			ReadMsg ();
-			delayCount = 0f;
-		} else
-			delayCount = Time.deltaTime;
+//			delayCount = 0f;
+//		} else
+//			delayCount += Time.fixedDeltaTime;
+//		}
+	//	yield return null;
 	}
 
 	public void SetStatus(int robot, float mag, int variable)
@@ -86,13 +91,28 @@ public class Connection : MonoBehaviour {
 	private void ReadMsg()
 	{
 		byte[] buffer = clientHere.ReceiveByte ();
-		for (int i = 0; i < n_Robots; i++)
+
+		// Check if message is different than zero
+		bool check = false;
+		foreach(byte element in buffer)
 		{
-			for (int j = 0; j < N_VAR; j++)
+			if (element != 0x0)
 			{
-				robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
+				check = true;
+				break;
 			}
-//			Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+		}
+
+		if (check)
+		{
+			for (int i = 0; i < n_Robots; i++)
+			{
+				for (int j = 0; j < N_VAR; j++)
+				{
+					robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
+				}
+	//			Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+			}
 		}
 		return;
 	}

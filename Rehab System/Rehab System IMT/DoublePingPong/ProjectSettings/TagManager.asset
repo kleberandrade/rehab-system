@@ -16,6 +16,7 @@ TagManager:
   - PickUp
   - Connection
   - PickUpWall
+  - Boundary
   layers:
   - Default
   - TransparentFX

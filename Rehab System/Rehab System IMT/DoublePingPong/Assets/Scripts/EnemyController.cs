@@ -17,6 +17,7 @@ public class EnemyController : MonoBehaviour {
 	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
 	public int onTagPickUp, onWallHit;
+	public bool missWall;
 	public Collider show;
 
 	void Awake(){
@@ -31,6 +32,7 @@ public class EnemyController : MonoBehaviour {
 		pickUpTimeCount = 0f;
 		onTagPickUp = 0;
 		onWallHit = 0;
+		missWall = false;
 		pickUpMask = LayerMask.GetMask ("PickUp");
 	}
 
@@ -116,6 +118,9 @@ public class EnemyController : MonoBehaviour {
 		case "PickUpWall":
 			onTagPickUp ++;
 			break;
+		case "Boundary":
+			missWall = true;
+			break;
 		}
 	}
 
@@ -135,6 +140,9 @@ public class EnemyController : MonoBehaviour {
 				enemyTrack = FindImpact(pickUpMask);
 				Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
 			}
+			break;
+		case "Boundary":
+			missWall = false;
 			break;
 		}
 	}
