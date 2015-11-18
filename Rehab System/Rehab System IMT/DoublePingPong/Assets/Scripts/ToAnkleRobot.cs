@@ -138,16 +138,16 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		Vector2 impact, safeArea, track, distance;
 		impact = new Vector2 (
-			enemy.FindImpact(targetMask).point.x, 
-			enemy.FindImpact(targetMask).point.z);
+			Mathf.Clamp(enemy.FindImpact(targetMask).point.x, -player.boundary, player.boundary), 
+			Mathf.Clamp(enemy.FindImpact(targetMask).point.z, -player.boundary, player.boundary));
 
 		safeArea = new Vector2 (
-			player.boundaryDist - Mathf.Abs (impact.y) + 0.2f,
-			player.boundaryDist - Mathf.Abs (impact.x) + 0.2f);
+			player.boundary - Mathf.Abs (impact.y),
+			player.boundary - Mathf.Abs (impact.x));
 
 		track = new Vector2	(
-			Mathf.Abs(enemy.enemyBody.position.x - impact.x),
-			Mathf.Abs(enemy.enemyBody.position.z - impact.y));
+			Mathf.Abs(Mathf.Clamp(enemy.enemyBody.position.x, -player.boundary, player.boundary) - impact.x) + 0.5f,
+			Mathf.Abs(Mathf.Clamp(enemy.enemyBody.position.z, -player.boundary, player.boundary) - impact.y) + 0.5f);
 
 		distance = (track + safeArea) / enemy.speed * player.speed;
 		centerSpring = SquareToElipse (impact);
@@ -205,8 +205,8 @@ public class ToAnkleRobot : MonoBehaviour {
 			Mathf.Abs(square.x / player.boundaryDist) :
 			Mathf.Abs(square.y / player.boundaryDist);
 
-		elipse.x = origin.x + range * cosAng * bases.x / elipseScale;
-		elipse.y = origin.y + range * sinAng * bases.y / elipseScale;
+		elipse.x = origin.x + range * cosAng * bases.x; // / elipseScale;
+		elipse.y = origin.y + range * sinAng * bases.y; // / elipseScale;
 		return (elipse);
 	}
 

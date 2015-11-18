@@ -63,7 +63,7 @@ public class AnklePackage : MonoBehaviour {
 		GL.Color(Color.blue);
 		point = origin + Vector2.Scale (package.origin, size);
 		ElipseForm (point, Vector2.Scale(package.bases, size));
-		ElipseForm (point, Vector2.Scale(package.bases, size)*package.elipseScale);
+		ElipseForm (point, Vector2.Scale(package.bases, size)/package.elipseScale);
 		CrossForm (point, 0.1f*size);
 
 

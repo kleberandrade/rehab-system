@@ -395,10 +395,6 @@ MonoBehaviour:
   freeSpace: {x: .00999999978, y: .00999999978}
   K: 1
   D: .100000001
-  impact: {x: 0, y: 0}
-  safeArea: {x: 0, y: 0}
-  track: {x: 0, y: 0}
-  distance: {x: 0, y: 0}
 --- !u!114 &236470448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1397,7 +1393,7 @@ Prefab:
       objectReference: {fileID: 1381727666}
     - target: {fileID: 11467016, guid: e51704ee401db0741b58dec47d505f63, type: 2}
       propertyPath: speed
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e51704ee401db0741b58dec47d505f63, type: 2}

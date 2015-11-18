@@ -24,12 +24,12 @@ public class NetworkClientUDP : NetworkClient {
 		}
 		catch( Exception e ) 
 		{
-			Debug.Log( e.ToString() );
+			Debug.Log("Error Creating UDP Client: " + e.ToString() );
 		}
 	}
 
 	public override void Connect( string host, int remotePort, int localPort ) 
-	{	
+	{
 		//client.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true );
 
 		base.Connect( host, remotePort, localPort );
@@ -42,7 +42,7 @@ public class NetworkClientUDP : NetworkClient {
 	}
 
 	private void updateCallback() 
-	{	
+	{
 		isReceiving = true;
 
 		Debug.Log( "NetworkClientUDP: Starting to receive messages" );
@@ -73,7 +73,7 @@ public class NetworkClientUDP : NetworkClient {
 					}
 					catch( IndexOutOfRangeException e )
 					{
-						Debug.Log( e.ToString() );
+						Debug.Log("Error at Queue: " + e.ToString() );
 					}
 
 					lock( searchLock )
@@ -85,7 +85,7 @@ public class NetworkClientUDP : NetworkClient {
 		}
 		catch( ObjectDisposedException e ) 
 		{
-			Debug.Log( e.ToString() );
+			Debug.Log("Error Update Callback: " + e.ToString() );
 		}
 		
 		Disconnect();
@@ -94,7 +94,7 @@ public class NetworkClientUDP : NetworkClient {
 	}
 
 	public override string ReceiveString() 
-	{	
+	{
 		if( messageQueue.Count > 0 )
 		{
 			try
@@ -108,7 +108,7 @@ public class NetworkClientUDP : NetworkClient {
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString() );
+				Debug.Log("Error Receiving: " + e.ToString() );
 			}
 		}
 

@@ -8,7 +8,7 @@ using System.Net.Sockets;
 public class NetworkClientTCP : NetworkClient {
 	
 	public NetworkClientTCP() 
-	{	
+	{
 		try 
 		{
 			client = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -16,7 +16,7 @@ public class NetworkClientTCP : NetworkClient {
 		}
 		catch( Exception e ) 
 		{
-			Debug.Log( e.ToString() );
+			Debug.Log("Error Creating TPC Client: " + e.ToString() );
 		}
 		
 	}
@@ -40,7 +40,7 @@ public class NetworkClientTCP : NetworkClient {
 			} 
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString () );
+				Debug.Log("Error Receiving: " + e.ToString () );
 			}
 		}
 		
@@ -66,9 +66,10 @@ public class NetworkClientTCP : NetworkClient {
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString () );
+				Debug.Log("Error Receiving: " +  e.ToString () );
 			}
 		}
+		//else Debug.Log("Not Connected");
 		Array.Clear( inputBuffer, 0, inputBuffer.Length );
 		return inputBuffer;
 	}
