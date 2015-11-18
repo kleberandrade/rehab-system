@@ -53,24 +53,25 @@ public class NetworkClientTCP : NetworkClient {
 		{
 			try 
 			{
+				while (!(client.Available > 0));
+//				if( client.Available > 0 )
+//				{
 				Array.Clear( inputBuffer, 0, inputBuffer.Length );
-				if( client.Available > 0 )
-				{
-					client.Receive( inputBuffer );
-					
-	//				Debug.Log( "Received string: " + Encoding.ASCII.GetString( inputBuffer ) );
-					
-					return inputBuffer;
-				}
-				else Debug.Log( "No receiving" );
+				client.Receive( inputBuffer );
+				
+//				Debug.Log( "Received string: " + Encoding.ASCII.GetString( inputBuffer ) );
+				
+				return inputBuffer;
+//				}
+		//		else Debug.Log( "No receiving" );
 			}
 			catch( Exception e ) 
 			{
 				Debug.Log("Error Receiving: " +  e.ToString () );
 			}
 		}
-		//else Debug.Log("Not Connected");
-		Array.Clear( inputBuffer, 0, inputBuffer.Length );
+		else Debug.Log("Not Connected");
+//		Array.Clear( inputBuffer, 0, inputBuffer.Length );
 		return inputBuffer;
 	}
 	

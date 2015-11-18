@@ -391,6 +391,8 @@ MonoBehaviour:
   enemy: {fileID: 475464696}
   input: {x: 0, y: 0}
   enemyPos: {x: 0, y: 0}
+  helperLimit: .100000001
+  helperFade: .5
   centerSpring: {x: 0, y: 0}
   freeSpace: {x: .00999999978, y: .00999999978}
   K: 1

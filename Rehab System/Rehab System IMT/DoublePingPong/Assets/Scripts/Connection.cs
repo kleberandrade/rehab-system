@@ -111,7 +111,7 @@ public class Connection : MonoBehaviour {
 				{
 					robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
 				}
-	//			Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+//				Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
 			}
 		}
 		return;

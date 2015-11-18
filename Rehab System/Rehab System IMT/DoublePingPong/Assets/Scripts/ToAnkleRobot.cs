@@ -30,6 +30,8 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	// Control
 	private int targetMask;
+	public float helperLimit;
+	public float helperFade;
 
 	[Space]
 
@@ -133,25 +135,45 @@ public class ToAnkleRobot : MonoBehaviour {
 		origin = (max + min) / 2;
 	}
 
-
 	void PlayerHelper()
 	{
-		Vector2 impact, safeArea, track, distance;
+		Vector2 impact, impactBoundary, safeArea, track, distance;
 		impact = new Vector2 (
+			enemy.FindImpact(targetMask).point.x, 
+			enemy.FindImpact(targetMask).point.z);
+		
+		impactBoundary = new Vector2 (
 			Mathf.Clamp(enemy.FindImpact(targetMask).point.x, -player.boundary, player.boundary), 
 			Mathf.Clamp(enemy.FindImpact(targetMask).point.z, -player.boundary, player.boundary));
-
+		
 		safeArea = new Vector2 (
-			player.boundary - Mathf.Abs (impact.y),
-			player.boundary - Mathf.Abs (impact.x));
-
+			player.boundary - Mathf.Abs (impactBoundary.y),
+			player.boundary - Mathf.Abs (impactBoundary.x));
+		
 		track = new Vector2	(
-			Mathf.Abs(Mathf.Clamp(enemy.enemyBody.position.x, -player.boundary, player.boundary) - impact.x) + 0.5f,
-			Mathf.Abs(Mathf.Clamp(enemy.enemyBody.position.z, -player.boundary, player.boundary) - impact.y) + 0.5f);
-
+			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
+			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
+		
 		distance = (track + safeArea) / enemy.speed * player.speed;
-		centerSpring = SquareToElipse (impact);
-		freeSpace = SquareToElipse (distance);
+		
+		if (helperFade >= 1f)
+		{
+			if ((centerSpring - SquareToElipse (impact)).magnitude < 0.05f)
+			{
+				centerSpring = SquareToElipse (impact);
+				freeSpace = SquareToElipse (distance);
+			}
+			else
+			{
+				helperFade = 0f;
+			}
+		}
+		else
+		{
+			centerSpring = Vector2.Lerp( centerSpring, SquareToElipse (impact), helperFade);
+			freeSpace = Vector2.Lerp( freeSpace, SquareToElipse (distance), helperFade);
+			helperFade += Time.deltaTime;
+		}
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)
