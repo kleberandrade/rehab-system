@@ -1,0 +1,20 @@
+<resources>
+  <string name="register">The Catcher © 2011-2014 Trinus Studio. All right reserved.</string>
+  <string name="remember_login">Remember account</string>
+  <string name="login">Account Name</string>
+  <string name="password">Password</string>
+  <string name="region">Region</string>
+  <string name="login_button">Login</string>
+  <string name="account_button">Manage Account</string>
+  <string name="credits_button">Credits</string>
+  <string name="options_button">Options</string>
+  <string name="exit_button">Exit</string>
+  <string name="exit_message">Are sure you want to exit system?</string>
+  <string name="exit_title">Exit</string>
+  <string name="login_title">Server Autentication</string>
+  <string name="login_message">Connecting and Authenticating credentials</string>
+  <string name="login_error_title">Exit</string>
+  <string name="login_error_message">Exit</string>
+  <string name="lang_brazil">Portuguese (BR)</string>
+  <string name="lang_english">English (US)</string>
+</resources>
