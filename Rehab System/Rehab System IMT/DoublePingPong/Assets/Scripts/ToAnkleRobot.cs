@@ -138,21 +138,27 @@ public class ToAnkleRobot : MonoBehaviour {
 	void PlayerHelper()
 	{
 		Vector2 impact, impactBoundary, safeArea, track, distance;
+		float impactDist;
+
+		impactDist = enemy.FindImpact (targetMask).distance + helperLimit;
+
 		impact = new Vector2 (
 			enemy.FindImpact(targetMask).point.x, 
 			enemy.FindImpact(targetMask).point.z);
-		
+
 		impactBoundary = new Vector2 (
-			Mathf.Clamp(enemy.FindImpact(targetMask).point.x, -player.boundary, player.boundary), 
-			Mathf.Clamp(enemy.FindImpact(targetMask).point.z, -player.boundary, player.boundary));
+			Mathf.Clamp(impact.x, -player.boundary, player.boundary), 
+			Mathf.Clamp(impact.y, -player.boundary, player.boundary));
 		
 		safeArea = new Vector2 (
 			player.boundary - Mathf.Abs (impactBoundary.y),
 			player.boundary - Mathf.Abs (impactBoundary.x));
 		
-		track = new Vector2	(
-			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
-			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
+//		track = new Vector2	(
+//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
+//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
+
+		track = new Vector2 (impactDist, impactDist);
 		
 		distance = (track + safeArea) / enemy.speed * player.speed;
 		
