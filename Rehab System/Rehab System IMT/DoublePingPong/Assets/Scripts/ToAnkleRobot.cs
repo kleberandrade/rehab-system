@@ -100,13 +100,7 @@ public class ToAnkleRobot : MonoBehaviour {
 				player.horizontalWalls [0].position.x/player.boundary,
 				player.verticalWalls [0].position.z/player.boundary
 				);
-	//		centerSpring = SquareToElipse(new Vector2(enemy.enemyBody.position.x, enemy.enemyBody.position.z));
 		}
-//		else 
-//		{ 
-//			K = 0;
-//			D = 0;
-//		}
 		Calibration (input);
 		enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
 		enemyPos = SquareToElipse (enemyPos);
@@ -116,9 +110,6 @@ public class ToAnkleRobot : MonoBehaviour {
 
 		if (followBall)
 			centerSpring = enemyPos;
-
-		//		player.SetWalls(ElipseToSquare(input));
-//		}
 	}
 
 	void Calibration(Vector2 position)
@@ -239,33 +230,3 @@ public class ToAnkleRobot : MonoBehaviour {
 	}
 
 }
-//		if (player.controlActive) 
-//		{
-//			Vector3 position = enemy.enemyTrack.point / player.boundary;
-//			connection.SetStatus (ESQUERDO, position.z * desloc_max + position.x * ang_max / 2, Connection.POSITION);
-//			connection.SetStatus (DIREITO, position.z * desloc_max - position.x * ang_max / 2, Connection.POSITION);
-//
-//			Vector3 velocity = new Vector3(
-//				player.horizontalWalls[0].GetComponent<Rigidbody> ().velocity.x / player.speed,
-//				0,
-//				player.verticalWalls[0].GetComponent<Rigidbody> ().velocity.z / player.speed
-//				);
-//			connection.SetStatus (ESQUERDO, velocity.z * speed_max + velocity.x * rot_max / 2, Connection.VELOCITY);
-//			connection.SetStatus (DIREITO, velocity.z * speed_max - velocity.x * rot_max / 2, Connection.VELOCITY);
-//
-//			connection.SetStatus (ESQUERDO, K, Connection.STIFF);
-//			connection.SetStatus (DIREITO, K, Connection.STIFF);
-//			connection.SetStatus (ESQUERDO, D, Connection.DAMP);
-//			connection.SetStatus (DIREITO, D, Connection.DAMP);
-//		} else
-//			{
-//			connection.SetStatus (ESQUERDO, player.v_aux * speed_max + player.h_aux * rot_max / 2, Connection.VELOCITY);
-//			connection.SetStatus (DIREITO, player.v_aux * speed_max - player.h_aux * rot_max / 2, Connection.VELOCITY);
-//			connection.ClearMask ();
-//
-////			h = (connection.ReadStatus(ESQUERDO, Connection.VELOCITY) - connection.ReadStatus(DIREITO, Connection.VELOCITY))/rot_max;
-////			v = (connection.ReadStatus(ESQUERDO, Connection.VELOCITY) + connection.ReadStatus(DIREITO, Connection.VELOCITY))/(rot_max*2);
-////			player.MoveWalls(v, h);
-//			}
-//	}
-//}

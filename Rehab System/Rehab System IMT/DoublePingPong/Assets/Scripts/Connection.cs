@@ -41,23 +41,13 @@ public class Connection : MonoBehaviour {
 	//	clientHere.ReceiveString ();
 		InitializeVariables (2); // Entre com o numero de robos
 	//	ClearMask ();
-//		StartCoroutine(ConnectionUpdate());
 	}
 
-//	private IEnumerator ConnectionUpdate()
 	void FixedUpdate()
 	{
-//	while (true)
-//		{
-//		if (delayCount > timeDelay) {
-			SendMsg ();
-			ClearMask ();
-			ReadMsg ();
-//			delayCount = 0f;
-//		} else
-//			delayCount += Time.fixedDeltaTime;
-//		}
-	//	yield return null;
+		SendMsg ();
+		ClearMask ();
+		ReadMsg ();
 	}
 
 	public void SetStatus(int robot, float mag, int variable)
@@ -151,18 +141,4 @@ public class Connection : MonoBehaviour {
 	{
 		clientHere.Disconnect ();
 	}
-
-
-//	IEnumerator SendReceive()
-//	{
-//		while (true)
-//			{
-//			yield return new WaitForSeconds (0.2f);
-//			clientHere.SendString (enemy.transform.position.ToString());
-//			clientHere.ReceiveString ();
-//			}
-//	}
-
-
-
 }
