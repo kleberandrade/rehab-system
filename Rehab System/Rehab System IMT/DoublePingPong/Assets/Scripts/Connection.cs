@@ -9,10 +9,13 @@ using System.Linq;
 public class Connection : MonoBehaviour {
 
 	// Indice relativo da variavel
-	public const int POSITION = 0; 		// Compartilhado para robo e game
-	public const int VELOCITY = 1; 		// Compartilhado para robo e game
+	public const int CENTERSPRING = 0; 	// Game
+	public const int FREESPACE = 1; 	// Game
 	public const int STIFF = 2;			// Game
 	public const int DAMP = 3;			// Game
+
+	public const int POSITION = 0; 		// Robo
+	public const int VELOCITY = 1; 		// Robo
 	public const int ACC = 2;			// Robo
 	public const int FORCE = 3;			// Robo
 
@@ -27,7 +30,6 @@ public class Connection : MonoBehaviour {
 	private float[][] robotStade;
 
 	private float delayCount;
-	public float timeDelay;
 
 //================================
 	private NetworkClientTCP clientHere = new NetworkClientTCP();
@@ -35,7 +37,6 @@ public class Connection : MonoBehaviour {
 
 	void Start()
 	{
-		timeDelay = 0.01f;
 		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();

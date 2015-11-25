@@ -19,12 +19,6 @@ public class AnklePackage : MonoBehaviour {
 
 	private float colorRate, colorAlpha;
 
-//	void Awake()
-//	{
-////		package = GameObject.FindGameObjectWithTag("Connection").GetComponent<ToAnkleRobot>();
-//	}
-
-
 	void Start() 
 	{
 		ankleTrack = new List<Vector3> ();

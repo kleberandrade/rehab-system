@@ -8,8 +8,8 @@ using System.Text;
 
 public class ToAnkleRobot : MonoBehaviour {
 
-	private const int VERTICAL = 0;		// or RIGHT?
-	private const int HORIZONTAL = 1;	// or LEFT?
+	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
+	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
 	public bool activeConnection, activeHelper, followBall;
@@ -26,7 +26,6 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	// Communication
 	public Vector2 input, enemyPos;
-	private float timeFree;
 
 	// Control
 	private int targetMask;
@@ -52,15 +51,14 @@ public class ToAnkleRobot : MonoBehaviour {
 									 "Pos\t\t" +
 									 "FVel\t\t" +
 									 "Vel\t\t" +
-									 "Torque" +
+									 "Torque\t" +
+		                   			 "CenterSpring\t\t" +
+		                   			 "FreeSpace\t\t" +
+		                   			 "K" +
+		                   			 "D" +
 		                   			Environment.NewLine);
 		targetMask = LayerMask.GetMask ("Target");
-		timeFree = 0f;
 	}
-
-//	void Start()
-//	{
-//	}
 
 	void FixedUpdate () 
 	{
@@ -71,27 +69,50 @@ public class ToAnkleRobot : MonoBehaviour {
 				connection.ReadStatus(HORIZONTAL, Connection.POSITION),
 				connection.ReadStatus(VERTICAL, Connection.POSITION)
 				);
-			File.AppendAllText(textFile, 
-			                   + Time.time + "\t"
-			                   + input.x + "\t" 
-			                   + input.y  + "\t");
 
-			for (int j = 0; j < Connection.N_VAR; j++)
-				for (int i = 1; i >= 0; i--)
-					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
-			File.AppendAllText(textFile, Environment.NewLine);
-
+			// Move player
 			player.SetWalls(ElipseToSquare(input));
 
-			connection.SetStatus (VERTICAL, centerSpring.y, Connection.POSITION);
-			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.POSITION);
-			connection.SetStatus (VERTICAL, freeSpace.y, Connection.VELOCITY);
-			connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.VELOCITY);
+			// Player helper
+			if (activeHelper)
+				PlayerHelper ();
+
+			// Follow the ball
+			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
+			enemyPos = SquareToElipse (enemyPos);
+			if (followBall)
+				centerSpring = enemyPos;
+
+			// Set variables to send to robot
+			connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
+			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
+			connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
+			connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.FREESPACE);
 
 			connection.SetStatus (VERTICAL, K, Connection.STIFF);
 			connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
+
+			// Print the all variables
+			File.AppendAllText(textFile, 
+			                   + Time.time + "\t"
+			                   + input.x + "\t" 
+			                   + input.y  + "\t");
+			
+			for (int j = 0; j < Connection.N_VAR; j++)
+				for (int i = 1; i >= 0; i--)
+					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
+
+			File.AppendAllText(textFile, centerSpring.x + "\t");
+			File.AppendAllText(textFile, centerSpring.y + "\t");
+			File.AppendAllText(textFile, freeSpace.x + "\t");
+			File.AppendAllText(textFile, freeSpace.y + "\t");
+			File.AppendAllText(textFile, K + "\t");
+			File.AppendAllText(textFile, D + "\t");
+
+			File.AppendAllText(textFile, Environment.NewLine);
+			
 		} else 
 		{
 			player.MoveWalls(player.ReadInput());
@@ -102,14 +123,6 @@ public class ToAnkleRobot : MonoBehaviour {
 				);
 		}
 		Calibration (input);
-		enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
-		enemyPos = SquareToElipse (enemyPos);
-
-		if (activeHelper)
-			PlayerHelper ();
-
-		if (followBall)
-			centerSpring = enemyPos;
 	}
 
 	void Calibration(Vector2 position)

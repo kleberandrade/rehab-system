@@ -11,9 +11,6 @@ public class EnemyController : MonoBehaviour {
 
 	private int pickUpMask;			// Mask for the playe where "pickup" will appear
 
-	private float pickUpTimeCount;	// Delay for next "pickup" placing
-	private float multiHitCheck;	// Variable auxiliar for checking multiple impact
-
 	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
 	public int onTagPickUp, onWallHit;
@@ -27,9 +24,7 @@ public class EnemyController : MonoBehaviour {
 	void Start () 
 	{
 //		enemyBody.velocity = RandVectOnGround()*speed;	// Inicialize with a random velocity
-		enemyBody.velocity = 0.2f * Vector3.down;
-		multiHitCheck = Time.time;
-		pickUpTimeCount = 0f;
+		enemyBody.velocity = 0.2f * Vector3.down + 0.1f * Vector3.one;
 		onTagPickUp = 0;
 		onWallHit = 0;
 		missWall = false;
@@ -77,7 +72,7 @@ public class EnemyController : MonoBehaviour {
 //			return;
 //		}
 		if (onWallHit > 1)
-			enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
+			enemyBody.velocity = new Vector3 (-enemyBody.position.x, 0f, -enemyBody.position.z).normalized * speed;
 		else 
 		{
 			switch (wall) {
