@@ -6,13 +6,16 @@ using System.Net;
 using System.Net.Sockets;
 
 public class NetworkClientTCP : NetworkClient {
-	
+
+	private float notConnectedMsg;
+
 	public NetworkClientTCP() 
 	{
 		try 
 		{
 			client = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			client.ReceiveTimeout = 1000;
+			notConnectedMsg = 1f;
 		}
 		catch( Exception e ) 
 		{
@@ -70,7 +73,12 @@ public class NetworkClientTCP : NetworkClient {
 				Debug.Log("Error Receiving: " +  e.ToString () );
 			}
 		}
-		else Debug.Log("Not Connected");
+		else if (notConnectedMsg > 0)
+		{
+			Debug.Log("Not Connected");
+			notConnectedMsg = -10f;
+		} 
+		else notConnectedMsg += Time.deltaTime;
 //		Array.Clear( inputBuffer, 0, inputBuffer.Length );
 		return inputBuffer;
 	}

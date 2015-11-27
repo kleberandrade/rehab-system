@@ -42,7 +42,13 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	void Awake () 
 	{
-		connection = GetComponent<Connection>();
+		targetMask = LayerMask.GetMask ("Target");
+	}
+
+	void Start ()
+	{
+		activeConnection = false;
+//		connection = GetComponent<Connection>();
 		File.WriteAllText (textFile, "Horizontal\t" +
 		                   			 "Vertical" + 
 		                   			Environment.NewLine + 
@@ -57,7 +63,6 @@ public class ToAnkleRobot : MonoBehaviour {
 		                   			 "K" +
 		                   			 "D" +
 		                   			Environment.NewLine);
-		targetMask = LayerMask.GetMask ("Target");
 	}
 
 	void FixedUpdate () 
@@ -240,6 +245,21 @@ public class ToAnkleRobot : MonoBehaviour {
 		elipse.x = origin.x + range * cosAng * bases.x; // / elipseScale;
 		elipse.y = origin.y + range * sinAng * bases.y; // / elipseScale;
 		return (elipse);
+	}
+
+	public void Connect()
+	{
+		activeConnection = true;
+		gameObject.AddComponent<Connection>();
+		connection = GetComponent<Connection>();
+	}
+
+	public void Disconnect()
+	{
+		activeConnection = false;
+		//connection.CloseConnection();
+		Destroy (GetComponent <Connection>());
+		connection = null;
 	}
 
 }

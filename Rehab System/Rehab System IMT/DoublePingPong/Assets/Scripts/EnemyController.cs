@@ -17,12 +17,15 @@ public class EnemyController : MonoBehaviour {
 	public bool missWall;
 	public Collider show;
 
+	public bool playing;
+
 	void Awake(){
 		enemyBody = GetComponent<Rigidbody> ();
 	}
 
 	void Start () 
 	{
+		playing = false;
 //		enemyBody.velocity = RandVectOnGround()*speed;	// Inicialize with a random velocity
 		enemyBody.velocity = 0.2f * Vector3.down + 0.1f * Vector3.one;
 		onTagPickUp = 0;
@@ -35,30 +38,22 @@ public class EnemyController : MonoBehaviour {
 	{
 		if (Mathf.Abs(enemyBody.velocity.y) < Mathf.Epsilon)
 		{
-			if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
+			if (playing)
 			{
-				enemyBody.velocity = RandVectOnGround()*speed;
-				if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
-					Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+				if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
+				{
+					enemyBody.velocity = RandVectOnGround()*speed;
+					if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
+						Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+				}
+				else
+				{
+					enemyBody.velocity = enemyBody.velocity.normalized * speed;
+				}
+
 			}
-			else
-			{
-				enemyBody.velocity = enemyBody.velocity.normalized * speed;
-			}
+			else enemyBody.velocity = Vector3.zero;
 		}
-
-		// Counting delay for new "pickup" 
-//		pickUpTimeCount += Time.deltaTime;	
-
-	//	GameObject aux = GameObject.FindGameObjectsWithTag("PickUp")
-		//if (GameObject.FindGameObjectWithTag("PickUp") == null)
-	//	if (pickUpTimeCount > 0f)
-//		{
-//			enemyTrack = FindImpact(pickUpMask);
-//			Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
-//			pickUpTimeCount = -3f;
-//
-//		}
 
 		// Alternative enemy control for testing
 		MoveEnemy();
@@ -175,5 +170,14 @@ public class EnemyController : MonoBehaviour {
 			enemyBody.velocity = new Vector3 (h, 0f, v);
 		}
 	}
-	
+
+	public void StartPlay()
+	{
+		playing = true;
+	}
+	public void StopPlay()
+	{
+		playing = false;
+	}
+
 }

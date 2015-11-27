@@ -140,6 +140,11 @@ public class Connection : MonoBehaviour {
 
 	public void CloseConnection()
 	{
+		Destroy (this);
+	}
+
+	~Connection()
+	{
 		clientHere.Disconnect ();
 	}
 }
