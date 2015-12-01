@@ -15,9 +15,6 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector] public float boundaryDist = 10f;	// Distance between boundary
 	private float outCut = 2f;			// Gap for helper control
 
-	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
-	private float playerScore, machineScore, lazyScore;				// Value Scores
-
 	private int targetMask;
 
 	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFilePos.txt";
@@ -30,13 +27,6 @@ public class PlayerController : MonoBehaviour
 	{
 		targetMask = LayerMask.GetMask ("Target");
 		controlActive = false;
-		
-		playerScoreText.text = "Player\n0";
-		machineScoreText.text = "Machine\n0";
-		lazyScoreText.text = "Lazy Time\n0";
-		playerScore = 0;
-		machineScore = 0;
-		lazyScore = 0;
 	}
 
 	void Start ()
@@ -48,11 +38,6 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		// Update scores
-		lazyScore = Time.time - (playerScore + machineScore)/speed;
-		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
-		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
-		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
 
 		// Record movements
 		File.AppendAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
@@ -124,8 +109,8 @@ public class PlayerController : MonoBehaviour
 	{
 		Vector2 direction = new Vector2 (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
 
-		if (direction != Vector2.zero)
-			playerScore += speed * Time.deltaTime;
+//		if (direction != Vector2.zero)
+//			playerScore += speed * Time.deltaTime;
 		
 		return direction;
 	}
@@ -144,7 +129,7 @@ public class PlayerController : MonoBehaviour
 				Normalize (OutCut (playerTrack.z, (boundaryDist - Mathf.Abs (enemyImpact.point.x)) / enemy.speed * speed + outCut))
 				);
 			MoveWalls (control);
-			machineScore += speed * Time.deltaTime * Mathf.Abs(control.magnitude);
+//			machineScore += speed * Time.deltaTime * Mathf.Abs(control.magnitude);
 			controlActive = true;
 		} else
 			controlActive = false;

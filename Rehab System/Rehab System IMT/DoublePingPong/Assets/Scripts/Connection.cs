@@ -37,6 +37,7 @@ public class Connection : MonoBehaviour {
 
 	void Start()
 	{
+		Debug.Log ("Starting connection");
 		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();

@@ -381,6 +381,9 @@ MonoBehaviour:
   activeConnection: 0
   activeHelper: 0
   followBall: 0
+  playerScoreText: {fileID: 1063334332}
+  machineScoreText: {fileID: 1051574904}
+  lazyScoreText: {fileID: 1381727666}
   max: {x: .100000001, y: .100000001}
   min: {x: -.100000001, y: -.100000001}
   bases: {x: .100000001, y: .100000001}

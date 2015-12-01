@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Globalization;
 using System.Collections;
 
@@ -7,13 +8,16 @@ using System.IO;
 using System.Text;
 
 public class ToAnkleRobot : MonoBehaviour {
-
 	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
 	public bool activeConnection, activeHelper, followBall;
 
+	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
+	private float playerScore, machineScore, lazyScore;				// Value Scores
+	public float lazySpeed, lazyForce;
+	
 	// Envelope do movimento
 	public Vector2 max, min;		// Input for elipse
 	public Vector2 bases, origin;	// Elipse's parameters
@@ -43,6 +47,13 @@ public class ToAnkleRobot : MonoBehaviour {
 	void Awake () 
 	{
 		targetMask = LayerMask.GetMask ("Target");
+		
+		playerScoreText.text = "Player\n0";
+		machineScoreText.text = "Machine\n0";
+		lazyScoreText.text = "Lazy Time\n0";
+		playerScore = 0;
+		machineScore = 0;
+		lazyScore = 0;
 	}
 
 	void Start ()
@@ -65,6 +76,15 @@ public class ToAnkleRobot : MonoBehaviour {
 		                   			Environment.NewLine);
 	}
 
+	void Update()
+	{
+		// Update scores
+		lazyScore = Time.time - (playerScore + machineScore);
+		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
+		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
+		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
+	}
+
 	void FixedUpdate () 
 	{
 		if (activeConnection)
@@ -81,6 +101,14 @@ public class ToAnkleRobot : MonoBehaviour {
 			// Player helper
 			if (activeHelper)
 				PlayerHelper ();
+
+			if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
+			                connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce)
+				machineScore += Time.deltaTime;
+			else
+				if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.VELOCITY),
+			                connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
+					playerScore += Time.deltaTime;
 
 			// Follow the ball
 			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
