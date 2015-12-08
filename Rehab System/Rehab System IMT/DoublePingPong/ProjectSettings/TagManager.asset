@@ -17,6 +17,10 @@ TagManager:
   - Connection
   - PickUpWall
   - Boundary
+  - North
+  - South
+  - East
+  - West
   layers:
   - Default
   - TransparentFX
@@ -28,7 +32,7 @@ TagManager:
   - 
   - PickUp
   - Target
-  - 
+  - Training Control
   - 
   - 
   - 

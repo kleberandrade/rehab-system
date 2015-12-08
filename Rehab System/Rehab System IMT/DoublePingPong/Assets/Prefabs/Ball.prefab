@@ -14,7 +14,7 @@ GameObject:
   - 135: {fileID: 13522690}
   - 114: {fileID: 11495086}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Ball
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -90,8 +90,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  timeDelay: .5
   pickUp: {fileID: 106026, guid: 8da4f462a9b81b74ba39094ebe5420c2, type: 2}
+  enemyBody: {fileID: 0}
+  onTagPickUp: 0
+  onWallHit: 0
+  missWall: 0
+  show: {fileID: 0}
+  playing: 0
 --- !u!135 &13522690
 SphereCollider:
   m_ObjectHideFlags: 1

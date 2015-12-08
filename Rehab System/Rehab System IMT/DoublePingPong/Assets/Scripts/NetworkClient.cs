@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 using System.Net;
@@ -49,9 +49,6 @@ public abstract class NetworkClient
 
 	public virtual void Connect( string host, int remotePort, int localPort ) 
 	{
-		float a = -1f;
-		while (a < 0)
-			a += Time.deltaTime;
 		if( !client.Connected || host != currentHost || remotePort != currentRemotePort ) 
 		{
 			Debug.Log( "Trying to connect to host " + host + " and port " + remotePort.ToString() );

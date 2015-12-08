@@ -4,14 +4,12 @@ using System.Collections;
 public class Rotator : MonoBehaviour 
 {
 
-	EnemyController enemy;
-	Rigidbody rigidBody;
-	LayerMask pickUpMask;
+	protected Rigidbody rigidBody;
+	protected LayerMask pickUpMask;
 
 	void Awake()
 	{
 		pickUpMask = LayerMask.GetMask ("PickUp");
-		enemy = GameObject.FindGameObjectWithTag ("Enemy").GetComponent<EnemyController> ();
 	}
 
 	void Start()
@@ -23,6 +21,5 @@ public class Rotator : MonoBehaviour
 	void FixedUpdate () 
 	{
 		transform.Rotate (new Vector3 (15, 30, 45) * Time.deltaTime);
-		rigidBody.position = Vector3.ProjectOnPlane(enemy.FindImpact (pickUpMask).point, Vector3.up);
 	}
 }
