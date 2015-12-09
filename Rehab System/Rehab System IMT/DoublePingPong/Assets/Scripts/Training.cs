@@ -20,16 +20,20 @@ public class Training : MonoBehaviour {
 	private float rayLength = 100f;
 	private float timer;
 	private int floorMask, wallMask;
+	private float timeClick = 0.5f;
 
 	public GameObject PickUpTraining;
+	public Transform PickUpSetting, VectorSetting;
+	public Stretchable Arrow;
 
 	// Use this for initialization
 	void Start () 
 	{
 		plan = new List<State> ();
 		floorMask = LayerMask.GetMask ("Training Control");
-		wallMask = LayerMask.GetMask ("PickUp");
-		timer = -1;
+		wallMask = LayerMask.GetMask ("PickUpWall");
+		timer = -timeClick;
+		plan.Add (new State(Vector3.zero, ""));
 
 	}
 	
@@ -43,47 +47,49 @@ public class Training : MonoBehaviour {
 			InsertTarget();
 		}
 
-
+		Rect screenRect = new Rect(0,0, Screen.width, Screen.height);
+		if (screenRect.Contains (Input.mousePosition))
+		{
+//			Debug.Log (Input.mousePosition);
+			PickUpSetting.position = FromMousePosition().position;
+//		Arrow.SetForm(plan[plan.Count - 1].position , FromMousePosition().position);
+		}
 	}
 
-	void InsertTarget()
+	private void InsertTarget()
+	{
+		timer = -timeClick;
+		State trainingState;
+
+		trainingState = FromMousePosition ();
+
+		plan.Add (trainingState);
+
+		Instantiate (PickUpTraining, trainingState.position, Quaternion.identity);
+	}
+
+	public State FromMousePosition()
 	{
 		State previousTarget;
 		Ray camRay, trackRay;
 		RaycastHit trainingFloor, targetWall;
+	
+		previousTarget = plan[plan.Count - 1];
+		Debug.Log ("Previous Plan " + previousTarget.tag + " - " + previousTarget.position);
 
-		timer = -1;
 		camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
-
-		if (plan.Count == 0)
-		{
-			previousTarget = new State(0.5f * Vector3.down, "");
-			Debug.Log ("No plan");
-		}
-		else
-		{
-			previousTarget = plan[plan.Count - 1];
-			Debug.Log ("Plan " + previousTarget.tag + " " + previousTarget.position);
-		}
-//		floorTraining.collider.tag;
+		Debug.Log ("CamRay " + camRay.origin + " - " + camRay.direction);
 
 		Physics.Raycast (camRay, out trainingFloor, rayLength, floorMask);
-		Debug.Log ("HitCam " + trainingFloor.collider.tag + " " + trainingFloor.point);
-
-		trackRay = new Ray (previousTarget.position, trainingFloor.point);
-		Debug.Log (previousTarget.position + " - " + trainingFloor.point);
+		Debug.Log ("Hit on Floor " + trainingFloor.collider.tag + " - " + trainingFloor.point);
+		
+		trackRay = new Ray (previousTarget.position, trainingFloor.point - previousTarget.position);
+		Debug.Log ("TrackRay " + trackRay.origin + " - " + trackRay.direction);
 
 		Physics.Raycast (trackRay, out targetWall, rayLength, wallMask);
-		Debug.Log ("HitWall " + targetWall.collider.tag + " " + targetWall.point);
+		Debug.Log ("Hit on Wall: " + targetWall.collider.tag + " - " + targetWall.point);
+		
 
-		State bla;
-
-
-
-		bla = new State (targetWall.point, targetWall.collider.tag);
-
-		plan.Add (bla);
-
-		Instantiate (PickUpTraining, targetWall.point, Quaternion.identity);
+		return new State (targetWall.point, targetWall.collider.tag);
 	}
 }

@@ -31,7 +31,7 @@ public class EnemyController : MonoBehaviour {
 		onTagPickUp = 0;
 		onWallHit = 0;
 		missWall = false;
-		pickUpMask = LayerMask.GetMask ("PickUp");
+		pickUpMask = LayerMask.GetMask ("PickUpWall");
 	}
 
 	void FixedUpdate()
@@ -52,7 +52,14 @@ public class EnemyController : MonoBehaviour {
 				}
 
 			}
-			else enemyBody.velocity = Vector3.zero;
+			else 
+			{
+		//		enemyBody.position = new Vector3(enemyBody.position.x,
+		//		                                 -0.5f,
+		//		                                 enemyBody.position.z);
+				enemyBody.angularVelocity = Vector3.zero;
+				enemyBody.velocity = Vector3.zero;
+			}
 		}
 
 		// Alternative enemy control for testing

@@ -7,10 +7,6 @@ public class Rotator : MonoBehaviour
 	protected Rigidbody rigidBody;
 	protected LayerMask pickUpMask;
 
-	void Awake()
-	{
-		pickUpMask = LayerMask.GetMask ("PickUp");
-	}
 
 	void Start()
 	{
