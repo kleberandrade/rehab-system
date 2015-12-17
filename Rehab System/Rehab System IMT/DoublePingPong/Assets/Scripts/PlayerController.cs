@@ -38,9 +38,8 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-
 		// Record movements
-		File.AppendAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
+		File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
 	}
 
 	void FixedUpdate()

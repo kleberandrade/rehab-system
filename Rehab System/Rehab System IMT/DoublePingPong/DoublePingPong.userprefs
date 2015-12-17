@@ -1,10 +1,12 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Training.cs">
     <Files>
-      <File FileName="Assets\Scripts\Training.cs" Line="87" Column="62" />
-      <File FileName="Assets\Scripts\Rotator.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Stretchable.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Training.cs" Line="18" Column="43" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="42" Column="19" />
+      <File FileName="Assets\Scripts\Stretchable.cs" Line="17" Column="84" />
+      <File FileName="Assets\Scripts\ScaleProtector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Connection.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

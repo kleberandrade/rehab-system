@@ -25,7 +25,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 433106}
   - 33: {fileID: 3311324}
-  - 136: {fileID: 13686414}
   - 23: {fileID: 2393364}
   m_Layer: 0
   m_Name: Cylinder
@@ -44,6 +43,7 @@ GameObject:
   - 4: {fileID: 465878}
   - 33: {fileID: 3351006}
   - 23: {fileID: 2370028}
+  - 114: {fileID: 11419548}
   m_Layer: 0
   m_Name: Cone
   m_TagString: Untagged
@@ -58,7 +58,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 118776}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 465878}
@@ -72,8 +72,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 129978}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: .600000024, y: 1, z: .600000024}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6, y: 0.5, z: 0.6}
   m_Children: []
   m_Father: {fileID: 404326}
   m_RootOrder: 1
@@ -84,8 +84,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 165458}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1.1, z: 1}
   m_Children: []
   m_Father: {fileID: 404326}
   m_RootOrder: 0
@@ -107,8 +107,10 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_AutoUVMaxDistance: .5
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
@@ -131,8 +133,10 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_AutoUVMaxDistance: .5
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
@@ -151,6 +155,22 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 165458}
   m_Mesh: {fileID: 4300000, guid: 32f4f101957f20744a1fcbefd2e14133, type: 2}
+--- !u!114 &11419548
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 165458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28727d88ab4ceaa4f96da1c24ae67f25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 0}
+  initialScale: {x: 0, y: 0, z: 0}
+  x: 0
+  y: 1
+  z: 0
 --- !u!114 &11449540
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -162,21 +182,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28af81223d162eb43aaa274d2b778a31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxScaleXZ: .5
-  parentScale: {x: 1, y: 1, z: 1}
---- !u!136 &13686414
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 129978}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: .5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  maxScaleXZ: 0.7
+  minScaleXZ: 1
+  scaleFactorXZ: 5
+  scaleFactorY: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -8,11 +8,18 @@ public class Training : MonoBehaviour {
 	{
 		public Vector3 position;
 		public string tag;
-		
+		public Object target;
+
 		public State(Vector3 v, string s)
 		{
 			this.position = v;
 			this.tag = s;
+		}
+		public State(Vector3 v, string s, Object g)
+		{
+			this.position = v;
+			this.tag = s;
+			this.target = g;
 		}
 	}
 	
@@ -21,20 +28,30 @@ public class Training : MonoBehaviour {
 	private float timer;
 	private int floorMask, wallMask;
 	private float timeClick = 0.5f;
+	private Vector3 prevMousePos;
 
-	public GameObject PickUpTraining;
-	public Transform PickUpSetting, VectorSetting;
-	public Stretchable Arrow;
+	public GameObject pickUpTraining;
+	public Transform vectorArrow;
+
+	private Transform pickUpPos;
+	private Stretchable arrow;
 
 	// Use this for initialization
 	void Start () 
 	{
 		plan = new List<State> ();
+		plan.Add (new State(Vector3.down * 0.5f, ""));
+
 		floorMask = LayerMask.GetMask ("Training Control");
 		wallMask = LayerMask.GetMask ("PickUpWall");
 		timer = -timeClick;
-		plan.Add (new State(Vector3.zero, ""));
+		prevMousePos = Vector3.zero;
 
+	//	pickUpTraining = Instantiate (pickUpTraining);
+	//	vectorArrow = Instantiate (vectorArrow);
+
+		arrow = vectorArrow.GetComponent<Stretchable> ();
+		pickUpPos = pickUpTraining.GetComponent<Transform> ();
 	}
 	
 	// Update is called once per frame
@@ -47,13 +64,8 @@ public class Training : MonoBehaviour {
 			InsertTarget();
 		}
 
-		Rect screenRect = new Rect(0,0, Screen.width, Screen.height);
-		if (screenRect.Contains (Input.mousePosition))
-		{
-//			Debug.Log (Input.mousePosition);
-			PickUpSetting.position = FromMousePosition().position;
-//		Arrow.SetForm(plan[plan.Count - 1].position , FromMousePosition().position);
-		}
+		SetVector();
+
 	}
 
 	private void InsertTarget()
@@ -64,8 +76,6 @@ public class Training : MonoBehaviour {
 		trainingState = FromMousePosition ();
 
 		plan.Add (trainingState);
-
-		Instantiate (PickUpTraining, trainingState.position, Quaternion.identity);
 	}
 
 	public State FromMousePosition()
@@ -75,21 +85,36 @@ public class Training : MonoBehaviour {
 		RaycastHit trainingFloor, targetWall;
 	
 		previousTarget = plan[plan.Count - 1];
-		Debug.Log ("Previous Plan " + previousTarget.tag + " - " + previousTarget.position);
 
 		camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
-		Debug.Log ("CamRay " + camRay.origin + " - " + camRay.direction);
-
 		Physics.Raycast (camRay, out trainingFloor, rayLength, floorMask);
-		Debug.Log ("Hit on Floor " + trainingFloor.collider.tag + " - " + trainingFloor.point);
 		
 		trackRay = new Ray (previousTarget.position, trainingFloor.point - previousTarget.position);
-		Debug.Log ("TrackRay " + trackRay.origin + " - " + trackRay.direction);
-
 		Physics.Raycast (trackRay, out targetWall, rayLength, wallMask);
-		Debug.Log ("Hit on Wall: " + targetWall.collider.tag + " - " + targetWall.point);
-		
 
-		return new State (targetWall.point, targetWall.collider.tag);
+
+		//Instantiate (pickUpTraining, targetWall.point, Quaternion.identity);
+
+		return new State (
+			targetWall.point, 
+			targetWall.collider.tag,
+			Instantiate (pickUpTraining, targetWall.point, Quaternion.identity)
+		);
+	}
+
+	public void SetVector()
+	{
+		Rect screenRect = new Rect(0,0, Screen.width, Screen.height);
+		if (screenRect.Contains (Input.mousePosition))
+		{
+			//			Debug.Log (Input.mousePosition);
+			pickUpPos.position = FromMousePosition().position;
+			arrow.SetForm(plan[plan.Count - 1].position , FromMousePosition().position);
+			prevMousePos = FromMousePosition().position;
+		}
+		else 
+		{
+			arrow.SetForm(plan[plan.Count - 1].position, prevMousePos);
+		}		
 	}
 }
