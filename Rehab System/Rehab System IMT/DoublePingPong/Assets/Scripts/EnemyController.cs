@@ -11,6 +11,8 @@ public class EnemyController : MonoBehaviour {
 
 	private int pickUpMask;			// Mask for the playe where "pickup" will appear
 
+	public Training training;
+
 	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
 	public int onTagPickUp, onWallHit;
@@ -42,7 +44,8 @@ public class EnemyController : MonoBehaviour {
 			{
 				if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
 				{
-					enemyBody.velocity = RandVectOnGround()*speed;
+					if (training.plan.Count == 0)
+						enemyBody.velocity = RandVectOnGround()*speed;
 					if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
 						Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
 				}

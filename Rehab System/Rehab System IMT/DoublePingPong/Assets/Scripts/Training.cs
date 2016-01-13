@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class Training : MonoBehaviour {
 
+	private static Vector3 startPlan = Vector3.down * 0.5f + Vector3.right * 1f;
+
 	public class State
 	{
 		public Vector3 position;
@@ -21,9 +23,16 @@ public class Training : MonoBehaviour {
 			this.tag = s;
 			this.target = g;
 		}
+		public void SetObject(Object g)
+		{
+			this.target = g;
+			return;
+		}
+
 	}
 	
-	private List<State> plan;
+	public List<State> plan;
+
 	private float rayLength = 100f;
 	private float timer;
 	private int floorMask, wallMask;
@@ -33,6 +42,8 @@ public class Training : MonoBehaviour {
 	public GameObject pickUpTraining;
 	public Transform vectorArrow;
 
+//	public GameObject pickUpTrPrefab, vectorArrowPrefab;
+
 	private Transform pickUpPos;
 	private Stretchable arrow;
 
@@ -40,15 +51,15 @@ public class Training : MonoBehaviour {
 	void Start () 
 	{
 		plan = new List<State> ();
-		plan.Add (new State(Vector3.down * 0.5f, ""));
+	//	plan.Add (new State(startPlan, ""));
 
 		floorMask = LayerMask.GetMask ("Training Control");
 		wallMask = LayerMask.GetMask ("PickUpWall");
 		timer = -timeClick;
-		prevMousePos = Vector3.zero;
+		prevMousePos = Vector3.one;
 
-	//	pickUpTraining = Instantiate (pickUpTraining);
-	//	vectorArrow = Instantiate (vectorArrow);
+	//	pickUpTraining = Instantiate (pickUpTrPrefab);
+	//	vectorArrow = Instantiate (vectorArrowPrefab).GetComponent<Transform>();
 
 		arrow = vectorArrow.GetComponent<Stretchable> ();
 		pickUpPos = pickUpTraining.GetComponent<Transform> ();
@@ -75,6 +86,8 @@ public class Training : MonoBehaviour {
 
 		trainingState = FromMousePosition ();
 
+		trainingState.SetObject (Instantiate (pickUpTraining, trainingState.position, Quaternion.identity));
+
 		plan.Add (trainingState);
 	}
 
@@ -83,8 +96,11 @@ public class Training : MonoBehaviour {
 		State previousTarget;
 		Ray camRay, trackRay;
 		RaycastHit trainingFloor, targetWall;
-	
-		previousTarget = plan[plan.Count - 1];
+
+		if (plan.Count == 0)
+			previousTarget = new State(startPlan, "");
+		else
+			previousTarget = plan[plan.Count - 1];
 
 		camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
 		Physics.Raycast (camRay, out trainingFloor, rayLength, floorMask);
@@ -97,24 +113,30 @@ public class Training : MonoBehaviour {
 
 		return new State (
 			targetWall.point, 
-			targetWall.collider.tag,
-			Instantiate (pickUpTraining, targetWall.point, Quaternion.identity)
+			targetWall.collider.tag
 		);
 	}
 
 	public void SetVector()
 	{
+		Vector3 previousTarget;
+
+		if (plan.Count == 0)
+			previousTarget = startPlan;
+		else
+			previousTarget = plan[plan.Count - 1].position;
+		
 		Rect screenRect = new Rect(0,0, Screen.width, Screen.height);
 		if (screenRect.Contains (Input.mousePosition))
 		{
 			//			Debug.Log (Input.mousePosition);
 			pickUpPos.position = FromMousePosition().position;
-			arrow.SetForm(plan[plan.Count - 1].position , FromMousePosition().position);
+			arrow.SetForm(previousTarget , FromMousePosition().position);
 			prevMousePos = FromMousePosition().position;
 		}
 		else 
 		{
-			arrow.SetForm(plan[plan.Count - 1].position, prevMousePos);
-		}		
+			arrow.SetForm(previousTarget, prevMousePos);
+		}
 	}
 }
