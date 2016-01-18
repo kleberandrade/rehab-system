@@ -9,14 +9,17 @@ using System.Linq;
 public class Connection : MonoBehaviour {
 
 	// Indice relativo da variavel
-	public const int POSITION = 0; 		// Compartilhado para robo e game
-	public const int VELOCITY = 1; 		// Compartilhado para robo e game
+	public const int CENTERSPRING = 0; 	// Game
+	public const int FREESPACE = 1; 	// Game
 	public const int STIFF = 2;			// Game
 	public const int DAMP = 3;			// Game
+
+	public const int POSITION = 0; 		// Robo
+	public const int VELOCITY = 1; 		// Robo
 	public const int ACC = 2;			// Robo
 	public const int FORCE = 3;			// Robo
 
-	private const int N_VAR = 4; 		// Numero de variaveis envolvidas
+	public const int N_VAR = 4; 		// Numero de variaveis envolvidas
 	private const int BIT_SIZE = 4; 	// Numero de bit da mascara; Deve ser multiplo de 2
 	private const int INFO_SIZE = 4;	// 4 Float; 8 Double
 	
@@ -27,7 +30,6 @@ public class Connection : MonoBehaviour {
 	private float[][] robotStade;
 
 	private float delayCount;
-	public float timeDelay;
 
 //================================
 	private NetworkClientTCP clientHere = new NetworkClientTCP();
@@ -35,24 +37,19 @@ public class Connection : MonoBehaviour {
 
 	void Start()
 	{
-		timeDelay = 0.01f;
-		clientHere.Connect ("192.168.0.66", 8080, 0); // Here 192.168.0.67
+		Debug.Log ("Starting connection");
+		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();
 		InitializeVariables (2); // Entre com o numero de robos
 	//	ClearMask ();
-	//	StartCoroutine(SendReceive ());
 	}
 
-	void Update()
+	void FixedUpdate()
 	{
-		if (delayCount > timeDelay) {
-			SendMsg ();
-			ClearMask ();
-			ReadMsg ();
-			delayCount = 0f;
-		} else
-			delayCount = Time.deltaTime;
+		SendMsg ();
+		ClearMask ();
+		ReadMsg ();
 	}
 
 	public void SetStatus(int robot, float mag, int variable)
@@ -86,13 +83,28 @@ public class Connection : MonoBehaviour {
 	private void ReadMsg()
 	{
 		byte[] buffer = clientHere.ReceiveByte ();
-		for (int i = 0; i < n_Robots; i++)
+
+		// Check if message is different than zero
+		bool check = false;
+		foreach(byte element in buffer)
 		{
-			for (int j = 0; j < N_VAR; j++)
+			if (element != 0x0)
 			{
-				robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
+				check = true;
+				break;
 			}
-//			Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+		}
+
+		if (check)
+		{
+			for (int i = 0; i < n_Robots; i++)
+			{
+				for (int j = 0; j < N_VAR; j++)
+				{
+					robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
+				}
+//				Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+			}
 		}
 		return;
 	}
@@ -104,7 +116,6 @@ public class Connection : MonoBehaviour {
 		mask_size = (BIT_SIZE * n_robots) / 8 < 0 ? 1 : (BIT_SIZE * n_robots) / 8;
 
 		activeMask = new byte[mask_size];
-		Debug.Log ("Inicializado?");
 
 		gameStade = new byte[n_robots][][];
 		robotStade = new float[n_robots][];
@@ -130,20 +141,11 @@ public class Connection : MonoBehaviour {
 
 	public void CloseConnection()
 	{
-		clientHere.Disconnect ();
+		Destroy (this);
 	}
 
-
-//	IEnumerator SendReceive()
-//	{
-//		while (true)
-//			{
-//			yield return new WaitForSeconds (0.2f);
-//			clientHere.SendString (enemy.transform.position.ToString());
-//			clientHere.ReceiveString ();
-//			}
-//	}
-
-
-
+	~Connection()
+	{
+		clientHere.Disconnect ();
+	}
 }

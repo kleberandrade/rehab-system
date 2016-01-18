@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 using System.Net;
@@ -68,7 +68,7 @@ public abstract class NetworkClient
 				}*/
 
 				IPAddress ipRemoteHost = Dns.GetHostEntry( host ).AddressList[ 0 ];
-				Debug.Log( ipRemoteHost.ToString() );
+				Debug.Log( "Ip Remote Host: " + ipRemoteHost.ToString() );
 				IPEndPoint remoteIpAddress = new IPEndPoint( ipRemoteHost, remotePort );
 				client.Connect( (EndPoint) remoteIpAddress );
 				Debug.Log( "Bound to: " + client.LocalEndPoint.ToString() );
@@ -79,7 +79,7 @@ public abstract class NetworkClient
 			catch( Exception e ) 
 			{
 				Disconnect();
-				Debug.Log( e.ToString() );
+				Debug.Log("Error Connecting: " + e.ToString() );
 			}
 		}
 	}
@@ -101,7 +101,7 @@ public abstract class NetworkClient
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString() );
+				Debug.Log("Error Sending: " + e.ToString() );
 			}	
 		}
 	}
@@ -117,7 +117,7 @@ public abstract class NetworkClient
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString() );
+				Debug.Log("Error Sending: " + e.ToString() );
 			}	
 		}
 	}
@@ -130,7 +130,7 @@ public abstract class NetworkClient
 		}
 		catch( Exception e )
 		{
-			Debug.Log( e.ToString() );
+			Debug.Log("Error Desconnecting: " + e.ToString() );
 		}
 
 		currentHost = "localhost";

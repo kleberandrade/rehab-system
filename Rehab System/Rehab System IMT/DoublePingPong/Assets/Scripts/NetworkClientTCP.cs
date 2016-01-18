@@ -6,17 +6,20 @@ using System.Net;
 using System.Net.Sockets;
 
 public class NetworkClientTCP : NetworkClient {
-	
+
+	private float notConnectedMsg;
+
 	public NetworkClientTCP() 
-	{	
+	{
 		try 
 		{
 			client = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			client.ReceiveTimeout = 1000;
+			notConnectedMsg = 1f;
 		}
 		catch( Exception e ) 
 		{
-			Debug.Log( e.ToString() );
+			Debug.Log("Error Creating TPC Client: " + e.ToString() );
 		}
 		
 	}
@@ -40,7 +43,7 @@ public class NetworkClientTCP : NetworkClient {
 			} 
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString () );
+				Debug.Log("Error Receiving: " + e.ToString () );
 			}
 		}
 		
@@ -53,23 +56,30 @@ public class NetworkClientTCP : NetworkClient {
 		{
 			try 
 			{
+				while (!(client.Available > 0));
+//				if( client.Available > 0 )
+//				{
 				Array.Clear( inputBuffer, 0, inputBuffer.Length );
-				if( client.Available > 0 )
-				{
-					client.Receive( inputBuffer );
-					
-	//				Debug.Log( "Received string: " + Encoding.ASCII.GetString( inputBuffer ) );
-					
-					return inputBuffer;
-				}
-				else Debug.Log( "No receiving" );
+				client.Receive( inputBuffer );
+				
+//				Debug.Log( "Received string: " + Encoding.ASCII.GetString( inputBuffer ) );
+				
+				return inputBuffer;
+//				}
+		//		else Debug.Log( "No receiving" );
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log( e.ToString () );
+				Debug.Log("Error Receiving: " +  e.ToString () );
 			}
 		}
-		Array.Clear( inputBuffer, 0, inputBuffer.Length );
+		else if (notConnectedMsg > 0)
+		{
+			Debug.Log("Not Connected");
+			notConnectedMsg = -10f;
+		} 
+		else notConnectedMsg += Time.deltaTime;
+//		Array.Clear( inputBuffer, 0, inputBuffer.Length );
 		return inputBuffer;
 	}
 	

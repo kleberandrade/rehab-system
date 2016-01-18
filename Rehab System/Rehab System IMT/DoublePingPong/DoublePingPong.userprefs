@@ -1,13 +1,13 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\ToAnkleRobot.cs">
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Training.cs">
     <Files>
-      <File FileName="Assets\Scripts\Connection.cs" Line="95" Column="3" />
-      <File FileName="Assets\Scripts\ToAnkleRobot.cs" Line="56" Column="68" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="76" Column="1" />
-      <File FileName="Assets\Scripts\EnemyController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\NetworkClientTCP.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\NetworkInterface.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Training.cs" Line="83" Column="3" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="42" Column="19" />
+      <File FileName="Assets\Scripts\Stretchable.cs" Line="17" Column="84" />
+      <File FileName="Assets\Scripts\ScaleProtector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Connection.cs" Line="23" Column="86" />
+      <File FileName="Assets\Scripts\EnemyController.cs" Line="47" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

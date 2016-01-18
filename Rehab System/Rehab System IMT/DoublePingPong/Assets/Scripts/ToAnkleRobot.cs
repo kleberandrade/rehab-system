@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Globalization;
 using System.Collections;
 
 using System;
@@ -6,99 +8,154 @@ using System.IO;
 using System.Text;
 
 public class ToAnkleRobot : MonoBehaviour {
+	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
+	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
+	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
+	public bool activeConnection, activeHelper, followBall;
 
-//	private const int ESQUERDO = 0;
-//	private const int DIREITO = 1;
-
-	private const int VERTICAL = 0;		// ou ESQUERDO?
-	private const int HORIZONTAL = 1;	// ou DIREITO?
-	private const float QUADRANTES = 0.70710678118654752440084436210485f;
-
-//	public float desloc_max, speed_max;
-//	public float ang_max, rot_max;
-
+	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
+	private float playerScore, machineScore, lazyScore;				// Value Scores
+	public float lazySpeed, lazyForce;
+	
 	// Envelope do movimento
-	public Vector2 max, min;		// Dados de entrada da Elipse
-	public Vector2 bases, origin;	// Parametros da Elipse
-	public float elipseScale;
+	public Vector2 max, min;		// Input for elipse
+	public Vector2 bases, origin;	// Elipse's parameters
+	public float elipseScale;		// Scale for fitting the moves
 
-	public float K, D;
-
-	private PlayerController player;
-	private EnemyController enemy;
+	// Communication with another scripts
+	public PlayerController player;
+	public EnemyController enemy;
 	private Connection connection;
-	private Vector2 desloc;
-//	private float dh, dv;
 
-	public GameObject point, back;
-//	public float px, py, sx, sy;
-	public float scalePoint;
+	// Communication
+	public Vector2 input, enemyPos;
 
-	public Vector2 input;
+	// Control
+	private int targetMask;
+	public float helperLimit;
+	public float helperFade;
 
-	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFileAnkle.txt";
+	[Space]
 
-	void Start () 
+	public Vector2 centerSpring;
+	public Vector2 freeSpace;
+	public float K, D;				// Stiffness and Damping
+
+	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+
+	void Awake () 
 	{
-		player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-		enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyController>();
-		connection = GameObject.FindGameObjectWithTag("Connection").GetComponent<Connection>();
-		File.WriteAllText (textFile, "Horizoltal\tVertical\tH_Elipse\tV_Elipse" + Environment.NewLine);
-
-//		px = point.GetComponent<RectTransform> ().anchoredPosition.x;
-//		py = point.GetComponent<RectTransform> ().anchoredPosition.y;
-//		sx = back.GetComponent<RectTransform> ().localScale.x;
-//		sy = back.GetComponent<RectTransform> ().localScale.y;
-
-
-		//scalePoint = back.GetComponentInParent<RectTransform>().sizeDelta.x;
-		Debug.Log (back.GetComponentInParent<RectTransform> ().sizeDelta)
+		targetMask = LayerMask.GetMask ("Target");
+		
+		playerScoreText.text = "Player\n0";
+		machineScoreText.text = "Machine\n0";
+		lazyScoreText.text = "Lazy Time\n0";
+		playerScore = 0;
+		machineScore = 0;
+		lazyScore = 0;
 	}
-	 
 
-	void Update () 
+	void Start ()
 	{
-//		if (player.controlActive)
-//		{
-			Vector3 position = enemy.enemyTrack.point / player.boundary;
-		//	connection.SetStatus (VERTICAL, position.z * dv_max, Connection.POSITION);
-		//	connection.SetStatus (HORIZONTAL, position.x * dh_max, Connection.POSITION);
+		activeConnection = false;
+//		connection = GetComponent<Connection>();
+		File.WriteAllText (textFile, "Horizontal\t" +
+		                   			 "Vertical" + 
+		                   			Environment.NewLine + 
+									 "Time\t" +
+									 "SqrPos\t\t" +
+									 "Pos\t\t" +
+									 "FVel\t\t" +
+									 "Vel\t\t" +
+									 "Torque\t" +
+		                   			 "CenterSpring\t\t" +
+		                   			 "FreeSpace\t\t" +
+		                   			 "K" +
+		                   			 "D" +
+		                   			Environment.NewLine);
+	}
 
-			Vector3 velocity = new Vector3(
-								player.horizontalWalls[0].GetComponent<Rigidbody> ().velocity.x / player.speed,
-								0,
-								player.verticalWalls[0].GetComponent<Rigidbody> ().velocity.z / player.speed
-								);
-		//	connection.SetStatus (VERTICAL, velocity.z * sv_max, Connection.VELOCITY);
-		//	connection.SetStatus (HORIZONTAL, velocity.x * sh_max, Connection.VELOCITY);
+	void Update()
+	{
+		// Update scores
+		lazyScore = Time.time - (playerScore + machineScore);
+		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
+		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
+		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
+	}
+
+	void FixedUpdate () 
+	{
+		if (activeConnection)
+		{
+			input = new Vector2
+				(
+				connection.ReadStatus(HORIZONTAL, Connection.POSITION),
+				connection.ReadStatus(VERTICAL, Connection.POSITION)
+				);
+
+			// Move player
+			player.SetWalls(ElipseToSquare(input));
+
+			// Player helper
+			if (activeHelper)
+				PlayerHelper ();
+
+			if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
+			                connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce)
+				machineScore += Time.deltaTime;
+			else
+				if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.VELOCITY),
+			                connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
+					playerScore += Time.deltaTime;
+
+			// Follow the ball
+			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
+			enemyPos = SquareToElipse (enemyPos);
+			if (followBall)
+				centerSpring = enemyPos;
+
+			// Set variables to send to robot
+			connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
+			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
+			connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
+			connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.FREESPACE);
 
 			connection.SetStatus (VERTICAL, K, Connection.STIFF);
 			connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
-//		}
-//		else
-//		{
 
-		input = new Vector2
-			(
-//			connection.ReadStatus(HORIZONTAL, Connection.POSITION),
-//			connection.ReadStatus(VERTICAL, Connection.POSITION)
-			player.horizontalWalls [0].GetComponent<Rigidbody> ().position.x/10f,
-			player.verticalWalls [0].GetComponent<Rigidbody> ().position.z/10f
-			);
+			// Print the all variables
+			File.AppendAllText(textFile, 
+			                   + Time.time + "\t"
+			                   + input.x + "\t" 
+			                   + input.y  + "\t");
+			
+			for (int j = 0; j < Connection.N_VAR; j++)
+				for (int i = 1; i >= 0; i--)
+					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
 
-		File.AppendAllText(textFile, input.x + "\t" + input.y  + "\t"
-		                   + ElipseToSquare(input).x + "\t" + ElipseToSquare(input).y + Environment.NewLine);
+			File.AppendAllText(textFile, centerSpring.x + "\t");
+			File.AppendAllText(textFile, centerSpring.y + "\t");
+			File.AppendAllText(textFile, freeSpace.x + "\t");
+			File.AppendAllText(textFile, freeSpace.y + "\t");
+			File.AppendAllText(textFile, K + "\t");
+			File.AppendAllText(textFile, D + "\t");
 
+			File.AppendAllText(textFile, Environment.NewLine);
+			
+		} else 
+		{
+			player.MoveWalls(player.ReadInput());
+			input = new Vector2
+				(
+				player.horizontalWalls [0].position.x/player.boundary,
+				player.verticalWalls [0].position.z/player.boundary
+				);
+		}
 		Calibration (input);
-//		player.SetWalls(ElipseToSquare(input));
-//		}
-	
-		point.GetComponent<RectTransform> ().anchoredPosition = input*scalePoint*elipseScale;
-		back.GetComponent<RectTransform> ().anchoredPosition = origin*scalePoint;
-		back.GetComponent<RectTransform> ().localScale = bases;
 	}
 
 	void Calibration(Vector2 position)
@@ -113,6 +170,53 @@ public class ToAnkleRobot : MonoBehaviour {
 			min.x = position.x;
 		bases = elipseScale * (max - min) / 2;
 		origin = (max + min) / 2;
+	}
+
+	void PlayerHelper()
+	{
+		Vector2 impact, impactBoundary, safeArea, track, distance;
+		float impactDist;
+
+		impactDist = enemy.FindImpact (targetMask).distance + helperLimit;
+
+		impact = new Vector2 (
+			enemy.FindImpact(targetMask).point.x, 
+			enemy.FindImpact(targetMask).point.z);
+
+		impactBoundary = new Vector2 (
+			Mathf.Clamp(impact.x, -player.boundary, player.boundary), 
+			Mathf.Clamp(impact.y, -player.boundary, player.boundary));
+		
+		safeArea = new Vector2 (
+			player.boundary - Mathf.Abs (impactBoundary.y),
+			player.boundary - Mathf.Abs (impactBoundary.x));
+		
+//		track = new Vector2	(
+//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
+//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
+
+		track = new Vector2 (impactDist, impactDist);
+		
+		distance = (track + safeArea) / enemy.speed * player.speed;
+		
+		if (helperFade >= 1f)
+		{
+			if ((centerSpring - SquareToElipse (impact)).magnitude < 0.05f)
+			{
+				centerSpring = SquareToElipse (impact);
+				freeSpace = SquareToElipse (distance);
+			}
+			else
+			{
+				helperFade = 0f;
+			}
+		}
+		else
+		{
+			centerSpring = Vector2.Lerp( centerSpring, SquareToElipse (impact), helperFade);
+			freeSpace = Vector2.Lerp( freeSpace, SquareToElipse (distance), helperFade);
+			helperFade += Time.deltaTime;
+		}
 	}
 
 	Vector2 ElipseToSquare(Vector2 elipse)
@@ -134,7 +238,7 @@ public class ToAnkleRobot : MonoBehaviour {
 					// (X - OX)/COS(T)/BX
 			range = ((elipse.x - origin.x)/cosAng/bases.x);
 
-		if (Mathf.Abs(cosAng) < QUADRANTES)
+		if (Mathf.Abs(cosAng) < QUADRANTS)
 		{
 			r = Mathf.Abs(1f/sinAng);
 			square.x = range*r*cosAng;
@@ -149,34 +253,41 @@ public class ToAnkleRobot : MonoBehaviour {
 		return (square);
 	}
 
+	
+	Vector2 SquareToElipse(Vector2 square)
+	{
+		float range;
+		float cosAng, sinAng;
+		Vector2 elipse = Vector2.zero;
+		
+		// ATAN2(((X-OX)*BY);((Y-OY)*BX))
+		float ang = Mathf.Atan2 (square.y, square.x);
+
+		cosAng = Mathf.Cos(ang);
+		sinAng = Mathf.Sin(ang);
+
+		range = Mathf.Abs(square.x) > Mathf.Abs(square.y) ?
+			Mathf.Abs(square.x / player.boundaryDist) :
+			Mathf.Abs(square.y / player.boundaryDist);
+
+		elipse.x = origin.x + range * cosAng * bases.x; // / elipseScale;
+		elipse.y = origin.y + range * sinAng * bases.y; // / elipseScale;
+		return (elipse);
+	}
+
+	public void Connect()
+	{
+		activeConnection = true;
+		gameObject.AddComponent<Connection>();
+		connection = GetComponent<Connection>();
+	}
+
+	public void Disconnect()
+	{
+		activeConnection = false;
+		//connection.CloseConnection();
+		Destroy (GetComponent <Connection>());
+		connection = null;
+	}
+
 }
-//		if (player.controlActive) 
-//		{
-//			Vector3 position = enemy.enemyTrack.point / player.boundary;
-//			connection.SetStatus (ESQUERDO, position.z * desloc_max + position.x * ang_max / 2, Connection.POSITION);
-//			connection.SetStatus (DIREITO, position.z * desloc_max - position.x * ang_max / 2, Connection.POSITION);
-//
-//			Vector3 velocity = new Vector3(
-//				player.horizontalWalls[0].GetComponent<Rigidbody> ().velocity.x / player.speed,
-//				0,
-//				player.verticalWalls[0].GetComponent<Rigidbody> ().velocity.z / player.speed
-//				);
-//			connection.SetStatus (ESQUERDO, velocity.z * speed_max + velocity.x * rot_max / 2, Connection.VELOCITY);
-//			connection.SetStatus (DIREITO, velocity.z * speed_max - velocity.x * rot_max / 2, Connection.VELOCITY);
-//
-//			connection.SetStatus (ESQUERDO, K, Connection.STIFF);
-//			connection.SetStatus (DIREITO, K, Connection.STIFF);
-//			connection.SetStatus (ESQUERDO, D, Connection.DAMP);
-//			connection.SetStatus (DIREITO, D, Connection.DAMP);
-//		} else
-//			{
-//			connection.SetStatus (ESQUERDO, player.v_aux * speed_max + player.h_aux * rot_max / 2, Connection.VELOCITY);
-//			connection.SetStatus (DIREITO, player.v_aux * speed_max - player.h_aux * rot_max / 2, Connection.VELOCITY);
-//			connection.ClearMask ();
-//
-////			h = (connection.ReadStatus(ESQUERDO, Connection.VELOCITY) - connection.ReadStatus(DIREITO, Connection.VELOCITY))/rot_max;
-////			v = (connection.ReadStatus(ESQUERDO, Connection.VELOCITY) + connection.ReadStatus(DIREITO, Connection.VELOCITY))/(rot_max*2);
-////			player.MoveWalls(v, h);
-//			}
-//	}
-//}
