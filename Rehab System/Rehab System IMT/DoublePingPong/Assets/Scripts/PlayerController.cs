@@ -23,10 +23,14 @@ public class PlayerController : MonoBehaviour
 	public Rigidbody[] verticalWalls;
 	public bool controlActive;	// Indicate if helper control is active
 
+	private GameClient gameClient = null;
+
 	void Awake()
 	{
 		targetMask = LayerMask.GetMask ("Target");
 		controlActive = false;
+
+		gameClient = GetComponent<GameClient> ();
 	}
 
 	void Start ()
@@ -45,13 +49,18 @@ public class PlayerController : MonoBehaviour
 	void FixedUpdate()
 	{
 		MoveWalls(ReadInput ());
+
+		// Update remotely controlled objects position
+		SetWalls (Vector2.zero);
+		SetBall ();
+
 //		ControlPosition ();
 	}
 
 	// Set the wall's speed
 	public void MoveWalls(Vector2 direction)
 	{
-		for (int i = 0; i < horizontalWalls.Length; i++) 
+		/*for (int i = 0; i < horizontalWalls.Length; i++) 
 		{
 			horizontalWalls[i].velocity = new Vector3 (direction.x*speed, 0f, 0f);
 			horizontalWalls[i].position = new Vector3
@@ -60,7 +69,7 @@ public class PlayerController : MonoBehaviour
 				0.0f,
 				horizontalWalls[i].position.z
 				);
-		}
+		}*/
 		for (int i = 0; i < verticalWalls.Length; i++) 
 		{
 			verticalWalls[i].velocity = new Vector3 (0f, 0f, direction.y*speed);
@@ -70,6 +79,9 @@ public class PlayerController : MonoBehaviour
 				0.0f,
 				Mathf.Clamp (verticalWalls[i].position.z, -boundary, boundary) // Keep the player inside the boundary
 				);
+
+			// Send locally controlled object position (z) over network
+			gameClient.SetLocalPosition ((byte) i, 0, verticalWalls [i].position.z);
 		}
 	}
 
@@ -78,14 +90,22 @@ public class PlayerController : MonoBehaviour
 	{
 		for (int i = 0; i < horizontalWalls.Length; i++) 
 		{
-			horizontalWalls[i].position = new Vector3
+			/*horizontalWalls[i].position = new Vector3
 				(
 					Mathf.Clamp (position.x*boundary, -boundary, boundary),
 					0.0f,
 					horizontalWalls[i].position.z
+				);*/
+
+			// Get remotely controlled object position (z) and set it locally (x)
+			horizontalWalls[i].position = new Vector3
+				(
+					Mathf.Clamp (gameClient.GetRemotePosition((byte) i, 0), -boundary, boundary),
+					0.0f,
+					horizontalWalls[i].position.z
 				);
 		}
-		for (int i = 0; i < verticalWalls.Length; i++) 
+		/*for (int i = 0; i < verticalWalls.Length; i++) 
 		{
 			verticalWalls[i].position = new Vector3
 				(
@@ -93,7 +113,18 @@ public class PlayerController : MonoBehaviour
 					0.0f,
 					Mathf.Clamp (position.y*boundary, -boundary, boundary)
 				);
-		}
+		}*/
+	}
+
+	public void SetBall ()
+	{
+		// Get remotely controlled ball positions (x,z) and set them locally
+		enemy.enemyBody.position = new Vector3
+			(
+				Mathf.Clamp (gameClient.GetRemotePosition((byte) 2, 0), -boundary, boundary),
+				0.0f,
+				Mathf.Clamp (gameClient.GetRemotePosition((byte) 2, 2), -boundary, boundary)
+			);
 	}
 
 	// Returns a equivalente vector position based on horizontal and vertical walls

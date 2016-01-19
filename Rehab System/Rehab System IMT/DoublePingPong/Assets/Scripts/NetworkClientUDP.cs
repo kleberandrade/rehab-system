@@ -7,9 +7,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-public class NetworkClientUDP : NetworkClient {
-
-	private List<string> messageQueue = new List<string>( 5 );
+public class NetworkClientUDP : NetworkClient 
+{
+	private const int QUEUE_LENGTH = 5;
+	private byte[][] messageQueue = new byte[ QUEUE_LENGTH ][] { new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ] };
+	private int firstIndex = 0, lastIndex = 0;
 
 	private Thread updateThread = null;
 	private bool isReceiving = false;
@@ -20,29 +22,34 @@ public class NetworkClientUDP : NetworkClient {
 	{
 		try 
 		{
-			client = new Socket( AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp );
+			workSocket = new Socket( AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp );
 		}
 		catch( Exception e ) 
 		{
-			Debug.Log("Error Creating UDP Client: " + e.ToString() );
+			Debug.Log( e.ToString() );
 		}
 	}
 
-	public override void Connect( string host, int remotePort, int localPort ) 
-	{
+	public NetworkClientUDP( Socket clientSocket ) : base( clientSocket ) {	}
+
+	public override void Connect( string host, int remotePort ) 
+	{	
 		//client.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true );
 
-		base.Connect( host, remotePort, localPort );
+		base.Connect( host, remotePort );
 
 		if( !isReceiving )
 		{
-			updateThread = new Thread( new ThreadStart( updateCallback ) );
+			updateThread = new Thread( new ThreadStart( UpdateCallback ) );
 			updateThread.Start();
+
+			byte[] nullBuffer = new byte[ BUFFER_SIZE ];
+			SendData( nullBuffer );
 		}
 	}
 
-	private void updateCallback() 
-	{
+	private void UpdateCallback() 
+	{	
 		isReceiving = true;
 
 		Debug.Log( "NetworkClientUDP: Starting to receive messages" );
@@ -51,41 +58,31 @@ public class NetworkClientUDP : NetworkClient {
 		{
 			while( isReceiving )
 			{
-				if( client.Available > 0 )
+				if( workSocket.Available > 0 )
 				{
 					Debug.Log( "NetworkClientUDP: Messages available" );
 
-					//try
-					//{
-						/*int bytesRead =*/ client.Receive( inputBuffer );
-
-						//Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + Encoding.ASCII.GetString( inputBuffer ) );
-					//}
-					//catch( SocketException e )
-					//{
-					//	Debug.Log( e.ToString() );
-					//}
-
-					try
-					{
-						if( messageQueue.Count >= messageQueue.Capacity )
-							messageQueue.RemoveAt( 0 );
-					}
-					catch( IndexOutOfRangeException e )
-					{
-						Debug.Log("Error at Queue: " + e.ToString() );
-					}
-
 					lock( searchLock )
 					{
-						messageQueue.Add( Encoding.ASCII.GetString( inputBuffer ) );
+						try
+						{
+							int bytesRead = workSocket.Receive( messageQueue[ lastIndex % QUEUE_LENGTH ] );
+
+							Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
+
+							lastIndex++;
+						}
+						catch( SocketException e )
+						{
+							Debug.Log( e.ToString() );
+						}
 					}
 				} 
 			}
 		}
 		catch( ObjectDisposedException e ) 
 		{
-			Debug.Log("Error Update Callback: " + e.ToString() );
+			Debug.Log( e.ToString() );
 		}
 		
 		Disconnect();
@@ -93,54 +90,37 @@ public class NetworkClientUDP : NetworkClient {
 		Debug.Log( "NetworkClientUDP: Finishing update thread" );
 	}
 
-	public override string ReceiveString() 
-	{
-		if( messageQueue.Count > 0 )
+	public override bool ReceiveData( byte[] inputBuffer ) 
+	{	
+		if( lastIndex - firstIndex > 0 )
 		{
 			try
 			{
 				lock( searchLock )
 				{
-					string remoteMessage = messageQueue[ messageQueue.Count - 1 ];
-					messageQueue.RemoveAt( messageQueue.Count - 1 );
-					return remoteMessage;
+					Buffer.BlockCopy( messageQueue[ firstIndex % QUEUE_LENGTH ], 0, inputBuffer, 0, BUFFER_SIZE );
+
+					firstIndex++;
+
+					return true;
 				}
 			}
 			catch( Exception e ) 
 			{
-				Debug.Log("Error Receiving: " + e.ToString() );
+				Debug.Log( e.ToString() );
 			}
 		}
 
-		return "";
-	}
-
-	public override string[] QueryData( string key )
-	{
-		lock( searchLock )
-		{
-			int matchIndex = messageQueue.FindLastIndex( item => item.StartsWith( key + ':' ) );
-			if( matchIndex >= 0 )
-			{
-				string remoteMessage = messageQueue[ matchIndex ];
-				Debug.Log( "Query found " + key + " in " + remoteMessage );
-				Debug.Log( "Query data: " + remoteMessage.Substring( key.Length + 1 ).Trim().Split(':').ToString() );
-				messageQueue.RemoveAt( matchIndex );
-				return remoteMessage.Substring( key.Length + 1 ).Trim().Split(':');
-			}
-		}
-
-		return "".Split();
+		return false;
 	}
 
 	public override void Disconnect()
 	{
 		isReceiving = false;
-		messageQueue.Clear();
-		//base.Disconnect();
+		if( updateThread != null )
+			updateThread.Join();
 
-		//if( updateThread != null )
-		//	updateThread.Join();
+		base.Disconnect();
 
 		Debug.Log( "Encerrando conexao UDP" );
 	}
