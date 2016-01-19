@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
 	private int targetMask;
 
-	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFilePos.txt";
+	private string textFile = "./LogFilePos.txt";
 
 	public Rigidbody[] horizontalWalls;
 	public Rigidbody[] verticalWalls;
