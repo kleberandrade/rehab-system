@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-
 using System;
 using System.IO;
 using System.Text;
@@ -23,17 +22,39 @@ public class PlayerController : MonoBehaviour
 	public Rigidbody[] verticalWalls;
 	public bool controlActive;	// Indicate if helper control is active
 
-	private GameClient gameClient = null;
+	private GameConnection gameConnection = null;
 
 	void Awake()
 	{
-		targetMask = LayerMask.GetMask ("Target");
+		targetMask = LayerMask.GetMask( "Target" );
 		controlActive = false;
 
-		gameClient = GetComponent<GameClient> ();
+		string networkRole = PlayerPrefs.GetString( "Network Role", "client" );
+
+		// Network update coroutines
+		if( networkRole == "server" )
+		{
+			gameConnection = gameObject.AddComponent<GameServer>();
+
+			foreach( Rigidbody wall in horizontalWalls )
+				wall.isKinematic = true;
+
+			StartCoroutine( UpdateServer() );
+		} 
+		else if( networkRole == "client" )
+		{
+			gameConnection = gameObject.AddComponent<GameClient>();
+
+			foreach( Rigidbody wall in horizontalWalls )
+				wall.isKinematic = true;
+
+			enemy.enemyBody.isKinematic = true;
+
+			StartCoroutine( UpdateClient() );
+		} 			
 	}
 
-	void Start ()
+	void Start()
 	{
 		// Start file for record movements
 		if (File.Exists (textFile)) File.Delete (textFile);
@@ -48,83 +69,90 @@ public class PlayerController : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		MoveWalls(ReadInput ());
-
-		// Update remotely controlled objects position
-		SetWalls (Vector2.zero);
-		SetBall ();
+		MoveWalls( ReadInput() );
 
 //		ControlPosition ();
 	}
 
 	// Set the wall's speed
-	public void MoveWalls(Vector2 direction)
+	public void MoveWalls( Vector2 direction )
 	{
-		/*for (int i = 0; i < horizontalWalls.Length; i++) 
+		// Control horizontal walls if on local match
+		if( gameConnection == null )
 		{
-			horizontalWalls[i].velocity = new Vector3 (direction.x*speed, 0f, 0f);
-			horizontalWalls[i].position = new Vector3
-				(
-				Mathf.Clamp (horizontalWalls[i].position.x, -boundary, boundary), // Keep the player inside the boundary
-				0.0f,
-				horizontalWalls[i].position.z
-				);
-		}*/
-		for (int i = 0; i < verticalWalls.Length; i++) 
-		{
-			verticalWalls[i].velocity = new Vector3 (0f, 0f, direction.y*speed);
-			verticalWalls[i].position = new Vector3
-				(
-				verticalWalls[i].position.x,
-				0.0f,
-				Mathf.Clamp (verticalWalls[i].position.z, -boundary, boundary) // Keep the player inside the boundary
-				);
+			foreach( Rigidbody wall in horizontalWalls )
+			{
+				wall.velocity = new Vector3( direction.x * speed, 0f, 0f );
+				// Keep the player inside the boundary
+				wall.position = new Vector3( Mathf.Clamp( wall.position.x, -boundary, boundary ), 0.0f, wall.position.z );
+			}
+		}
 
-			// Send locally controlled object position (z) over network
-			gameClient.SetLocalPosition ((byte) i, 0, verticalWalls [i].position.z);
+		foreach( Rigidbody wall in verticalWalls ) 
+		{
+			wall.velocity = new Vector3( 0f, 0f, direction.y * speed );
+			// Keep the player inside the boundary
+			wall.position = new Vector3( wall.position.x, 0.0f,	Mathf.Clamp( wall.position.z, -boundary, boundary) );
 		}
 	}
 
 	// Set the wall's position
-	public void SetWalls (Vector2 position)
+	public void SetWalls( Vector2 position )
 	{
-		for (int i = 0; i < horizontalWalls.Length; i++) 
+		if( gameConnection == null )
 		{
-			/*horizontalWalls[i].position = new Vector3
-				(
-					Mathf.Clamp (position.x*boundary, -boundary, boundary),
-					0.0f,
-					horizontalWalls[i].position.z
-				);*/
-
-			// Get remotely controlled object position (z) and set it locally (x)
-			horizontalWalls[i].position = new Vector3
-				(
-					Mathf.Clamp (gameClient.GetRemotePosition((byte) i, 0), -boundary, boundary),
-					0.0f,
-					horizontalWalls[i].position.z
-				);
+			foreach( Rigidbody wall in horizontalWalls )
+				wall.position = new Vector3( Mathf.Clamp( position.x * boundary, -boundary, boundary ),	0.0f, wall.position.z );
 		}
-		/*for (int i = 0; i < verticalWalls.Length; i++) 
-		{
-			verticalWalls[i].position = new Vector3
-				(
-					verticalWalls[i].position.x,
-					0.0f,
-					Mathf.Clamp (position.y*boundary, -boundary, boundary)
-				);
-		}*/
+
+		foreach( Rigidbody wall in verticalWalls ) 
+			wall.position = new Vector3( wall.position.x, 0.0f, Mathf.Clamp( position.y * boundary, -boundary, boundary ) );
 	}
 
-	public void SetBall ()
+	public IEnumerator UpdateClient()
 	{
-		// Get remotely controlled ball positions (x,z) and set them locally
-		enemy.enemyBody.position = new Vector3
-			(
-				Mathf.Clamp (gameClient.GetRemotePosition((byte) 2, 0), -boundary, boundary),
-				0.0f,
-				Mathf.Clamp (gameClient.GetRemotePosition((byte) 2, 2), -boundary, boundary)
-			);
+		while( Application.isPlaying )
+		{
+			for( int i = 0; i < horizontalWalls.Length; i++ ) 
+			{
+				// Get remotely controlled object position (z) and set it locally (x)
+				horizontalWalls[i].position = new Vector3( Mathf.Clamp( gameConnection.GetRemotePosition( (byte) i, 0 ), -boundary, boundary ),
+					0.0f, horizontalWalls[i].position.z );
+			}
+
+			// Send locally controlled object positions (z) over network
+			for( int i = 0; i < verticalWalls.Length; i++ ) 
+				gameConnection.SetLocalPosition( (byte) i, 0, verticalWalls[i].position.z );
+
+			// Get remotely controlled ball positions (x,z) and set them locally
+			enemy.enemyBody.position = new Vector3(	Mathf.Clamp( gameConnection.GetRemotePosition( (byte) 2, 0 ), -boundary, boundary ),
+					                                             0.0f, Mathf.Clamp( gameConnection.GetRemotePosition( (byte) 2, 2 ), -boundary, boundary ) );
+
+			yield return new WaitForFixedUpdate();
+		}
+	}
+
+	public IEnumerator UpdateServer()
+	{
+		while( Application.isPlaying )
+		{ 
+			for( int i = 0; i < horizontalWalls.Length; i++ ) 
+			{
+				// Get remotely controlled object position (z) and set it locally (x)
+				horizontalWalls[i].position = new Vector3( Mathf.Clamp( gameConnection.GetRemotePosition( (byte) i, 0 ), -boundary, boundary ),
+					0.0f, horizontalWalls[i].position.z );
+			}
+
+			// Send locally controlled object positions (z) over network
+			for( int i = 0; i < verticalWalls.Length; i++ ) 
+				gameConnection.SetLocalPosition( (byte) i, 0, verticalWalls[i].position.z );
+
+			// Send locally controlled object positions (x,z) over network
+			gameConnection.SetLocalPosition( 2, 0, enemy.enemyBody.position.x );
+			gameConnection.SetLocalPosition( 2, 2, enemy.enemyBody.position.z );
+
+			yield return new WaitForFixedUpdate();
+		}
 	}
 
 	// Returns a equivalente vector position based on horizontal and vertical walls
