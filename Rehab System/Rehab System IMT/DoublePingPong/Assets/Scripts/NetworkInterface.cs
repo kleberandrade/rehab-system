@@ -74,9 +74,12 @@ public abstract class NetworkClient : NetworkInterface
 				IPAddress ipRemoteHost = Dns.GetHostEntry( host ).AddressList[ 0 ];
 				Debug.Log( ipRemoteHost.ToString() );
 				IPEndPoint remoteIpAddress = new IPEndPoint( ipRemoteHost, remotePort );
-				workSocket.Connect( (EndPoint) remoteIpAddress );
-				Debug.Log( "Bound to: " + workSocket.LocalEndPoint.ToString() );
-				Debug.Log( "Connected to: " + workSocket.RemoteEndPoint.ToString() );
+
+				//workSocket.Connect( (EndPoint) remoteIpAddress );
+				//Debug.Log( "Bound to: " + workSocket.LocalEndPoint.ToString() );
+				//Debug.Log( "Connected to: " + workSocket.RemoteEndPoint.ToString() );
+				workSocket.BeginConnect( (EndPoint) remoteIpAddress, connectCallback, workSocket );
+
 				currentHost = host;
 				currentRemotePort = remotePort;
 			} 
