@@ -38,7 +38,7 @@ public class Connection : MonoBehaviour {
 	void Start()
 	{
 		Debug.Log ("Starting connection");
-		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
+		clientHere.Connect ("192.168.0.66", 8000); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
 	//	clientHere.ReceiveString ();
 		InitializeVariables (2); // Entre com o numero de robos
@@ -76,13 +76,15 @@ public class Connection : MonoBehaviour {
 				System.Buffer.BlockCopy (gameStade [i][j], 0, msg, activeMask.Length + INFO_SIZE * (j + N_VAR * i), gameStade [i][j].Length);
 			}
 		}
-		clientHere.SendByte (msg);
+		clientHere.SendData (msg);
 		return;
 	}
 
 	private void ReadMsg()
 	{
-		byte[] buffer = clientHere.ReceiveByte ();
+		byte[] buffer = new byte[NetworkInterface.BUFFER_SIZE];
+
+		clientHere.ReceiveData (buffer);
 
 		// Check if message is different than zero
 		bool check = false;

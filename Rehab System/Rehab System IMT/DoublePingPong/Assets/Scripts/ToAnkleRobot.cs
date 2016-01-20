@@ -42,7 +42,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	public Vector2 freeSpace;
 	public float K, D;				// Stiffness and Damping
 
-	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+	private string textFile = "./LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
 
 	void Awake () 
 	{
