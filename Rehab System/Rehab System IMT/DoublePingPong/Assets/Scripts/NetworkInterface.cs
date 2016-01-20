@@ -31,6 +31,9 @@ public abstract class NetworkClient : NetworkInterface
 			Socket handle = (Socket) ar.AsyncState;
 			
 			handle.EndConnect( ar );
+
+			Debug.Log( "Bound to: " + workSocket.LocalEndPoint.ToString() );
+			Debug.Log( "Connected to: " + workSocket.RemoteEndPoint.ToString() );
 		}
 		catch( Exception e ) 
 		{
