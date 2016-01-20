@@ -19,8 +19,6 @@ public class InputManager : MonoBehaviour
 		AddAxis<MouseInputAxis>( "Mouse Y", Input.mousePosition.y );
 		AddAxis<KeyboardInputAxis>( "Horizontal" );
 		AddAxis<KeyboardInputAxis>( "Vertical" );
-
-		StartCoroutine( UpdateAxisValues() );
 	}
 
 	public static InputAxis AddAxis<AxisType>( string axisID, float initialPosition = 0.0f ) where AxisType : InputAxis, new()
@@ -39,17 +37,12 @@ public class InputManager : MonoBehaviour
 		inputAxes.RemoveAll( axis => axisID == axis.Name );
 	}
 
-	private static IEnumerator UpdateAxisValues()
+	void FixedUpdate()
 	{
-		while( Application.isPlaying )
-		{
-			float elapsedTime = Time.deltaTime;
+		float elapsedTime = Time.deltaTime;
 
-			foreach( InputAxis inputAxis in inputAxes )
-				inputAxis.Update( elapsedTime );
-
-			yield return new WaitForSeconds( 0.005f );
-		}
+		foreach( InputAxis inputAxis in inputAxes )
+			inputAxis.Update( elapsedTime );
 	}
 
 	public static InputAxis GetAxis( string axisID )
