@@ -282,9 +282,9 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		activeConnection = true;
 
-		gameObject.AddComponent<InputManager>();
-		horizontal = InputManager.AddAxis<AnkleBotInputAxis>( "1", 0.0f );
-		vertical = InputManager.AddAxis<AnkleBotInputAxis>( "0", 0.0f );
+		gameObject.AddComponent<InputAxisManager>();
+		horizontal = InputAxisManager.AddAxis<AnkleBotInputAxis>( "1", 0.0f );
+		vertical = InputAxisManager.AddAxis<AnkleBotInputAxis>( "0", 0.0f );
 	}
 
 	public void Disconnect()
@@ -292,9 +292,9 @@ public class ToAnkleRobot : MonoBehaviour {
 		activeConnection = false;
 		//connection.CloseConnection();
 
-		Destroy( GetComponent<InputManager>() );
-		InputManager.RemoveAxis( "0" );
-		InputManager.RemoveAxis( "1" );
+		Destroy( GetComponent<InputAxisManager>() );
+		InputAxisManager.RemoveAxis( "0" );
+		InputAxisManager.RemoveAxis( "1" );
 	}
 
 }

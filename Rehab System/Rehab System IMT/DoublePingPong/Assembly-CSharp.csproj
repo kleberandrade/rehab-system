@@ -55,7 +55,7 @@
      <Compile Include="Assets\Scripts\GameConnection.cs" />
      <Compile Include="Assets\Scripts\GameServer.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />
-     <Compile Include="Assets\Scripts\InputManager.cs" />
+     <Compile Include="Assets\Scripts\InputAxisManager.cs" />
      <Compile Include="Assets\Scripts\NetworkClientTCP.cs" />
      <Compile Include="Assets\Scripts\NetworkClientUDP.cs" />
      <Compile Include="Assets\Scripts\NetworkInterface.cs" />
