@@ -11,10 +11,8 @@ public class PXIeInputAxis : RemoteInputAxis
 	private static byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 	private static byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 
-	public override void Init( string axisName, float initialPosition = 0.0f )
-	{ 
-		base.Init( axisName, initialPosition );
-
+	public PXIeInputAxis()
+	{
 		setpointsMask = new BitArray( 4, false );
 			
 		Connect();

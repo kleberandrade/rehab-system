@@ -7,7 +7,9 @@ using System;
 using System.IO;
 using System.Text;
 
-public class ToAnkleRobot : MonoBehaviour {
+[ RequireComponent( typeof(InputAxisManager) ) ]
+public class ToAnkleRobot : MonoBehaviour 
+{
 	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
@@ -282,19 +284,13 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		activeConnection = true;
 
-		gameObject.AddComponent<InputAxisManager>();
-		horizontal = InputAxisManager.AddAxis<AnkleBotInputAxis>( "1", 0.0f );
-		vertical = InputAxisManager.AddAxis<AnkleBotInputAxis>( "0", 0.0f );
+		horizontal = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "1" );
+		vertical = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "0" );
 	}
 
 	public void Disconnect()
 	{
 		activeConnection = false;
-		//connection.CloseConnection();
-
-		Destroy( GetComponent<InputAxisManager>() );
-		InputAxisManager.RemoveAxis( "0" );
-		InputAxisManager.RemoveAxis( "1" );
 	}
 
 }

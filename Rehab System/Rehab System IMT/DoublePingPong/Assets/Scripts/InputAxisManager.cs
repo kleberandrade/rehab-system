@@ -11,28 +11,25 @@ public class InputAxisManager : MonoBehaviour
 	//private static StreamWriter inputLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\input.txt", false );
 	//private static StreamWriter trajectoryLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\trajectory.txt", false );
 
-	private static List<InputAxis> inputAxes = new List<InputAxis>();
+	private List<InputAxis> inputAxes = new List<InputAxis>();
 
-	void Start()
+	public InputAxis GetAxis<AxisType>( string axisID ) where AxisType : InputAxis, new()
 	{
-		AddAxis<MouseInputAxis>( "Mouse X", Input.mousePosition.x );
-		AddAxis<MouseInputAxis>( "Mouse Y", Input.mousePosition.y );
-		AddAxis<KeyboardInputAxis>( "Horizontal" );
-		AddAxis<KeyboardInputAxis>( "Vertical" );
-	}
+		InputAxis newAxis = inputAxes.Find( axis => axisID == axis.Name );
 
-	public static InputAxis AddAxis<AxisType>( string axisID, float initialPosition = 0.0f ) where AxisType : InputAxis, new()
-	{
-		if( inputAxes.Find( axis => axisID == axis.Name ) == null )	inputAxes.Add( new AxisType() );
+		if( newAxis == null ) 
+		{
+			newAxis = new AxisType();
 
-		InputAxis newAxis = GetAxis( axisID );
+			if( !newAxis.Init( axisID ) ) return null;
 
-		if( newAxis != null ) newAxis.Init( axisID, initialPosition );
+			inputAxes.Add( newAxis );
+		}
 
 		return newAxis;
 	}
 
-	public static void RemoveAxis( string axisID )
+	public void RemoveAxis( string axisID )
 	{
 		inputAxes.RemoveAll( axis => axisID == axis.Name );
 	}
@@ -45,13 +42,10 @@ public class InputAxisManager : MonoBehaviour
 			inputAxis.Update( elapsedTime );
 	}
 
-	public static InputAxis GetAxis( string axisID )
-	{
-		return inputAxes.Find( axis => axisID == axis.Name );
-	}
-
 	void OnDestroy()
 	{
+		inputAxes.Clear();
+
 		//inputLog.Close();
 		//trajectoryLog.Close();
 	}
