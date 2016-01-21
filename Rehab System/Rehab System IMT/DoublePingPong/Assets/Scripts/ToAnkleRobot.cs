@@ -7,7 +7,9 @@ using System;
 using System.IO;
 using System.Text;
 
-public class ToAnkleRobot : MonoBehaviour {
+[ RequireComponent( typeof(InputAxisManager) ) ]
+public class ToAnkleRobot : MonoBehaviour 
+{
 	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
@@ -26,7 +28,9 @@ public class ToAnkleRobot : MonoBehaviour {
 	// Communication with another scripts
 	public PlayerController player;
 	public EnemyController enemy;
-	private Connection connection;
+
+	//private Connection connection;
+	private InputAxis horizontal, vertical;
 
 	// Communication
 	public Vector2 input, enemyPos;
@@ -42,7 +46,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	public Vector2 freeSpace;
 	public float K, D;				// Stiffness and Damping
 
-	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+	private string textFile = "./LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
 
 	void Awake () 
 	{
@@ -89,26 +93,21 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		if (activeConnection)
 		{
-			input = new Vector2
-				(
-				connection.ReadStatus(HORIZONTAL, Connection.POSITION),
-				connection.ReadStatus(VERTICAL, Connection.POSITION)
-				);
+			//input = new Vector2( connection.ReadStatus(HORIZONTAL, Connection.POSITION), connection.ReadStatus(VERTICAL, Connection.POSITION) );
+			input = new Vector2( horizontal.Position, vertical.Position );
 
 			// Move player
-			player.SetWalls(ElipseToSquare(input));
+			player.SetWalls( ElipseToSquare( input ) );
 
 			// Player helper
-			if (activeHelper)
-				PlayerHelper ();
+			if( activeHelper ) PlayerHelper();
 
-			if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
-			                connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce)
+			//if( new Vector2( connection.ReadStatus( HORIZONTAL, Connection.FORCE ), connection.ReadStatus( HORIZONTAL, Connection.FORCE ) ).magnitude > lazyForce )
+			if( new Vector2( horizontal.Force, horizontal.Force ).magnitude > lazyForce )	
 				machineScore += Time.deltaTime;
-			else
-				if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.VELOCITY),
-			                connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
-					playerScore += Time.deltaTime;
+			//else if( new Vector2( connection.ReadStatus( HORIZONTAL, Connection.VELOCITY ), connection.ReadStatus( HORIZONTAL, Connection.VELOCITY ) ).magnitude > lazySpeed )
+			else if( new Vector2( horizontal.Velocity, horizontal.Velocity ).magnitude > lazySpeed )
+				playerScore += Time.deltaTime;
 
 			// Follow the ball
 			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
@@ -117,25 +116,31 @@ public class ToAnkleRobot : MonoBehaviour {
 				centerSpring = enemyPos;
 
 			// Set variables to send to robot
-			connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
-			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
-			connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
-			connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.FREESPACE);
+			//connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
+			vertical.Position = centerSpring.y;
+			//connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
+			horizontal.Position = centerSpring.x;
+			//connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
+			vertical.Velocity = freeSpace.y;
+			//connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.FREESPACE);
+			horizontal.Velocity = freeSpace.x;
 
-			connection.SetStatus (VERTICAL, K, Connection.STIFF);
-			connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
-			connection.SetStatus (VERTICAL, D, Connection.DAMP);
-			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
+			//connection.SetStatus (VERTICAL, K, Connection.STIFF);
+			vertical.Stiffness = K;
+			//connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
+			horizontal.Stiffness = K;
+			//connection.SetStatus (VERTICAL, D, Connection.DAMP);
+			vertical.Damping = D;
+			//connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
+			horizontal.Damping = D;
 
 			// Print the all variables
-			File.AppendAllText(textFile, 
-			                   + Time.time + "\t"
-			                   + input.x + "\t" 
-			                   + input.y  + "\t");
-			
-			for (int j = 0; j < Connection.N_VAR; j++)
-				for (int i = 1; i >= 0; i--)
-					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
+			File.AppendAllText( textFile, + Time.time + "\t"
+			                              + input.x + "\t" 
+			                              + input.y  + "\t" );
+
+			File.AppendAllText( textFile, vertical.Position + "\t" + vertical.Velocity + "\t" + vertical.Force );
+			File.AppendAllText( textFile, horizontal.Position + "\t" + horizontal.Velocity + "\t" + horizontal.Force );
 
 			File.AppendAllText(textFile, centerSpring.x + "\t");
 			File.AppendAllText(textFile, centerSpring.y + "\t");
@@ -278,16 +283,14 @@ public class ToAnkleRobot : MonoBehaviour {
 	public void Connect()
 	{
 		activeConnection = true;
-		gameObject.AddComponent<Connection>();
-		connection = GetComponent<Connection>();
+
+		horizontal = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "1" );
+		vertical = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "0" );
 	}
 
 	public void Disconnect()
 	{
 		activeConnection = false;
-		//connection.CloseConnection();
-		Destroy (GetComponent <Connection>());
-		connection = null;
 	}
 
 }
