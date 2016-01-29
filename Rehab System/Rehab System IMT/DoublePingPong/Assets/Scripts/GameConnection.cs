@@ -39,16 +39,4 @@ public abstract class GameConnection : MonoBehaviour
 	}
 
 	public abstract void Connect();
-
-	// Use this for initialization
-	void Start() 
-	{
-		Connect();
-	}
-	
-	// Update is called once per frame
-	/*void Update() 
-	{
-	
-	}*/
 }

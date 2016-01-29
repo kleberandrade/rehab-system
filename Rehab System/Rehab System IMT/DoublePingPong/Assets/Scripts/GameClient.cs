@@ -7,7 +7,7 @@ public class GameClient : GameConnection
 {
 	public override void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, ConnectionManager.LOCAL_SERVER_HOST );
+		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"10.42.0.1" );
 		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
 	}
 
