@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-public enum InputAxisType { Mouse, Keyboard, PXIe, AnkleBot };
+public enum InputAxisType { Keyboard, Mouse, PXIe, AnkleBot };
 
 public class InputAxisManager : MonoBehaviour
 {

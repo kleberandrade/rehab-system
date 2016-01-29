@@ -64,20 +64,20 @@ public class Robot : MonoBehaviour
 	{
 		activeConnection = false;
 //		connection = GetComponent<Connection>();
-		File.WriteAllText (textFile, "Horizontal\t" +
-		                   			 "Vertical" + 
-		                   			Environment.NewLine + 
-									 "Time\t" +
-									 "SqrPos\t\t" +
-									 "Pos\t\t" +
-									 "FVel\t\t" +
-									 "Vel\t\t" +
-									 "Torque\t" +
-		                   			 "CenterSpring\t\t" +
-		                   			 "FreeSpace\t\t" +
-		                   			 "K" +
-		                   			 "D" +
-		                   			Environment.NewLine);
+//		File.WriteAllText (textFile, "Horizontal\t" +
+//		                   			 "Vertical" + 
+//		                   			Environment.NewLine + 
+//									 "Time\t" +
+//									 "SqrPos\t\t" +
+//									 "Pos\t\t" +
+//									 "FVel\t\t" +
+//									 "Vel\t\t" +
+//									 "Torque\t" +
+//		                   			 "CenterSpring\t\t" +
+//		                   			 "FreeSpace\t\t" +
+//		                   			 "K" +
+//		                   			 "D" +
+//		                   			Environment.NewLine);
 	}
 
 	void Update()
@@ -93,8 +93,7 @@ public class Robot : MonoBehaviour
 	{
 		if( activeConnection )
 		{
-			//input = new Vector2( connection.ReadStatus(HORIZONTAL, Connection.POSITION), connection.ReadStatus(VERTICAL, Connection.POSITION) );
-			input = new Vector2( horizontal.Position, vertical.Position );
+			input = new Vector2( horizontal.Position, vertical.Position ) * 5.0f;
 
 			// Move player
 			player.SetWalls( ElipseToSquare( input ) );
@@ -102,64 +101,47 @@ public class Robot : MonoBehaviour
 			// Player helper
 			if( activeHelper ) PlayerHelper();
 
-			//if( new Vector2( connection.ReadStatus( HORIZONTAL, Connection.FORCE ), connection.ReadStatus( HORIZONTAL, Connection.FORCE ) ).magnitude > lazyForce )
-			if( new Vector2( horizontal.Force, horizontal.Force ).magnitude > lazyForce )	
-				machineScore += Time.deltaTime;
-			//else if( new Vector2( connection.ReadStatus( HORIZONTAL, Connection.VELOCITY ), connection.ReadStatus( HORIZONTAL, Connection.VELOCITY ) ).magnitude > lazySpeed )
-			else if( new Vector2( horizontal.Velocity, horizontal.Velocity ).magnitude > lazySpeed )
-				playerScore += Time.deltaTime;
+			if( new Vector2( horizontal.Force, horizontal.Force ).magnitude > lazyForce ) machineScore += Time.deltaTime;
+			else if( new Vector2( horizontal.Velocity, horizontal.Velocity ).magnitude > lazySpeed ) playerScore += Time.deltaTime;
 
 			// Follow the ball
 			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
 			enemyPos = SquareToElipse (enemyPos);
-			if (followBall)
-				centerSpring = enemyPos;
+			if( followBall ) centerSpring = enemyPos;
 
 			// Set variables to send to robot
-			//connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
 			vertical.Position = centerSpring.y;
-			//connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
 			horizontal.Position = centerSpring.x;
-			//connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
 			vertical.Velocity = freeSpace.y;
-			//connection.SetStatus (HORIZONTAL, freeSpace.x, Connection.FREESPACE);
 			horizontal.Velocity = freeSpace.x;
 
-			//connection.SetStatus (VERTICAL, K, Connection.STIFF);
 			vertical.Stiffness = K;
-			//connection.SetStatus (HORIZONTAL, K, Connection.STIFF);
 			horizontal.Stiffness = K;
-			//connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			vertical.Damping = D;
-			//connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
 			horizontal.Damping = D;
 
 			// Print the all variables
-			File.AppendAllText( textFile, + Time.time + "\t"
-			                              + input.x + "\t" 
-			                              + input.y  + "\t" );
-
-			File.AppendAllText( textFile, vertical.Position + "\t" + vertical.Velocity + "\t" + vertical.Force );
-			File.AppendAllText( textFile, horizontal.Position + "\t" + horizontal.Velocity + "\t" + horizontal.Force );
-
-			File.AppendAllText(textFile, centerSpring.x + "\t");
-			File.AppendAllText(textFile, centerSpring.y + "\t");
-			File.AppendAllText(textFile, freeSpace.x + "\t");
-			File.AppendAllText(textFile, freeSpace.y + "\t");
-			File.AppendAllText(textFile, K + "\t");
-			File.AppendAllText(textFile, D + "\t");
-
-			File.AppendAllText(textFile, Environment.NewLine);
+//			File.AppendAllText( textFile, + Time.time + "\t"
+//			                              + input.x + "\t" 
+//			                              + input.y  + "\t" );
+//
+//			File.AppendAllText( textFile, vertical.Position + "\t" + vertical.Velocity + "\t" + vertical.Force );
+//			File.AppendAllText( textFile, horizontal.Position + "\t" + horizontal.Velocity + "\t" + horizontal.Force );
+//
+//			File.AppendAllText(textFile, centerSpring.x + "\t");
+//			File.AppendAllText(textFile, centerSpring.y + "\t");
+//			File.AppendAllText(textFile, freeSpace.x + "\t");
+//			File.AppendAllText(textFile, freeSpace.y + "\t");
+//			File.AppendAllText(textFile, K + "\t");
+//			File.AppendAllText(textFile, D + "\t");
+//
+//			File.AppendAllText(textFile, Environment.NewLine);
 			
 		} 
         else 
 		{
             player.MoveWalls( ReadInput() );
-			input = new Vector2
-				(
-				player.horizontalWalls [0].position.x/player.boundary,
-				player.verticalWalls [0].position.z/player.boundary
-				);
+			input = new Vector2( player.horizontalWalls[ 0 ].position.x/player.boundary, player.verticalWalls[ 0 ].position.z/player.boundary );
 		}
 
 		Calibration( input );
@@ -188,80 +170,70 @@ public class Robot : MonoBehaviour
 		Vector2 impact, impactBoundary, safeArea, track, distance;
 		float impactDist;
 
-		impactDist = enemy.FindImpact (targetMask).distance + helperLimit;
+		impactDist = enemy.FindImpact( targetMask ).distance + helperLimit;
 
-		impact = new Vector2 (
-			enemy.FindImpact(targetMask).point.x, 
-			enemy.FindImpact(targetMask).point.z);
+		impact = new Vector2( enemy.FindImpact( targetMask ).point.x, enemy.FindImpact( targetMask ).point.z );
 
-		impactBoundary = new Vector2 (
-			Mathf.Clamp(impact.x, -player.boundary, player.boundary), 
-			Mathf.Clamp(impact.y, -player.boundary, player.boundary));
+		impactBoundary = new Vector2( Mathf.Clamp( impact.x, -player.boundary, player.boundary ), Mathf.Clamp( impact.y, -player.boundary, player.boundary ) );
 		
-		safeArea = new Vector2 (
-			player.boundary - Mathf.Abs (impactBoundary.y),
-			player.boundary - Mathf.Abs (impactBoundary.x));
+		safeArea = new Vector2(	player.boundary - Mathf.Abs( impactBoundary.y ), player.boundary - Mathf.Abs( impactBoundary.x ) );
 		
 //		track = new Vector2	(
 //			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
 //			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
 
-		track = new Vector2 (impactDist, impactDist);
+		track = new Vector2( impactDist, impactDist );
 		
-		distance = (track + safeArea) / enemy.speed * player.speed;
+		distance = ( track + safeArea ) / enemy.speed * player.speed;
 		
-		if (helperFade >= 1f)
+		if( helperFade >= 1.0f )
 		{
-			if ((centerSpring - SquareToElipse (impact)).magnitude < 0.05f)
+			if( ( centerSpring - SquareToElipse( impact ) ).magnitude < 0.05f )
 			{
-				centerSpring = SquareToElipse (impact);
-				freeSpace = SquareToElipse (distance);
+				centerSpring = SquareToElipse( impact );
+				freeSpace = SquareToElipse( distance );
 			}
 			else
 			{
-				helperFade = 0f;
+				helperFade = 0.0f;
 			}
 		}
 		else
 		{
-			centerSpring = Vector2.Lerp( centerSpring, SquareToElipse (impact), helperFade);
-			freeSpace = Vector2.Lerp( freeSpace, SquareToElipse (distance), helperFade);
+			centerSpring = Vector2.Lerp( centerSpring, SquareToElipse( impact ), helperFade );
+			freeSpace = Vector2.Lerp( freeSpace, SquareToElipse( distance ), helperFade );
 			helperFade += Time.deltaTime;
 		}
 	}
 
-	Vector2 ElipseToSquare(Vector2 elipse)
+	Vector2 ElipseToSquare( Vector2 elipse )
 	{
 		float range, r;
 		float cosAng, sinAng;
 		Vector2 square = Vector2.zero;
+        			
+        float ang = Mathf.Atan2( ( elipse.y - origin.y ) * bases.x, ( elipse.x - origin.x ) * bases.y );    // ATAN2(((X-OX)*BY);((Y-OY)*BX))
 
-						// ATAN2(((X-OX)*BY);((Y-OY)*BX))
-		float ang = Mathf.Atan2 ((elipse.y - origin.y) * bases.x, (elipse.x - origin.x)*bases.y);
-
-		cosAng = Mathf.Cos(ang);
-		sinAng = Mathf.Sin(ang);
-
-		if (Mathf.Abs(cosAng) < Mathf.Epsilon)
-					// (Y - OY)/SIN(T)/BY
-			range = ((elipse.y - origin.y)/sinAng/bases.y);
-		else
-					// (X - OX)/COS(T)/BX
-			range = ((elipse.x - origin.x)/cosAng/bases.x);
-
-		if (Mathf.Abs(cosAng) < QUADRANTS)
+		cosAng = Mathf.Cos( ang );
+		sinAng = Mathf.Sin( ang );
+         
+        if( Mathf.Abs( cosAng ) < Mathf.Epsilon ) range = ( elipse.y - origin.y ) / sinAng / bases.y;   // (Y - OY)/SIN(T)/BY
+        else range = ( elipse.x - origin.x ) / cosAng / bases.x;                                        // (X - OX)/COS(T)/BX
+					
+		if( Mathf.Abs( cosAng ) < QUADRANTS )
 		{
-			r = Mathf.Abs(1f/sinAng);
-			square.x = range*r*cosAng;
-			square.y = range*Mathf.Sign(sinAng);
+			r = Mathf.Abs( 1.0f / sinAng );
+			square.x = range * r * cosAng;
+			square.y = range * Mathf.Sign( sinAng );
 		}
 		else
 		{
-			r = Mathf.Abs(1f/cosAng);
-			square.x = range*Mathf.Sign(cosAng);
-			square.y = range*r*sinAng;
+			r = Mathf.Abs( 1.0f / cosAng );
+			square.x = range * Mathf.Sign( cosAng );
+			square.y = range * r * sinAng;
 		}
-		return (square);
+
+		return square;
 	}
 
 	
@@ -290,8 +262,8 @@ public class Robot : MonoBehaviour
 	{
 		activeConnection = true;
 
-        horizontal = GetComponent<InputAxisManager>().GetAxis( "0" );
-        vertical = GetComponent<InputAxisManager>().GetAxis( "1" );
+        horizontal = GetComponent<InputAxisManager>().GetAxis( "1" );
+        vertical = GetComponent<InputAxisManager>().GetAxis( "0" );
 
         if( horizontal == null ) horizontal = GetComponent<InputAxisManager>().GetAxis( "Horizontal", InputAxisType.Keyboard );
         if( vertical == null ) vertical = GetComponent<InputAxisManager>().GetAxis( "Vertical", InputAxisType.Keyboard );

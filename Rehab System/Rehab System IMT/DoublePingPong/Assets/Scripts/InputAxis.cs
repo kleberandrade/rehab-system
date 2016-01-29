@@ -16,7 +16,7 @@ public class InputAxis
 	protected float feedbackPosition = 0.0f, feedbackVelocity = 0.0f;
 	protected float stiffness = 0.0f, damping = 0.0f;
 
-	protected BitArray setpointsMask;
+    protected BitArray setpointsMask = new BitArray( 4, false );
 
 	public virtual bool Init( string axisName )
 	{

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AnkleanklePackage : MonoBehaviour {
+public class AnklePackage : MonoBehaviour {
 	
 	public Material mat;
 	public Vector3 startVertex;
@@ -13,7 +13,7 @@ public class AnkleanklePackage : MonoBehaviour {
 	public Vector2 origin, size, point;
 	private float lenght;
 
-	public Robot anklePackage;
+	public Robot ankleRobot;
 
 	private List<Vector3> ankleTrack;
 
@@ -21,62 +21,60 @@ public class AnkleanklePackage : MonoBehaviour {
 
 	void Start() 
 	{
-		ankleTrack = new List<Vector3> ();
+		ankleTrack = new List<Vector3>();
 		colorRate = 0.01f;
 		colorAlpha = 0.3f;
 	}
 
 	void OnPostRender() 
 	{
-		if (!mat) 
+		if( !mat ) 
 		{
-			Debug.LogError("Please Assign a material on the inspector");
+			Debug.LogError( "Please Assign a material on the inspector" );
 			return;
 		}	
 		// Start Graph plot
 		GL.PushMatrix();
-		mat.SetPass(0);
+		mat.SetPass( 0 );
 		GL.LoadOrtho();
-		GL.Begin(GL.LINES);
+		GL.Begin( GL.LINES );
 
 		// Scale of space plot
-		size = new Vector2 (
-			space.rect.width * space.localScale.x,
-			space.rect.height * space.localScale.y);
+		size = new Vector2( space.rect.width * space.localScale.x, space.rect.height * space.localScale.y );
 
 		// Center of space plot
 		origin = space.position; // + size / 2;
-		origin += Vector2.Scale(size, new Vector2(1, -1)) / 2;
+		origin += Vector2.Scale( size, new Vector2( 1, -1 ) ) / 2;
 
 		// Black Rectangle for space
-		GL.Color(Color.black);
-		RectForm (space.position, size);
-		CrossForm (origin, size);
+		GL.Color( Color.black );
+		RectForm( space.position, size );
+		CrossForm( origin, size );
 
-		// Blue Elipse for anklePackage
+		// Blue Elipse for ankleRobot
 		GL.Color(Color.blue);
-		point = origin + Vector2.Scale (anklePackage.origin, size);
-		ElipseForm (point, Vector2.Scale(anklePackage.bases, size));
-		ElipseForm (point, Vector2.Scale(anklePackage.bases, size)/anklePackage.elipseScale);
+		point = origin + Vector2.Scale (ankleRobot.origin, size);
+		ElipseForm (point, Vector2.Scale(ankleRobot.bases, size));
+		ElipseForm (point, Vector2.Scale(ankleRobot.bases, size)/ankleRobot.elipseScale);
 		CrossForm (point, 0.1f*size);
 
 
 		// Black Dot for position
 		GL.Color(Color.black);
-		point = origin + Vector2.Scale (anklePackage.input, size);
+		point = origin + Vector2.Scale (ankleRobot.input, size);
 		ElipseForm (point, 0.02f*size);
 		ElipseForm (point, 0.03f*size);
 		CrossForm (point, 0.02f*size);
 
 		// Green Lines for helper
 		GL.Color(new Color(0.0f, 0.4f, 0.0f, 1.0f));
-		ElipseForm (origin + Vector2.Scale (anklePackage.centerSpring, size), Vector2.Scale (anklePackage.freeSpace, size));
-		CrossForm (origin + Vector2.Scale (anklePackage.centerSpring, size), 0.02f*size);
+		ElipseForm (origin + Vector2.Scale (ankleRobot.centerSpring, size), Vector2.Scale (ankleRobot.freeSpace, size));
+		CrossForm (origin + Vector2.Scale (ankleRobot.centerSpring, size), 0.02f*size);
 
 		// Red Dot for enemy
 		GL.Color(Color.red);
-		ElipseForm (origin + Vector2.Scale (anklePackage.enemyPos, size), 0.02f*size);
-		CrossForm (origin + Vector2.Scale (anklePackage.enemyPos, size), 0.02f*size);
+		ElipseForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
+		CrossForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (

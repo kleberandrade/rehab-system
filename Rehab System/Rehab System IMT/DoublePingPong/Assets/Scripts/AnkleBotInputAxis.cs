@@ -32,6 +32,7 @@ public class AnkleBotInputAxis : RemoteInputAxis
 
 	public AnkleBotInputAxis()
 	{
+        //setpointsMask.Length = N_ROBOTS * N_VAR;
 		setpointsMask = new BitArray( N_ROBOTS * N_VAR, false );
 
 		Connect();

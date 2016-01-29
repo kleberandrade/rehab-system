@@ -46,14 +46,14 @@ public class PlayerController : MonoBehaviour
 	void Start()
 	{
 		// Start file for record movements
-		if (File.Exists (textFile)) File.Delete (textFile);
-		File.WriteAllText (textFile, "Horizoltal\tVertical" + Environment.NewLine);
+		//if (File.Exists (textFile)) File.Delete (textFile);
+		//File.WriteAllText (textFile, "Horizontal\tVertical" + Environment.NewLine);
 	}
 
 	void Update()
 	{
 		// Record movements
-		File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
+		//File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
 	}
 
 	void FixedUpdate()
@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
 	{
 		foreach( Rigidbody wall in verticalWalls ) 
 		{
-			wall.velocity = new Vector3( 0f, 0f, direction.y * speed );
+			wall.velocity = new Vector3( 0.0f, 0.0f, direction.y * speed );
 			// Keep the player inside the boundary
 			wall.position = new Vector3( wall.position.x, 0.0f,	Mathf.Clamp( wall.position.z, -boundary, boundary) );
 		}
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
 	// Returns a equivalente vector position based on horizontal and vertical walls
 	public Vector3 GetPosition()
 	{
-		Vector3 position = new Vector3(horizontalWalls[0].position.x, 0f, verticalWalls[0].position.z);
+		Vector3 position = new Vector3(horizontalWalls[0].position.x, 0.0f, verticalWalls[0].position.z);
 		return position;
 	}
 
@@ -129,24 +129,18 @@ public class PlayerController : MonoBehaviour
 			controlActive = false;
 	}
 	
-	float Normalize(float f)
+	float Normalize( float f )
 	{
-		if (f > 0f)
-			return 1f;
-		else if (f < 0f)
-			return -1f;
-		else return 0f;
+		if( f > 0.0f ) return 1.0f;
+		else if( f < 0.0f ) return -1.0f;
+		else return 0.0f;
 	}
 
 	// Set the f value to 0 when less then cut
-	float OutCut(float f, float cut)
+	float OutCut( float f, float cut )
 	{
-		if (f > cut)
-			return f;
-		else if (f < -cut)
-			return f;
-		else
-			return 0;
-
+		if( f > cut ) return f;
+		else if( f < -cut ) return f;
+		else return 0;
 	}
 }

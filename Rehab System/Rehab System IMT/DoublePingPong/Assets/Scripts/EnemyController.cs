@@ -21,8 +21,9 @@ public class EnemyController : MonoBehaviour {
 
 	public bool playing;
 
-	void Awake(){
-		enemyBody = GetComponent<Rigidbody> ();
+	void Awake()
+    {
+		enemyBody = GetComponent<Rigidbody>();
 	}
 
 	void Start () 
@@ -147,7 +148,7 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	public RaycastHit FindImpact(int mask)
+	public RaycastHit FindImpact( int mask )
 	{
 		RaycastHit boundaryHit;
 
@@ -158,26 +159,23 @@ public class EnemyController : MonoBehaviour {
 
 	Vector3 RandVectOnGround()
 	{
-		float rand = Random.Range (0f, Mathf.PI * 2);
-		return new Vector3(Mathf.Cos(rand), 0f, Mathf.Sin(rand)); 
+		float rand = Random.Range( 0.0f, Mathf.PI * 2 );
+		return new Vector3( Mathf.Cos( rand ), 0.0f, Mathf.Sin( rand ) ); 
 	}
 
 	void MoveEnemy()
 	{
-		if (Input.GetKey (KeyCode.J) || Input.GetKey (KeyCode.K) || Input.GetKey (KeyCode.L) || Input.GetKey (KeyCode.I)) 
+		if( Input.GetKey( KeyCode.J ) || Input.GetKey( KeyCode.K ) || Input.GetKey( KeyCode.L ) || Input.GetKey( KeyCode.I ) ) 
 		{
-			float h = 0f;
-			float v = 0f;
+			float h = 0.0f;
+			float v = 0.0f;
 
-			if (Input.GetKey (KeyCode.L))
-				h = 1f;
-			if (Input.GetKey (KeyCode.J))
-				h = -1f;
-			if (Input.GetKey (KeyCode.I))
-				v = 1f;
-			if (Input.GetKey (KeyCode.K))
-				v = -1f;
-			enemyBody.velocity = new Vector3 (h, 0f, v);
+			if( Input.GetKey( KeyCode.L ) )	h = 5.0f;
+			if( Input.GetKey( KeyCode.J ) )	h = -5.0f;
+			if( Input.GetKey( KeyCode.I ) )	v = 5.0f;
+			if( Input.GetKey( KeyCode.K ) )	v = -5.0f;
+
+			enemyBody.velocity = new Vector3( h, 0.0f, v );
 		}
 	}
 

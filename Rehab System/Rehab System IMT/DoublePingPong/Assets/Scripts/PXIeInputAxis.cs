@@ -13,9 +13,7 @@ public class PXIeInputAxis : RemoteInputAxis
 
 	public PXIeInputAxis()
 	{
-		setpointsMask = new BitArray( 4, false );
-			
-		Connect();
+        Connect();
 	}
 
 	public override void Update( float updateTime )
@@ -66,7 +64,8 @@ public class PXIeInputAxis : RemoteInputAxis
 
 	public override void Connect()
 	{
-		string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, ConnectionManager.LOCAL_SERVER_HOST );
+		string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"169.254.110.158" );
+        ConnectionManager.InfoClient.Connect( axisServerHost, 50000 );
 		ConnectionManager.AxisClient.Connect( axisServerHost, 50001 );
 	}
 }

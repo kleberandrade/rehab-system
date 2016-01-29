@@ -13,3 +13,7 @@ EditorBuildSettings:
     path: Assets/Brickout/Scenes/level2.unity
   - enabled: 0
     path: Assets/Brickout/Scenes/level3.unity
+  - enabled: 1
+    path: Assets/_Scenes/AxisSelect.unity
+  - enabled: 1
+    path: Assets/_Scenes/MiniGame.unity
