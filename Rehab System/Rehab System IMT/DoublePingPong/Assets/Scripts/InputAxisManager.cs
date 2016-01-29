@@ -5,21 +5,26 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+public enum InputAxisType { Mouse, Keyboard, PXIe, AnkleBot };
+
 public class InputAxisManager : MonoBehaviour
 {
-
 	//private static StreamWriter inputLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\input.txt", false );
 	//private static StreamWriter trajectoryLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\trajectory.txt", false );
 
-	private List<InputAxis> inputAxes = new List<InputAxis>();
+	private static List<InputAxis> inputAxes = new List<InputAxis>();
 
-	public InputAxis GetAxis<AxisType>( string axisID ) where AxisType : InputAxis, new()
+	public InputAxis GetAxis( string axisID, InputAxisType axisType = InputAxisType.Mouse )
 	{
 		InputAxis newAxis = inputAxes.Find( axis => axisID == axis.Name );
 
 		if( newAxis == null ) 
 		{
-			newAxis = new AxisType();
+			if( axisType == InputAxisType.Mouse ) newAxis = new MouseInputAxis();
+			else if( axisType == InputAxisType.Keyboard ) newAxis = new KeyboardInputAxis();
+			else if( axisType == InputAxisType.PXIe ) newAxis = new PXIeInputAxis();
+			else if( axisType == InputAxisType.AnkleBot ) newAxis = new AnkleBotInputAxis();
+			else return null;
 
 			if( !newAxis.Init( axisID ) ) return null;
 
@@ -44,7 +49,7 @@ public class InputAxisManager : MonoBehaviour
 
 	void OnDestroy()
 	{
-		inputAxes.Clear();
+		//inputAxes.Clear();
 
 		//inputLog.Close();
 		//trajectoryLog.Close();

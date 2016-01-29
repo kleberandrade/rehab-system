@@ -32,17 +32,6 @@ public static class ConnectionManager
 		}
 	}
 
-	private static NetworkServerUDP gameServer = null;
-	public static NetworkServerUDP GameServer
-	{
-		get 
-		{
-			if( gameServer == null ) gameServer = new NetworkServerUDP();
-
-			return gameServer;
-		}
-	}
-
 	private static NetworkClientUDP axisClient = null;
 	public static NetworkClientUDP AxisClient
 	{

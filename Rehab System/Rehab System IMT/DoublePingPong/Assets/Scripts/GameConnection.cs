@@ -19,6 +19,11 @@ public abstract class GameConnection : MonoBehaviour
 		localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
 	}
 
+	public bool HasRemoteKey( byte elementID, byte axisIndex )
+	{
+		return remotePositions.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) );
+	}
+
 	public float GetRemotePosition( byte elementID, byte axisIndex )
 	{
 		float value = 0.0f;

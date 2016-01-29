@@ -190,12 +190,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1491532017}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79126f7e8cf27a640a6d7c0aee908f97, type: 3}
+  m_Script: {fileID: 11500000, guid: 87f62b0c09c9d054d87ef76cd60dde3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
-  pickUp: {fileID: 106026, guid: 9c8ee4bab87fc5f47883dce0c07de293, type: 2}
-  training: {fileID: 1801299598}
+  speed: 0
+  pickUp: {fileID: 0}
+  training: {fileID: 0}
   enemyBody: {fileID: 0}
   onTagPickUp: 0
   onWallHit: 0
@@ -510,7 +510,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 236470446}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b05258a7256000544bdd978a264d6039, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ab4d20c6ad4e6c4e8edfb9969cd3f23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   activeConnection: 0
@@ -521,21 +521,21 @@ MonoBehaviour:
   lazyScoreText: {fileID: 1381727666}
   lazySpeed: 0
   lazyForce: 0
-  max: {x: 0.1, y: 0.1}
-  min: {x: -0.1, y: -0.1}
-  bases: {x: 0.1, y: 0.1}
+  max: {x: 0, y: 0}
+  min: {x: 0, y: 0}
+  bases: {x: 0, y: 0}
   origin: {x: 0, y: 0}
-  elipseScale: 0.9
-  player: {fileID: 2062545112}
-  enemy: {fileID: 8477717}
+  elipseScale: 0
+  player: {fileID: 0}
+  enemy: {fileID: 0}
   input: {x: 0, y: 0}
   enemyPos: {x: 0, y: 0}
-  helperLimit: 0.1
-  helperFade: 0.5
+  helperLimit: 0
+  helperFade: 0
   centerSpring: {x: 0, y: 0}
-  freeSpace: {x: 0.01, y: 0.01}
-  K: 1
-  D: 0.1
+  freeSpace: {x: 0, y: 0}
+  K: 0
+  D: 0
 --- !u!114 &236470448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,7 +769,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 334704782}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e33f0ee749af2ec4fbeae96018d35bfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 731a516be8fdf8b4c8c2edc1e7803a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxScaleXZ: 0.5
@@ -1429,13 +1429,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 550079178}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 111bc2956763e5d44b25f9f9455086a8, type: 3}
+  m_Script: {fileID: 11500000, guid: 699c1e0593249ce44b0d6bd057f27f99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
   startVertex: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
-  space: {fileID: 504723231}
+  space: {fileID: 0}
   origin: {x: 0, y: 0}
   size: {x: 0, y: 0}
   point: {x: 0, y: 0}
@@ -2237,7 +2237,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1282482688}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4d6f6d60fba48248b3321a87b4d1085, type: 3}
+  m_Script: {fileID: 11500000, guid: 11874d0a37e316d49937cda70246755a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
@@ -3252,7 +3252,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1801299597}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e63232a0872354142bce2cc072e95411, type: 3}
+  m_Script: {fileID: 11500000, guid: 9e1ebe5dc29daa346a94be796bfbabe0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pickUpTraining: {fileID: 362583475}
@@ -3701,19 +3701,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 7075527}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79b72fe511d1158488115bdef67dcc63, type: 3}
+  m_Script: {fileID: 11500000, guid: 626761f1fbf9a604994e2b27a6a870bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  enemy: {fileID: 8477717}
+  enemy: {fileID: 0}
   boundary: 7.25
   boundaryDist: 10
   horizontalWalls:
-  - {fileID: 7075531}
-  - {fileID: 7075530}
+  - {fileID: 0}
+  - {fileID: 0}
   verticalWalls:
-  - {fileID: 7075529}
-  - {fileID: 7075528}
+  - {fileID: 0}
+  - {fileID: 0}
   controlActive: 0
 --- !u!1 &2089567088
 GameObject:

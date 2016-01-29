@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 
 [ RequireComponent( typeof(InputAxisManager) ) ]
-public class ToAnkleRobot : MonoBehaviour 
+public class Robot : MonoBehaviour 
 {
 	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
@@ -89,9 +89,9 @@ public class ToAnkleRobot : MonoBehaviour
 		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
 	}
 
-	void FixedUpdate () 
+	void FixedUpdate() 
 	{
-		if (activeConnection)
+		if( activeConnection )
 		{
 			//input = new Vector2( connection.ReadStatus(HORIZONTAL, Connection.POSITION), connection.ReadStatus(VERTICAL, Connection.POSITION) );
 			input = new Vector2( horizontal.Position, vertical.Position );
@@ -151,30 +151,36 @@ public class ToAnkleRobot : MonoBehaviour
 
 			File.AppendAllText(textFile, Environment.NewLine);
 			
-		} else 
+		} 
+        else 
 		{
-			player.MoveWalls(player.ReadInput());
+            player.MoveWalls( ReadInput() );
 			input = new Vector2
 				(
 				player.horizontalWalls [0].position.x/player.boundary,
 				player.verticalWalls [0].position.z/player.boundary
 				);
 		}
-		Calibration (input);
+
+		Calibration( input );
 	}
 
-	void Calibration(Vector2 position)
+    public Vector2 ReadInput()
+    {
+        if( activeConnection ) return input; 
+
+        return Vector2.zero;
+    }
+
+	void Calibration( Vector2 position )
 	{
-		if (max.y < position.y)
-			max.y = position.y;
-		if (max.x < position.x)
-			max.x = position.x;
-		if (min.y > position.y)
-			min.y = position.y;
-		if (min.x > position.x)
-			min.x = position.x;
-		bases = elipseScale * (max - min) / 2;
-		origin = (max + min) / 2;
+		if( max.y < position.y ) max.y = position.y;
+		if( max.x < position.x ) max.x = position.x;
+		if( min.y > position.y ) min.y = position.y;
+		if( min.x > position.x ) min.x = position.x;
+
+		bases = elipseScale * ( max - min ) / 2;
+		origin = ( max + min ) / 2;
 	}
 
 	void PlayerHelper()
@@ -284,8 +290,11 @@ public class ToAnkleRobot : MonoBehaviour
 	{
 		activeConnection = true;
 
-		horizontal = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "1" );
-		vertical = GetComponent<InputAxisManager>().GetAxis<AnkleBotInputAxis>( "0" );
+        horizontal = GetComponent<InputAxisManager>().GetAxis( "0" );
+        vertical = GetComponent<InputAxisManager>().GetAxis( "1" );
+
+        if( horizontal == null ) horizontal = GetComponent<InputAxisManager>().GetAxis( "Horizontal", InputAxisType.Keyboard );
+        if( vertical == null ) vertical = GetComponent<InputAxisManager>().GetAxis( "Vertical", InputAxisType.Keyboard );
 	}
 
 	public void Disconnect()

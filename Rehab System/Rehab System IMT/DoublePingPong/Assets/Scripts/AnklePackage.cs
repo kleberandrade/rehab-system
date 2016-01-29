@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AnklePackage : MonoBehaviour {
+public class AnkleanklePackage : MonoBehaviour {
 	
 	public Material mat;
 	public Vector3 startVertex;
@@ -13,7 +13,7 @@ public class AnklePackage : MonoBehaviour {
 	public Vector2 origin, size, point;
 	private float lenght;
 
-	public ToAnkleRobot package;
+	public Robot anklePackage;
 
 	private List<Vector3> ankleTrack;
 
@@ -53,30 +53,30 @@ public class AnklePackage : MonoBehaviour {
 		RectForm (space.position, size);
 		CrossForm (origin, size);
 
-		// Blue Elipse for package
+		// Blue Elipse for anklePackage
 		GL.Color(Color.blue);
-		point = origin + Vector2.Scale (package.origin, size);
-		ElipseForm (point, Vector2.Scale(package.bases, size));
-		ElipseForm (point, Vector2.Scale(package.bases, size)/package.elipseScale);
+		point = origin + Vector2.Scale (anklePackage.origin, size);
+		ElipseForm (point, Vector2.Scale(anklePackage.bases, size));
+		ElipseForm (point, Vector2.Scale(anklePackage.bases, size)/anklePackage.elipseScale);
 		CrossForm (point, 0.1f*size);
 
 
 		// Black Dot for position
 		GL.Color(Color.black);
-		point = origin + Vector2.Scale (package.input, size);
+		point = origin + Vector2.Scale (anklePackage.input, size);
 		ElipseForm (point, 0.02f*size);
 		ElipseForm (point, 0.03f*size);
 		CrossForm (point, 0.02f*size);
 
 		// Green Lines for helper
 		GL.Color(new Color(0.0f, 0.4f, 0.0f, 1.0f));
-		ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
-		CrossForm (origin + Vector2.Scale (package.centerSpring, size), 0.02f*size);
+		ElipseForm (origin + Vector2.Scale (anklePackage.centerSpring, size), Vector2.Scale (anklePackage.freeSpace, size));
+		CrossForm (origin + Vector2.Scale (anklePackage.centerSpring, size), 0.02f*size);
 
 		// Red Dot for enemy
 		GL.Color(Color.red);
-		ElipseForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
-		CrossForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
+		ElipseForm (origin + Vector2.Scale (anklePackage.enemyPos, size), 0.02f*size);
+		CrossForm (origin + Vector2.Scale (anklePackage.enemyPos, size), 0.02f*size);
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (
