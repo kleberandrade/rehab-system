@@ -11,11 +11,6 @@ public class PXIeInputAxis : RemoteInputAxis
 	private static byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 	private static byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 
-	public PXIeInputAxis()
-	{
-        Connect();
-	}
-
 	public override void Update( float updateTime )
 	{
 		bool newDataReceived = ConnectionManager.AxisClient.ReceiveData( inputBuffer );

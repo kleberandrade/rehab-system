@@ -25,6 +25,8 @@ public class InputAxis
 		return true;
 	}
 
+    public virtual void End() {}
+
 	public void Reset()
 	{
 		positionOffset = 0.0f;
@@ -72,10 +74,23 @@ public class RemoteInputAxis : InputAxis
 	{
 		base.Init( axisName );
 
-		return byte.TryParse( axisName, out id );
+        if( byte.TryParse( axisName, out id ) )
+        {
+            Connect();
+            return true;
+        }
+
+        return false;
 	}
 
+    public override void End()
+    {
+        Disconnect();
+    }
+
 	public virtual void Connect() {}
+
+    public virtual void Disconnect() {}
 }
 
 public class MouseInputAxis : LocalInputAxis

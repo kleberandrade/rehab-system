@@ -53,7 +53,6 @@
      <Compile Include="Assets\Scripts\EnemyController.cs" />
      <Compile Include="Assets\Scripts\EnemyTarget.cs" />
      <Compile Include="Assets\Scripts\GameClient.cs" />
-     <Compile Include="Assets\Scripts\GameConnection.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />
      <Compile Include="Assets\Scripts\InputAxisManager.cs" />
      <Compile Include="Assets\Scripts\NetworkClientTCP.cs" />

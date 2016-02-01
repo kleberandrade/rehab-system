@@ -47,9 +47,12 @@ public class InputAxisManager : MonoBehaviour
 			inputAxis.Update( elapsedTime );
 	}
 
-	void OnDestroy()
+    void OnApplicationQuit()
 	{
-		//inputAxes.Clear();
+        foreach( InputAxis inputAxis in inputAxes )
+            inputAxis.End();
+
+        inputAxes.Clear();
 
 		//inputLog.Close();
 		//trajectoryLog.Close();

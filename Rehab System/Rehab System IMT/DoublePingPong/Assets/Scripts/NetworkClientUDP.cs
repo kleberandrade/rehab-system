@@ -9,9 +9,7 @@ using System.Threading;
 
 public class NetworkClientUDP : NetworkClient 
 {
-	private const int QUEUE_LENGTH = 5;
-	private byte[][] messageQueue = new byte[ QUEUE_LENGTH ][] { new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ], new byte[ BUFFER_SIZE ] };
-	private int firstIndex = 0, lastIndex = 0;
+	private byte[] lastMessage = new byte[ BUFFER_SIZE ];
 
 	private Thread updateThread = null;
 	private bool isReceiving = false;
@@ -66,11 +64,9 @@ public class NetworkClientUDP : NetworkClient
 					{
 						try
 						{
-							int bytesRead = workSocket.Receive( messageQueue[ lastIndex % QUEUE_LENGTH ] );
+                            int bytesRead = workSocket.Receive( lastMessage );
 
 							Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
-
-							lastIndex++;
 						}
 						catch( SocketException e )
 						{
@@ -92,23 +88,18 @@ public class NetworkClientUDP : NetworkClient
 
 	public override bool ReceiveData( byte[] inputBuffer ) 
 	{	
-		if( lastIndex - firstIndex > 0 )
+		try
 		{
-			try
+			lock( searchLock )
 			{
-				lock( searchLock )
-				{
-					Buffer.BlockCopy( messageQueue[ firstIndex % QUEUE_LENGTH ], 0, inputBuffer, 0, BUFFER_SIZE );
+                Buffer.BlockCopy( lastMessage, 0, inputBuffer, 0, Math.Min( inputBuffer.Length, BUFFER_SIZE ) );
 
-					firstIndex++;
-
-					return true;
-				}
+				return true;
 			}
-			catch( Exception e ) 
-			{
-				Debug.Log( e.ToString() );
-			}
+		}
+		catch( Exception e ) 
+		{
+			Debug.Log( e.ToString() );
 		}
 
 		return false;
@@ -117,8 +108,13 @@ public class NetworkClientUDP : NetworkClient
 	public override void Disconnect()
 	{
 		isReceiving = false;
-		if( updateThread != null )
-			updateThread.Join();
+        if( updateThread != null )
+        {
+            if( updateThread.IsAlive )
+            {
+                /*if( !updateThread.Join( 1000 ) )*/ updateThread.Abort();
+            }
+        }
 
 		base.Disconnect();
 
