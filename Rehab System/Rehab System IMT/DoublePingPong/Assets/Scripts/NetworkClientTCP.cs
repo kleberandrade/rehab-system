@@ -30,14 +30,13 @@ public class NetworkClientTCP : NetworkClient
 			Debug.Log( "Receive" );
 			try 
 			{
-				//if( client.Available > 0 )
-				//{
-				    int bytesRead = workSocket.Receive( inputBuffer );
+                int bytesRead = 0;
+                while( bytesRead < inputBuffer.Length )
+                    bytesRead += workSocket.Receive( inputBuffer );
 
-					Debug.Log( "Received " + bytesRead.ToString() + "bytes from " + workSocket.RemoteEndPoint );
+				Debug.Log( "Received " + bytesRead.ToString() + "bytes from " + workSocket.RemoteEndPoint );
 
-					return true;
-				//}
+				return true;
 			} 
 			catch( Exception e ) 
 			{

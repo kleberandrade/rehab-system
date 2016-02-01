@@ -46,7 +46,7 @@ public class Robot : MonoBehaviour
 	public Vector2 freeSpace;
 	public float K, D;				// Stiffness and Damping
 
-	private string textFile = "./LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+	//private string textFile = "./LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
 
 	void Awake () 
 	{
