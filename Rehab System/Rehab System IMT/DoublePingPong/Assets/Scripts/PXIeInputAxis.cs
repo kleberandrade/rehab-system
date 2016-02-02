@@ -11,6 +11,13 @@ public class PXIeInputAxis : RemoteInputAxis
 	private static byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 	private static byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 
+    public override void Connect()
+    {
+        string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.181" );
+        ConnectionManager.InfoClient.Connect( axisServerHost, 50000 );
+        ConnectionManager.AxisClient.Connect( axisServerHost, 50001 );
+    }
+
 	public override void Update( float updateTime )
 	{
 		bool newDataReceived = ConnectionManager.AxisClient.ReceiveData( inputBuffer );
@@ -56,12 +63,11 @@ public class PXIeInputAxis : RemoteInputAxis
 
 		if( newDataReceived ) ConnectionManager.AxisClient.SendData( outputBuffer );
 	}
-
-	public override void Connect()
-	{
-		string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.181" );
-        ConnectionManager.InfoClient.Connect( axisServerHost, 50000 );
-		ConnectionManager.AxisClient.Connect( axisServerHost, 50001 );
-	}
+       
+    public override void Disconnect()
+    {
+        ConnectionManager.InfoClient.Disconnect();
+        ConnectionManager.AxisClient.Disconnect();
+    }
 }
 

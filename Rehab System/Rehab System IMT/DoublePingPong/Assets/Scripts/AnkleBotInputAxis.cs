@@ -86,14 +86,14 @@ public class AnkleBotInputAxis : RemoteInputAxis
 		return;
 	}
 
-	public void CloseConnection()
+	public override void Disconnect()
 	{
 		ConnectionManager.InfoClient.Disconnect();
 	}
 
 	~AnkleBotInputAxis()
 	{
-		CloseConnection();
+        Disconnect();
 	}
 }
 

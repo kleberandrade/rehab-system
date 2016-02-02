@@ -96,7 +96,7 @@ public class Robot : MonoBehaviour
 			input = new Vector2( horizontal.Position, vertical.Position ) * 5.0f;
 
 			// Move player
-			player.SetWalls( ElipseToSquare( input ) );
+			//player.SetWalls( ElipseToSquare( input ) );
 
 			// Player helper
 			if( activeHelper ) PlayerHelper();
