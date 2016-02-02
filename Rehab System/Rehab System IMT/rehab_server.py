@@ -91,7 +91,10 @@ while True:
     for client in clientMessagesList:
       data = client.ReceiveData()
       if data is not None:
-#        print( 'Received {} from {}'.format( struct.unpack( 'f', data[3:7] )[0], client.address ) )
+        dataLength = data[ 0 ]
+#        print( 'Received {} from {}'.format( data[ 0:dataLength ], client.address ) )
+        for id in range( 1, dataLength, 6 ):
+          print( 'Received <({},{}): {}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], str(client.address) ) )
         clientMessagesList[ client ] = data
 
     for sendClient in clientMessagesList:
@@ -103,11 +106,11 @@ while True:
           data = clientMessagesList[ client ]
           dataLength = data[ 0 ]
           messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
-          messageLength += dataLength
-          for id in range( 0, dataLength, 7 ):
-            print( 'Sending <({},{}): {}> from {} to {}'.format( data[ id + 1 ], data[ id + 2 ],
-                                                                 struct.unpack( 'f', data[ id + 3:id + 7 ] )[ 0 ],
-                                                                 str(client.address), str(sendClient.address) ) )
+          messageLength += ( dataLength - 1 )
+#          for id in range( 0, dataLength, 7 ):
+#            print( 'Sending <({},{}): {}> from {} to {}'.format( data[ id + 1 ], data[ id + 2 ],
+#                                                                 struct.unpack( 'f', data[ id + 3:id + 7 ] )[ 0 ],
+#                                                                 str(client.address), str(sendClient.address) ) )
       if messageLength > 1:
         messageBuffer[ 0 ] = messageLength
         #print( 'Sending {} bytes to {}'.format( messageBuffer[0], sendClient.address ) )
@@ -120,3 +123,4 @@ while True:
 
 #asyncio.get_event_loop().close()
 server.StopListening()
+exit()

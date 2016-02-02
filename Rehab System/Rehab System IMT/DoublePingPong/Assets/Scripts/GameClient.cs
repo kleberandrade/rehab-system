@@ -72,12 +72,14 @@ public class GameClient : MonoBehaviour
 		{
 			int inputMessageLength = (int) inputBuffer[ 0 ];
 
+            Debug.Log( "Received " + inputMessageLength.ToString() + " bytes" );
+
 			for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
 			{
 				KeyValuePair<byte,byte> remotePositionKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
 				remotePositions[ remotePositionKey ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
 
-                Debug.Log( "Received " + remotePositionKey.ToString() + " position: " + remotePositions[ remotePositionKey ].ToString() );
+                Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remotePositionKey.ToString() + ": " + remotePositions[ remotePositionKey ].ToString() );
 			}
 		}
 	}
