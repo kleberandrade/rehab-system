@@ -21,7 +21,7 @@ public class GameClient : MonoBehaviour
 
 	public void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.102" );
+		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.98" );
 		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
 	}
 
@@ -61,7 +61,7 @@ public class GameClient : MonoBehaviour
 
 			outputMessageLength += DATA_SIZE;
 
-            Debug.Log( "Sending " + localPositionKey.ToString() + " position: " + localPositions[ localPositionKey ].ToString() );
+            //Debug.Log( "Sending " + localPositionKey.ToString() + " position: " + localPositions[ localPositionKey ].ToString() );
 		}
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
@@ -72,14 +72,14 @@ public class GameClient : MonoBehaviour
 		{
 			int inputMessageLength = (int) inputBuffer[ 0 ];
 
-            Debug.Log( "Received " + inputMessageLength.ToString() + " bytes" );
+            //Debug.Log( "Received " + inputMessageLength.ToString() + " bytes" );
 
 			for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
 			{
 				KeyValuePair<byte,byte> remotePositionKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
 				remotePositions[ remotePositionKey ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
 
-                Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remotePositionKey.ToString() + ": " + remotePositions[ remotePositionKey ].ToString() );
+                //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remotePositionKey.ToString() + ": " + remotePositions[ remotePositionKey ].ToString() );
 			}
 		}
 	}

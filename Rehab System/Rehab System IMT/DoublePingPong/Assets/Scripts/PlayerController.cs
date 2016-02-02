@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
 	// Set the wall's speed
     public void MoveWalls( Vector2 input )
 	{
-        Debug.Log( "Input: " + input.ToString() );
+        //Debug.Log( "Input: " + input.ToString() );
 
 		foreach( Rigidbody wall in verticalWalls ) 
 		{

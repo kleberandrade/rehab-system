@@ -49,7 +49,7 @@ public abstract class NetworkClient : NetworkInterface
 			
 			int bytesSent = handle.EndSend( ar );
 			
-			Debug.Log( "Sent " + bytesSent.ToString() + " bytes to: " + handle.RemoteEndPoint.ToString() );
+			//Debug.Log( "Sent " + bytesSent.ToString() + " bytes to: " + handle.RemoteEndPoint.ToString() );
 		}
 		catch( Exception e ) 
 		{		
