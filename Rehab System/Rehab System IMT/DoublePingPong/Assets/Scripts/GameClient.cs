@@ -29,7 +29,7 @@ public class GameClient : MonoBehaviour
     {
         if( localPositions.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) ) )
         {
-            if( Mathf.Abs( localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] - value ) > 0.5 )
+            if( Mathf.Abs( localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] - value ) > 0.5f )
                 localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
         }
         else
@@ -59,9 +59,10 @@ public class GameClient : MonoBehaviour
 	{
 		int outputMessageLength = 1;
 
-		foreach( KeyValuePair<byte,byte> localPositionKey in localPositions.Keys ) 
+        List<KeyValuePair<byte,byte>> localPositionKeysList = new List<KeyValuePair<byte, byte>>( localPositions.Keys );
+        foreach( KeyValuePair<byte,byte> localPositionKey in localPositionKeysList ) 
 		{
-            if( float.IsNaN( localPositions[ localPositionKey ] ) )
+            if( !float.IsNaN( localPositions[ localPositionKey ] ) )
             {
     			outputBuffer[ outputMessageLength ] = localPositionKey.Key;
     			outputBuffer[ outputMessageLength + 1 ] = localPositionKey.Value;
