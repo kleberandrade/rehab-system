@@ -10,6 +10,7 @@ using System.Threading;
 public class NetworkClientUDP : NetworkClient 
 {
 	private byte[] lastMessage = new byte[ BUFFER_SIZE ];
+    private bool hasNewMessage = false;
 
 	private Thread updateThread = null;
 	private bool isReceiving = false;
@@ -67,6 +68,8 @@ public class NetworkClientUDP : NetworkClient
                             int bytesRead = workSocket.Receive( lastMessage );
 
 							Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
+
+                            hasNewMessage = true;
 						}
 						catch( SocketException e )
 						{
@@ -74,6 +77,8 @@ public class NetworkClientUDP : NetworkClient
 						}
 					}
 				} 
+
+                Thread.Sleep( 1 );
 			}
 		}
 		catch( ObjectDisposedException e ) 
@@ -92,9 +97,13 @@ public class NetworkClientUDP : NetworkClient
 		{
 			lock( searchLock )
 			{
+                bool isNewMessage = hasNewMessage;
+
                 Buffer.BlockCopy( lastMessage, 0, inputBuffer, 0, Math.Min( inputBuffer.Length, BUFFER_SIZE ) );
 
-				return true;
+                hasNewMessage = false;
+
+                return isNewMessage;
 			}
 		}
 		catch( Exception e ) 
@@ -112,7 +121,7 @@ public class NetworkClientUDP : NetworkClient
         {
             if( updateThread.IsAlive )
             {
-                /*if( !updateThread.Join( 1000 ) )*/ updateThread.Abort();
+                if( !updateThread.Join( 500 ) ) updateThread.Abort();
             }
         }
 

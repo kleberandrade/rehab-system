@@ -68,6 +68,8 @@ public class PlayerController : MonoBehaviour
 	// Set the wall's speed
     public void MoveWalls( Vector2 direction )
 	{
+        Debug.Log( "Input: " + direction.ToString() );
+
 		foreach( Rigidbody wall in verticalWalls ) 
 		{
 			wall.velocity = new Vector3( 0.0f, 0.0f, direction.y * speed );
@@ -90,7 +92,7 @@ public class PlayerController : MonoBehaviour
 	{
         // Get remotely controlled object position (z) and set it locally (x)
         foreach( Rigidbody wall in horizontalWalls ) 
-            wall.position = new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.WALL, 0 ), -boundary, boundary ), 0.0f, wall.position.z );
+            wall.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.WALL, 0 ), -boundary, boundary ), 0.0f, wall.position.z ) );
 
 		// Send locally controlled object positions (z) over network
         foreach( Rigidbody wall in verticalWalls ) 
@@ -98,14 +100,21 @@ public class PlayerController : MonoBehaviour
 
 		// Get remotely controlled ball positions (x,z) and set them locally
 		if( enemy.enemyBody.isKinematic )
-            enemy.enemyBody.position = new Vector3(	Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 0 ), -boundary, boundary ),
-                                                    0.0f, Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 2 ), -boundary, boundary ) );
+        {
+            enemy.enemyBody.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 0 ), -boundary, boundary ),
+                                          0.0f, Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 2 ), -boundary, boundary ) ) );
+        }
+        else
+        {
+            gameClient.SetLocalPosition( (byte) Movable.BALL, 0, enemy.enemyBody.position.x );
+            gameClient.SetLocalPosition( (byte) Movable.BALL, 2, enemy.enemyBody.position.z );
+        }
 	}
 
 	// Returns a equivalente vector position based on horizontal and vertical walls
 	public Vector3 GetPosition()
 	{
-		Vector3 position = new Vector3(horizontalWalls[0].position.x, 0.0f, verticalWalls[0].position.z);
+		Vector3 position = new Vector3( horizontalWalls[ 0 ].position.x, 0.0f, verticalWalls[ 0 ].position.z );
 		return position;
 	}
 

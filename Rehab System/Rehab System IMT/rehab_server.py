@@ -32,29 +32,29 @@ class AsyncServer:
   def AcceptClient( self ):
     if len(self.clientsList) == 0: return None
 
-    return self.clientsList.pop()
+    return self.clientsList.pop( 0 )
 
   def StopListening( self ):
     self.isListening = False
     self.updateLoop.stop()
     self.updateLoop.close()
+    for client in clientAddressesList:
+      client.Disconnect()
     self.workSocket.close()
 
 
 class AsyncClient:
-  messageQueue = []
 
   def ReadCallback( self ):
     while self.isReading:
-      print( 'Reading' )
       address = self.workSocket.recvfrom( BUFFER_SIZE, MSG_PEEK )[ 1 ]
       if address == self.address:
-        print( 'New message from ' + str(address) )
-        self.messageQueue.append( self.workSocket.recvfrom( BUFFER_SIZE )[ 0 ] )
+        self.message = self.workSocket.recvfrom( BUFFER_SIZE )[ 0 ]
       time.sleep( 0.02 )
 
   def __init__( self, remoteAddress, sock=None ):
     self.address = remoteAddress
+    self.message = b''
     self.workSocket = sock
     if sock is None: self.workSocket = socket( type=SOCK_DGRAM )
     self.isReading = True
@@ -62,9 +62,7 @@ class AsyncClient:
     self.updateLoop.run_in_executor( None, self.ReadCallback )
 
   def ReceiveData( self ):
-    if len(self.messageQueue) == 0: return None
-
-    return self.messageQueue.pop()
+    return self.message
 
   def SendData( self, data ):
     self.workSocket.sendto( data, self.address )
@@ -91,24 +89,30 @@ while True:
     for client in clientMessagesList:
       data = client.ReceiveData()
       if data is not None:
-        print( '{0} bytes: ({1},{2}) position: {3}\r'.format( data[0], data[1], data[2], struct.unpack( 'f', data[3:7] ) ) )
+        print( 'Received {} from {}'.format( struct.unpack( 'f', data[3:7] )[0], client.address ) )
         clientMessagesList[ client ] = data
 
     for sendClient in clientMessagesList:
       messageLength = 1
+      messageBuffer = bytearray( BUFFER_SIZE )
       for client in clientMessagesList:
-        if client is not sendClient and clientMessagesList[ client ] is not None:
+#        print( 'comparing {} to {}: {}'.format( sendClient.address[0], client.address[0], str(client.address[0] != sendClient.address[0]) ) )
+        if client.address[0] != sendClient.address[0] and clientMessagesList[ client ] is not None:
           data = clientMessagesList[ client ]
           dataLength = data[ 0 ]
           messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
           messageLength += dataLength
-      messageBuffer[ 0 ] = messageLength
-      sendClient.SendData( messageBuffer )
+          print( 'Sending <({0},{1}): {2}> from {3} to {4}'.format( data[1], data[2], struct.unpack( 'f', data[3:7] )[0],                                     
+                                                             str(client.address), str(sendClient.address) ) )
+      if messageLength > 1:
+        messageBuffer[ 0 ] = messageLength
+        #print( 'Sending {} bytes to {}'.format( messageBuffer[0], sendClient.address ) )
+        sendClient.SendData( messageBuffer )
 
   except ( KeyboardInterrupt, SystemExit ):
     break
 
   time.sleep( 0.01 )
 
-asyncio.get_event_loop().close()
+#asyncio.get_event_loop().close()
 server.StopListening()
