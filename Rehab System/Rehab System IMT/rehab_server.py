@@ -104,8 +104,10 @@ while True:
           dataLength = data[ 0 ]
           messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
           messageLength += dataLength
-          print( 'Sending <({0},{1}): {2}> from {3} to {4}'.format( data[1], data[2], struct.unpack( 'f', data[3:7] )[0],
-                                                             str(client.address), str(sendClient.address) ) )
+          for id in range( 0, dataLength, 7 ):
+            print( 'Sending <({},{}): {}> from {} to {}'.format( data[ id + 1 ], data[ id + 2 ],
+                                                                 struct.unpack( 'f', data[ id + 3:id + 7 ] )[ 0 ],
+                                                                 str(client.address), str(sendClient.address) ) )
       if messageLength > 1:
         messageBuffer[ 0 ] = messageLength
         #print( 'Sending {} bytes to {}'.format( messageBuffer[0], sendClient.address ) )

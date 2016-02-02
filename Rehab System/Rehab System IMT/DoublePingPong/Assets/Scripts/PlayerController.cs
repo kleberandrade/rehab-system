@@ -9,14 +9,14 @@ using System.Text;
 [ RequireComponent( typeof(GameClient) ) ]
 public class PlayerController : MonoBehaviour 
 {
-	enum Movable { WALL, BALL };
+	enum Movable { WALL = 0, BALL = 2 };
 
-	public float speed;	// Player Speed
-	public EnemyController enemy;		// The ball
+	public float speed;	                                            // Player Speed
+	public EnemyController enemy;		                            // The ball
 
-	[HideInInspector] public float boundary = 7.25f; 	// Boundary player movement
-	[HideInInspector] public float boundaryDist = 10f;	// Distance between boundary
-	private float outCut = 2f;			// Gap for helper control
+	[HideInInspector] public float boundary = 7.25f; 	            // Boundary player movement
+	[HideInInspector] public float boundaryDist = 10.0f;	        // Distance between boundary
+	private float outCut = 2.0f;			                        // Gap for helper control
 
 	private int targetMask;
 
@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
 	public Rigidbody[] horizontalWalls;
 	public Rigidbody[] verticalWalls;
-	public bool controlActive;	// Indicate if helper control is active
+	public bool controlActive;	                                    // Indicate if helper control is active
 
     public Robot robot;
 
@@ -56,9 +56,9 @@ public class PlayerController : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		UpdateClient();
-
         MoveWalls( robot.ReadInput() );
+
+		UpdateClient();
 
 //		ControlPosition ();
 	}
@@ -94,8 +94,8 @@ public class PlayerController : MonoBehaviour
             wall.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.WALL, 0 ), -boundary, boundary ), 0.0f, wall.position.z ) );
 
 		// Send locally controlled object positions (z) over network
-        foreach( Rigidbody wall in verticalWalls ) 
-            gameClient.SetLocalPosition( (byte) Movable.WALL, 0, wall.position.z );
+        //foreach( Rigidbody wall in verticalWalls ) 
+        gameClient.SetLocalPosition( (byte) Movable.WALL, 0, verticalWalls[ 0 ].position.z );
 
         if( !robot.Connected && gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) ) enemy.enemyBody.isKinematic = true;
 
