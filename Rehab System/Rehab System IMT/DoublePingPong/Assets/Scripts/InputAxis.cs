@@ -54,8 +54,8 @@ public class InputAxis
 		                              set { feedbackVelocity = ( value * range / 2.0f ); setpointsMask[ 1 ] = true; } }
 	public float NormalizedForce { get { return ( 2 * ( force - minValue ) / range - 1.0f ); } }
 
-	public float MaxValue { set { maxValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
-	public float MinValue { set { minValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
+    public float MaxValue { get { return maxValue; } set { maxValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
+    public float MinValue { get { return minValue; } set { minValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
 }
 
 public class LocalInputAxis : InputAxis

@@ -62,7 +62,9 @@ class AsyncClient:
     self.updateLoop.run_in_executor( None, self.ReadCallback )
 
   def ReceiveData( self ):
-    return self.message
+    lastMessage = self.message
+    self.message = None
+    return lastMessage
 
   def SendData( self, data ):
     self.workSocket.sendto( data, self.address )
@@ -89,7 +91,7 @@ while True:
     for client in clientMessagesList:
       data = client.ReceiveData()
       if data is not None:
-        print( 'Received {} from {}'.format( struct.unpack( 'f', data[3:7] )[0], client.address ) )
+#        print( 'Received {} from {}'.format( struct.unpack( 'f', data[3:7] )[0], client.address ) )
         clientMessagesList[ client ] = data
 
     for sendClient in clientMessagesList:
@@ -102,7 +104,7 @@ while True:
           dataLength = data[ 0 ]
           messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
           messageLength += dataLength
-          print( 'Sending <({0},{1}): {2}> from {3} to {4}'.format( data[1], data[2], struct.unpack( 'f', data[3:7] )[0],                                     
+          print( 'Sending <({0},{1}): {2}> from {3} to {4}'.format( data[1], data[2], struct.unpack( 'f', data[3:7] )[0],
                                                              str(client.address), str(sendClient.address) ) )
       if messageLength > 1:
         messageBuffer[ 0 ] = messageLength

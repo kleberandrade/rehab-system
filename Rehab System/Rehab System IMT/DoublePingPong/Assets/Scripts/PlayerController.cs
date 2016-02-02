@@ -66,15 +66,16 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// Set the wall's speed
-    public void MoveWalls( Vector2 direction )
+    public void MoveWalls( Vector2 input )
 	{
-        Debug.Log( "Input: " + direction.ToString() );
+        Debug.Log( "Input: " + input.ToString() );
 
 		foreach( Rigidbody wall in verticalWalls ) 
 		{
-			wall.velocity = new Vector3( 0.0f, 0.0f, direction.y * speed );
+			//wall.velocity = new Vector3( 0.0f, 0.0f, direction.y * speed );
 			// Keep the player inside the boundary
-			wall.position = new Vector3( wall.position.x, 0.0f,	Mathf.Clamp( wall.position.z, -boundary, boundary) );
+			//wall.position = new Vector3( wall.position.x, 0.0f,	Mathf.Clamp( wall.position.z, -boundary, boundary) );
+            wall.MovePosition( new Vector3( wall.position.x, 0.0f,  Mathf.Clamp( input.y * boundary, -boundary, boundary) ) );
 		}
 	}
 

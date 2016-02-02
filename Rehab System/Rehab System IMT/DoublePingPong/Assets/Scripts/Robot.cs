@@ -21,7 +21,6 @@ public class Robot : MonoBehaviour
 	public float lazySpeed, lazyForce;
 	
 	// Envelope do movimento
-	public Vector2 max, min;		// Input for elipse
 	public Vector2 bases, origin;	// Elipse's parameters
 	public float elipseScale;		// Scale for fitting the moves
 
@@ -93,10 +92,7 @@ public class Robot : MonoBehaviour
 	{
 		if( activeConnection )
 		{
-			input = new Vector2( horizontal.Position, vertical.Position ) * 5.0f;
-
-			// Move player
-			//player.SetWalls( ElipseToSquare( input ) );
+			input = new Vector2( horizontal.NormalizedPosition, vertical.NormalizedPosition );
 
 			// Player helper
 			if( activeHelper ) PlayerHelper();
@@ -138,13 +134,8 @@ public class Robot : MonoBehaviour
 //			File.AppendAllText(textFile, Environment.NewLine);
 			
 		} 
-        else 
-		{
-            player.MoveWalls( ReadInput() );
-			input = new Vector2( player.horizontalWalls[ 0 ].position.x/player.boundary, player.verticalWalls[ 0 ].position.z/player.boundary );
-		}
 
-		Calibration( input );
+        Calibration();
 	}
 
     public Vector2 ReadInput()
@@ -154,15 +145,16 @@ public class Robot : MonoBehaviour
         return Vector2.zero;
     }
 
-	void Calibration( Vector2 position )
+	void Calibration()
 	{
-		if( max.y < position.y ) max.y = position.y;
-		if( max.x < position.x ) max.x = position.x;
-		if( min.y > position.y ) min.y = position.y;
-		if( min.x > position.x ) min.x = position.x;
+        if( horizontal.Position > horizontal.MaxValue ) horizontal.MaxValue = horizontal.Position;
+        else if( horizontal.Position < horizontal.MinValue ) horizontal.MinValue = horizontal.Position;
 
-		bases = elipseScale * ( max - min ) / 2;
-		origin = ( max + min ) / 2;
+        if( vertical.Position > vertical.MaxValue ) vertical.MaxValue = vertical.Position;
+        else if( vertical.Position < vertical.MinValue ) vertical.MinValue = vertical.Position;
+
+        bases = elipseScale * ( new Vector2( horizontal.MaxValue, vertical.MaxValue ) - new Vector2( horizontal.MinValue, vertical.MinValue ) ) / 2;
+        origin = ( new Vector2( horizontal.MaxValue, vertical.MaxValue ) + new Vector2( horizontal.MinValue, vertical.MinValue ) ) / 2;
 	}
 
 	void PlayerHelper()
