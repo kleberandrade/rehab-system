@@ -26,8 +26,14 @@ public class GameClient : MonoBehaviour
 	}
 
     public void SetLocalPosition( byte elementID, byte axisIndex, float value ) 
-    { 
-        localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
+    {
+        if( localPositions.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) ) )
+        {
+            if( Mathf.Abs( localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] - value ) > 0.5 )
+                localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
+        }
+        else
+            localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
     }
 
     public bool HasRemoteKey( byte elementID, byte axisIndex )
@@ -55,18 +61,23 @@ public class GameClient : MonoBehaviour
 
 		foreach( KeyValuePair<byte,byte> localPositionKey in localPositions.Keys ) 
 		{
-			outputBuffer[ outputMessageLength ] = localPositionKey.Key;
-			outputBuffer[ outputMessageLength + 1 ] = localPositionKey.Value;
-			Buffer.BlockCopy( BitConverter.GetBytes( localPositions[ localPositionKey ] ), 0, outputBuffer, outputMessageLength + 2, sizeof(float) );
+            if( float.IsNaN( localPositions[ localPositionKey ] ) )
+            {
+    			outputBuffer[ outputMessageLength ] = localPositionKey.Key;
+    			outputBuffer[ outputMessageLength + 1 ] = localPositionKey.Value;
+    			Buffer.BlockCopy( BitConverter.GetBytes( localPositions[ localPositionKey ] ), 0, outputBuffer, outputMessageLength + 2, sizeof(float) );
 
-			outputMessageLength += DATA_SIZE;
+    			outputMessageLength += DATA_SIZE;
+
+                localPositions[ localPositionKey ] = float.NaN;
+            }
 
             //Debug.Log( "Sending " + localPositionKey.ToString() + " position: " + localPositions[ localPositionKey ].ToString() );
 		}
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
 
-		ConnectionManager.GameClient.SendData( outputBuffer );
+        if( outputMessageLength > 1 ) ConnectionManager.GameClient.SendData( outputBuffer );
 
 		if( ConnectionManager.GameClient.ReceiveData( inputBuffer ) )
 		{
