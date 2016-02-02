@@ -14,9 +14,14 @@ public class GameClient : MonoBehaviour
     protected Dictionary<KeyValuePair<byte,byte>,float> localPositions = new Dictionary<KeyValuePair<byte,byte>,float>();
     protected Dictionary<KeyValuePair<byte,byte>,float> remotePositions = new Dictionary<KeyValuePair<byte,byte>,float>();
 
+    void Start()
+    {
+        Connect();
+    }
+
 	public void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.98" );
+		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.102" );
 		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
 	}
 
@@ -44,7 +49,7 @@ public class GameClient : MonoBehaviour
         return remotePositions.Keys.ToArray();
     }
 
-	void Update()
+	void FixedUpdate()
 	{
 		int outputMessageLength = 1;
 
