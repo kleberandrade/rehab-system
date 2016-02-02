@@ -16,6 +16,8 @@ public class Robot : MonoBehaviour
 
 	public bool activeConnection, activeHelper, followBall;
 
+    public bool Connected { get { return activeConnection; } set { activeConnection = value; } }
+
 	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 	private float playerScore, machineScore, lazyScore;				// Value Scores
 	public float lazySpeed, lazyForce;
@@ -77,6 +79,12 @@ public class Robot : MonoBehaviour
 //		                   			 "K" +
 //		                   			 "D" +
 //		                   			Environment.NewLine);
+
+        horizontal = GetComponent<InputAxisManager>().GetAxis( "1" );
+        vertical = GetComponent<InputAxisManager>().GetAxis( "0" );
+
+        if( horizontal == null ) horizontal = GetComponent<InputAxisManager>().GetAxis( "Horizontal", InputAxisType.Keyboard );
+        if( vertical == null ) vertical = GetComponent<InputAxisManager>().GetAxis( "Vertical", InputAxisType.Keyboard );
 	}
 
 	void Update()
@@ -249,21 +257,4 @@ public class Robot : MonoBehaviour
 		elipse.y = origin.y + range * sinAng * bases.y; // / elipseScale;
 		return (elipse);
 	}
-
-	public void Connect()
-	{
-		activeConnection = true;
-
-        horizontal = GetComponent<InputAxisManager>().GetAxis( "1" );
-        vertical = GetComponent<InputAxisManager>().GetAxis( "0" );
-
-        if( horizontal == null ) horizontal = GetComponent<InputAxisManager>().GetAxis( "Horizontal", InputAxisType.Keyboard );
-        if( vertical == null ) vertical = GetComponent<InputAxisManager>().GetAxis( "Vertical", InputAxisType.Keyboard );
-	}
-
-	public void Disconnect()
-	{
-		activeConnection = false;
-	}
-
 }

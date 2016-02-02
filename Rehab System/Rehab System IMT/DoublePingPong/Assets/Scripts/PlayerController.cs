@@ -39,8 +39,6 @@ public class PlayerController : MonoBehaviour
 
 		foreach( Rigidbody wall in horizontalWalls )
 			wall.isKinematic = true;
-
-        if( gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) ) enemy.enemyBody.isKinematic = true;
 	}
 
 	void Start()
@@ -99,13 +97,15 @@ public class PlayerController : MonoBehaviour
         foreach( Rigidbody wall in verticalWalls ) 
             gameClient.SetLocalPosition( (byte) Movable.WALL, 0, wall.position.z );
 
+        if( !robot.Connected && gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) ) enemy.enemyBody.isKinematic = true;
+
 		// Get remotely controlled ball positions (x,z) and set them locally
 		if( enemy.enemyBody.isKinematic )
         {
             enemy.enemyBody.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 0 ), -boundary, boundary ),
                                           0.0f, Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 2 ), -boundary, boundary ) ) );
         }
-        else
+        else if( robot.Connected )
         {
             gameClient.SetLocalPosition( (byte) Movable.BALL, 0, enemy.enemyBody.position.x );
             gameClient.SetLocalPosition( (byte) Movable.BALL, 2, enemy.enemyBody.position.z );
