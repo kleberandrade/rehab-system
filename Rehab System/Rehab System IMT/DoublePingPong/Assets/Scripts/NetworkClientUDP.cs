@@ -77,8 +77,6 @@ public class NetworkClientUDP : NetworkClient
 						}
 					}
 				} 
-
-                Thread.Sleep( 1 );
 			}
 		}
 		catch( ObjectDisposedException e ) 
