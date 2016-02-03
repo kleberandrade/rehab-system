@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 public class GameClient : MonoBehaviour
 {
-    protected const int DATA_SIZE = 2 * sizeof(byte) + sizeof(float);
+    private const int DATA_SIZE = 2 * sizeof(byte) + sizeof(float);
 
-    protected byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
-    protected byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+    private byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+    private byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 
-    protected List<NetworkClient> remoteClients = new List<NetworkClient>();
-    protected Dictionary<KeyValuePair<byte,byte>,float> localPositions = new Dictionary<KeyValuePair<byte,byte>,float>();
-    protected Dictionary<KeyValuePair<byte,byte>,float> remotePositions = new Dictionary<KeyValuePair<byte,byte>,float>();
+    private Dictionary<KeyValuePair<byte,byte>, float> localPositions = new Dictionary<KeyValuePair<byte,byte>, float>();
+    private Dictionary<KeyValuePair<byte,byte>, bool> localPositionsUpdated = new Dictionary<KeyValuePair<byte, byte>, bool>();
+    private Dictionary<KeyValuePair<byte,byte>, float> remotePositions = new Dictionary<KeyValuePair<byte,byte>, float>();
 
     void Start()
     {
@@ -21,19 +21,29 @@ public class GameClient : MonoBehaviour
 
 	public void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.98" );
+		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.102" );
 		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
 	}
 
     public void SetLocalPosition( byte elementID, byte axisIndex, float value ) 
     {
-        if( localPositions.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) ) )
+        KeyValuePair<byte,byte> localPositionKey = new KeyValuePair<byte,byte>( elementID, axisIndex );
+
+        if( localPositions.ContainsKey( localPositionKey ) )
         {
-            if( Mathf.Abs( localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] - value ) > 0.5f )
-                localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
+            if( Mathf.Abs( localPositions[ localPositionKey ] - value ) > 0.5f )
+            {
+                localPositions[ localPositionKey ] = value;
+                localPositionsUpdated[ localPositionKey ] = true;
+
+                Debug.Log( "Setting " + localPositionKey.ToString() + " position" );
+            }
         }
         else
-            localPositions[ new KeyValuePair<byte,byte>( elementID, axisIndex ) ] = value;
+        {
+            localPositions[ localPositionKey ] = value;
+            localPositionsUpdated[ localPositionKey ] = true;
+        }
     }
 
     public bool HasRemoteKey( byte elementID, byte axisIndex )
@@ -59,10 +69,9 @@ public class GameClient : MonoBehaviour
 	{
 		int outputMessageLength = 1;
 
-        List<KeyValuePair<byte,byte>> localPositionKeysList = new List<KeyValuePair<byte, byte>>( localPositions.Keys );
-        foreach( KeyValuePair<byte,byte> localPositionKey in localPositionKeysList ) 
+        foreach( KeyValuePair<byte,byte> localPositionKey in localPositions.Keys ) 
 		{
-            if( !float.IsNaN( localPositions[ localPositionKey ] ) )
+            if( localPositionsUpdated[ localPositionKey ] )
             {
     			outputBuffer[ outputMessageLength ] = localPositionKey.Key;
     			outputBuffer[ outputMessageLength + 1 ] = localPositionKey.Value;
@@ -70,7 +79,7 @@ public class GameClient : MonoBehaviour
 
     			outputMessageLength += DATA_SIZE;
 
-                localPositions[ localPositionKey ] = float.NaN;
+                localPositionsUpdated[ localPositionKey ] = false;
             }
 
             //Debug.Log( "Sending " + localPositionKey.ToString() + " position: " + localPositions[ localPositionKey ].ToString() );
@@ -82,7 +91,7 @@ public class GameClient : MonoBehaviour
 
 		if( ConnectionManager.GameClient.ReceiveData( inputBuffer ) )
 		{
-			int inputMessageLength = (int) inputBuffer[ 0 ];
+            int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
 
             //Debug.Log( "Received " + inputMessageLength.ToString() + " bytes" );
 

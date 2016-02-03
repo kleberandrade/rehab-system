@@ -93,8 +93,8 @@ while True:
       if data is not None:
         dataLength = data[ 0 ]
 #        print( 'Received {} from {}'.format( data[ 0:dataLength ], client.address ) )
-#        for id in range( 1, dataLength, 6 ):
-#          print( 'Received <({},{}): {}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], str(client.address) ) )
+        for id in range( 1, dataLength, 6 ):
+          print( 'Received <({},{}): {}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], str(client.address) ) )
         clientMessagesList[ client ] = data
 
     for sendClient in clientMessagesList:
@@ -102,7 +102,7 @@ while True:
       messageBuffer = bytearray( BUFFER_SIZE )
       for client in clientMessagesList:
 #        print( 'comparing {} to {}: {}'.format( sendClient.address[0], client.address[0], str(client.address[0] != sendClient.address[0]) ) )
-        if client.address[0] != sendClient.address[0] and clientMessagesList[ client ] is not None:
+        if client.address != sendClient.address and clientMessagesList[ client ] is not None:
           data = clientMessagesList[ client ]
           dataLength = data[ 0 ]
           messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
