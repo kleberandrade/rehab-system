@@ -48,11 +48,12 @@
      <Compile Include="Assets\Scripts\AnkleBotInputAxis.cs" />
      <Compile Include="Assets\Scripts\AnklePackage.cs" />
      <Compile Include="Assets\Scripts\AxisSelector.cs" />
+     <Compile Include="Assets\Scripts\BallController.cs" />
      <Compile Include="Assets\Scripts\Connection.cs" />
      <Compile Include="Assets\Scripts\ConnectionManager.cs" />
-     <Compile Include="Assets\Scripts\EnemyController.cs" />
      <Compile Include="Assets\Scripts\EnemyTarget.cs" />
      <Compile Include="Assets\Scripts\GameClient.cs" />
+     <Compile Include="Assets\Scripts\Gameplay.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />
      <Compile Include="Assets\Scripts\InputAxisManager.cs" />
      <Compile Include="Assets\Scripts\NetworkClientTCP.cs" />

@@ -94,7 +94,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 7075532}
   - 114: {fileID: 2062545112}
-  - 114: {fileID: 7075533}
   m_Layer: 0
   m_Name: Walls
   m_TagString: Player
@@ -117,7 +116,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 118
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!54 &7075529
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -133,7 +132,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 118
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!54 &7075530
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -182,17 +181,6 @@ Transform:
   - {fileID: 31549323}
   m_Father: {fileID: 0}
   m_RootOrder: 10
---- !u!114 &7075533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 7075527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abe0f66ffa9707f41acdb5b3bd434e50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8477717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,15 +193,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79126f7e8cf27a640a6d7c0aee908f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
-  pickUp: {fileID: 362583475}
-  training: {fileID: 1801299598}
-  enemyBody: {fileID: 0}
-  onTagPickUp: 0
-  onWallHit: 0
-  missWall: 0
-  show: {fileID: 0}
-  playing: 0
+  speed: 10
+  boundaries: {fileID: 1372134113}
+  isPlaying: 0
+  gameClient: {fileID: 318300298}
+  isMaster: 1
 --- !u!1 &31549319
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +252,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 31549319}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -525,27 +509,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae4d589cc904e524d90b6a9941e31dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeConnection: 0
-  activeHelper: 0
-  followBall: 0
   playerScoreText: {fileID: 1063334332}
   machineScoreText: {fileID: 1051574904}
   lazyScoreText: {fileID: 1381727666}
   lazySpeed: 0
   lazyForce: 0
-  bases: {x: 0.1, y: 0.1}
-  origin: {x: 0, y: 0}
-  elipseScale: 0.9
   player: {fileID: 2062545112}
-  enemy: {fileID: 8477717}
-  input: {x: 0, y: 0}
-  enemyPos: {x: 0, y: 0}
-  helperLimit: 0.1
-  helperFade: 0.5
+  ball: {fileID: 0}
   centerSpring: {x: 0, y: 0}
   freeSpace: {x: 0.01, y: 0.01}
-  K: 1
-  D: 0.1
+  stiffness: 0
+  damping: 0
 --- !u!114 &236470448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -715,6 +689,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 318300297}
+  - 114: {fileID: 318300298}
   m_Layer: 0
   m_Name: Playing Board
   m_TagString: Untagged
@@ -738,8 +713,20 @@ Transform:
   - {fileID: 1648382677}
   - {fileID: 2022830671}
   - {fileID: 940547539}
+  - {fileID: 1372134111}
   m_Father: {fileID: 0}
   m_RootOrder: 4
+--- !u!114 &318300298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 318300296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe0f66ffa9707f41acdb5b3bd434e50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &334704782
 GameObject:
   m_ObjectHideFlags: 0
@@ -1018,7 +1005,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 364177277}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -1184,7 +1171,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &395675360
 Transform:
   m_ObjectHideFlags: 0
@@ -1542,7 +1529,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 679087807}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -2357,6 +2344,63 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1302535180}
+--- !u!1 &1372134110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1372134111}
+  - 65: {fileID: 1372134113}
+  - 114: {fileID: 1372134112}
+  m_Layer: 0
+  m_Name: Boundaries
+  m_TagString: Boundary
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1372134111
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1372134110}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 318300297}
+  m_RootOrder: 6
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1372134112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1372134110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2961aeb84ae738c45b7bf77bda7f0b66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &1372134113
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1372134110}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 20, y: 4, z: 20}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1381727664
 GameObject:
   m_ObjectHideFlags: 0
@@ -2740,7 +2784,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1545227070}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -2828,7 +2872,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1648382676}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -2894,7 +2938,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1681065535}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -2994,9 +3038,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 236470447}
-        m_MethodName: set_Connected
-        m_Mode: 6
+      - m_Target: {fileID: 8477717}
+        m_MethodName: StopPlay
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3180,7 +3224,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 8477717}
         m_MethodName: StartPlay
         m_Mode: 1
         m_Arguments:
@@ -3345,7 +3389,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1809065880}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 236470447}
+        m_MethodName: set_HelperEnabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1809065880
@@ -3499,7 +3554,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2010514586}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -3575,7 +3630,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2022830667}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -3613,7 +3668,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2041219598
 Transform:
   m_ObjectHideFlags: 0
@@ -3704,9 +3759,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  enemy: {fileID: 8477717}
-  boundary: 7.25
-  boundaryDist: 10
+  boundaries: {fileID: 1372134113}
+  ball: {fileID: 8477717}
   horizontalWalls:
   - {fileID: 7075531}
   - {fileID: 7075530}
@@ -3715,6 +3769,7 @@ MonoBehaviour:
   - {fileID: 7075528}
   controlActive: 0
   robot: {fileID: 236470447}
+  gameClient: {fileID: 318300298}
 --- !u!1 &2089567088
 GameObject:
   m_ObjectHideFlags: 0

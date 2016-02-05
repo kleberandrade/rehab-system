@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum Movable { WALL = 0, BALL = 2 };
+
 public class Training : MonoBehaviour {
 
 	private static Vector3 startPlan = Vector3.down * 0.5f + Vector3.right * 1f;

@@ -1,21 +1,24 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\NetworkClientUDP.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerController.cs">
     <Files>
-      <File FileName="Assets\Scripts\GameClient.cs" Line="24" Column="142" />
-      <File FileName="Assets\Scripts\NetworkClientUDP.cs" Line="73" Column="8" />
+      <File FileName="Assets\Scripts\GameClient.cs" Line="6" Column="7" />
+      <File FileName="Assets\Scripts\NetworkClientUDP.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\NetworkInterface.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\AnkleBotInputAxis.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\AnklePackage.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\AnklePackage.cs" Line="56" Column="5" />
       <File FileName="Assets\Scripts\ConnectionManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\EnemyController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="24" Column="65" />
       <File FileName="Assets\Scripts\InputAxis.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\InputAxisManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Robot.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Robot.cs" Line="155" Column="3" />
       <File FileName="Assets\Scripts\AxisSelector.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\PXIeInputAxis.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\EnemyTarget.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\BallController.cs" Line="17" Column="35" />
+      <File FileName="Assets\Scripts\Training.cs" Line="5" Column="8" />
+      <File FileName="Assets\Scripts\EnemyTarget.cs" Line="17" Column="5" />
+      <File FileName="Assets\Scripts\Gameplay.cs" Line="8" Column="9" />
+      <File FileName="Assets\Scripts\Connection.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

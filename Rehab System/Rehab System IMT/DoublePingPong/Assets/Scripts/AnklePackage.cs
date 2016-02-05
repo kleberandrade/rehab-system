@@ -53,15 +53,15 @@ public class AnklePackage : MonoBehaviour {
 
 		// Blue Elipse for ankleRobot
 		GL.Color(Color.blue);
-		point = origin + Vector2.Scale (ankleRobot.origin, size);
-		ElipseForm (point, Vector2.Scale(ankleRobot.bases, size));
-		ElipseForm (point, Vector2.Scale(ankleRobot.bases, size)/ankleRobot.elipseScale);
+		//point = origin + Vector2.Scale (ankleRobot.origin, size);
+		//ElipseForm (point, Vector2.Scale(ankleRobot.bases, size));
+		//ElipseForm (point, Vector2.Scale(ankleRobot.bases, size)/ankleRobot.elipseScale);
 		CrossForm (point, 0.1f*size);
 
 
 		// Black Dot for position
 		GL.Color(Color.black);
-		point = origin + Vector2.Scale (ankleRobot.input, size);
+		//point = origin + Vector2.Scale (ankleRobot.input, size);
 		ElipseForm (point, 0.02f*size);
 		ElipseForm (point, 0.03f*size);
 		CrossForm (point, 0.02f*size);
@@ -73,8 +73,8 @@ public class AnklePackage : MonoBehaviour {
 
 		// Red Dot for enemy
 		GL.Color(Color.red);
-		ElipseForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
-		CrossForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
+		//ElipseForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
+		//CrossForm (origin + Vector2.Scale (ankleRobot.enemyPos, size), 0.02f*size);
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (

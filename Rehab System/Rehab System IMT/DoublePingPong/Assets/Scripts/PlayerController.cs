@@ -6,17 +6,14 @@ using System;
 using System.IO;
 using System.Text;
 
-[ RequireComponent( typeof(GameClient) ) ]
 public class PlayerController : MonoBehaviour 
 {
-	enum Movable { WALL = 0, BALL = 2 };
-
 	public float speed;	                                            // Player Speed
-	public EnemyController enemy;		                            // The ball
 
-	[HideInInspector] public float boundary = 7.25f; 	            // Boundary player movement
-	[HideInInspector] public float boundaryDist = 10.0f;	        // Distance between boundary
-	private float outCut = 2.0f;			                        // Gap for helper control
+    public BoxCollider boundaries;
+    private Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
+
+    public BallController ball;
 
 	private int targetMask;
 
@@ -28,14 +25,14 @@ public class PlayerController : MonoBehaviour
 
     public Robot robot;
 
-	private GameClient gameClient = null;
+	public GameClient gameClient;
 
 	void Awake()
 	{
 		targetMask = LayerMask.GetMask( "Target" );
 		controlActive = false;
 
-		gameClient = GetComponent<GameClient>();
+        rangeLimits = boundaries.bounds.extents;
 
 		foreach( Rigidbody wall in horizontalWalls )
 			wall.isKinematic = true;
@@ -70,46 +67,28 @@ public class PlayerController : MonoBehaviour
 
 		foreach( Rigidbody wall in verticalWalls ) 
 		{
-			//wall.velocity = new Vector3( 0.0f, 0.0f, direction.y * speed );
-			// Keep the player inside the boundary
-			//wall.position = new Vector3( wall.position.x, 0.0f,	Mathf.Clamp( wall.position.z, -boundary, boundary) );
-            wall.MovePosition( new Vector3( wall.position.x, 0.0f,  Mathf.Clamp( input.y * boundary, -boundary, boundary) ) );
+            wall.MovePosition( new Vector3( wall.position.x, 0.0f,  Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
 		}
 	}
 
 	// Set the wall's position
-	public void SetWalls( Vector2 position )
+	/*public void SetWalls( Vector2 position )
 	{
 		foreach( Rigidbody wall in horizontalWalls )
 			wall.position = new Vector3( Mathf.Clamp( position.x * boundary, -boundary, boundary ),	0.0f, wall.position.z );
 
 		foreach( Rigidbody wall in verticalWalls ) 
 			wall.position = new Vector3( wall.position.x, 0.0f, Mathf.Clamp( position.y * boundary, -boundary, boundary ) );
-	}
+	}*/
 
 	private void UpdateClient()
 	{
         // Get remotely controlled object position (z) and set it locally (x)
         foreach( Rigidbody wall in horizontalWalls ) 
-            wall.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.WALL, 0 ), -boundary, boundary ), 0.0f, wall.position.z ) );
+            wall.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetremoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION ), -rangeLimits.x, rangeLimits.x ), 0.0f, wall.position.z ) );
 
 		// Send locally controlled object positions (z) over network
-        //foreach( Rigidbody wall in verticalWalls ) 
-        gameClient.SetLocalPosition( (byte) Movable.WALL, 0, verticalWalls[ 0 ].position.z );
-
-        if( !robot.Connected && gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) ) enemy.enemyBody.isKinematic = true;
-
-		// Get remotely controlled ball positions (x,z) and set them locally
-		if( enemy.enemyBody.isKinematic )
-        {
-            enemy.enemyBody.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 0 ), -boundary, boundary ),
-                                          0.0f, Mathf.Clamp( gameClient.GetRemotePosition( (byte) Movable.BALL, 2 ), -boundary, boundary ) ) );
-        }
-        else if( robot.Connected )
-        {
-            gameClient.SetLocalPosition( (byte) Movable.BALL, 0, enemy.enemyBody.position.x );
-            gameClient.SetLocalPosition( (byte) Movable.BALL, 2, enemy.enemyBody.position.z );
-        }
+        if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, verticalWalls[ 0 ].position.z );
 	}
 
 	// Returns a equivalente vector position based on horizontal and vertical walls
@@ -119,18 +98,18 @@ public class PlayerController : MonoBehaviour
 		return position;
 	}
 
-	public void ControlPosition()
+/*	public void ControlPosition()
 	{
-		RaycastHit enemyImpact = enemy.FindImpact (targetMask);
-		Vector3 playerTrack = enemyImpact.point - GetPosition ();
+		RaycastHit ballImpact = ball.FindImpact( targetMask );
+		Vector3 playerTrack = ballImpact.point - GetPosition ();
 
-		// Check if the player still able to defend the enemy
-		if (playerTrack.magnitude / speed > enemyImpact.distance / enemy.speed) 
+		// Check if the player still able to defend the ball
+		if( playerTrack.magnitude / speed > ballImpact.distance / ball.speed ) 
 		{
 			Vector2 control = new Vector2 
 				(
-				Normalize (OutCut (playerTrack.x, (boundaryDist - Mathf.Abs (enemyImpact.point.z)) / enemy.speed * speed + outCut)),
-				Normalize (OutCut (playerTrack.z, (boundaryDist - Mathf.Abs (enemyImpact.point.x)) / enemy.speed * speed + outCut))
+				Normalize (OutCut (playerTrack.x, (boundaryDist - Mathf.Abs (ballImpact.point.z)) / ball.speed * speed + outCut)),
+				Normalize (OutCut (playerTrack.z, (boundaryDist - Mathf.Abs (ballImpact.point.x)) / ball.speed * speed + outCut))
 				);
 			MoveWalls (control);
 //			machineScore += speed * Time.deltaTime * Mathf.Abs(control.magnitude);
@@ -152,5 +131,5 @@ public class PlayerController : MonoBehaviour
 		if( f > cut ) return f;
 		else if( f < -cut ) return f;
 		else return 0;
-	}
+	}*/
 }
