@@ -31,9 +31,13 @@ public class GameClient : MonoBehaviour
     {
         KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( elementID, axisIndex );
 
-        if( !localValues.ContainsKey( localKey ) ) localValues[ localKey ] = new float[ 3 ];
+        if( !localValues.ContainsKey( localKey ) ) 
+        {
+            localValuesUpdated[ localKey ] = true;
+            localValues[ localKey ] = new float[ 3 ];
+        }
 
-        if( Mathf.Abs( localValues[ localKey ][ (int) valueType ] - value ) > 0.5f )
+        if( Mathf.Abs( localValues[ localKey ][ (int) valueType ] - value ) > 0.05f )
         {
           localValues[ localKey ][ (int) valueType ] = value;
           localValuesUpdated[ localKey ] = true;
@@ -92,21 +96,22 @@ public class GameClient : MonoBehaviour
 		{
             int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
 
-            //Debug.Log( "Received " + inputMessageLength.ToString() + " bytes" );
-
-			for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
+            for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
 			{
 				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
-				remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
+                Debug.Log( "Received values for key " + remoteKey.ToString() );
+                if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ 3 ];
+                    
+    			remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
                 remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
                 remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) );
+
+                //remoteValues[ remoteKey ][ (int) NetworkValue.POSITION ] += remoteValues[ remoteKey ][ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
 
                 //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
 			}
 		}
-
-//        foreach( KeyValuePair<byte,byte> remoteValue in remoteValues.Values )
-//            remoteValue[ (int) NetworkValue.POSITION ] += remoteValue[ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
+            
 	}
 
     void OnApplicationQuit()

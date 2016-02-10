@@ -6,11 +6,13 @@ using System;
 using System.IO;
 using System.Text;
 
+[ RequireComponent( typeof(Rigidbody) ) ]
+[ RequireComponent( typeof(BoxCollider) ) ]
 public class PlayerController : MonoBehaviour 
 {
-	public float speed;	                                            // Player Speed
+    public int elementID;
 
-    public BoxCollider boundaries;
+	public Collider boundaries;
     private Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
 
     public BallController ball;
@@ -19,117 +21,63 @@ public class PlayerController : MonoBehaviour
 
 	//private string textFile = "./LogFilePos.txt";
 
-	public Rigidbody[] horizontalWalls;
-	public Rigidbody[] verticalWalls;
-	public bool controlActive;	                                    // Indicate if helper control is active
+    private Rigidbody playerBody;
+    private BoxCollider playerCollider;
 
     public Robot robot;
 
 	public GameClient gameClient;
 
-	void Awake()
-	{
-		targetMask = LayerMask.GetMask( "Target" );
-		controlActive = false;
-
-        rangeLimits = boundaries.bounds.extents;
-
-		foreach( Rigidbody wall in horizontalWalls )
-			wall.isKinematic = true;
-	}
-
 	void Start()
 	{
+        targetMask = LayerMask.GetMask( "Target" );
+
+        playerBody = GetComponent<Rigidbody>();
+        playerCollider = GetComponent<BoxCollider>();
+
+        rangeLimits = boundaries.bounds.extents - playerCollider.bounds.extents;
+
 		// Start file for record movements
 		//if (File.Exists (textFile)) File.Delete (textFile);
 		//File.WriteAllText (textFile, "Horizontal\tVertical" + Environment.NewLine);
-	}
-
-	void Update()
-	{
-		// Record movements
-		//File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
 	}
 
 	void FixedUpdate()
 	{
         MoveWalls( robot.ReadInput() );
 
-		UpdateClient();
-
-//		ControlPosition ();
+		ControlPosition();
 	}
 
 	// Set the wall's speed
     public void MoveWalls( Vector2 input )
 	{
-        //Debug.Log( "Input: " + input.ToString() );
+        //File.WriteAllText( textFile, input.y.ToString() + Environment.NewLine );
 
-		foreach( Rigidbody wall in verticalWalls ) 
-		{
-            wall.MovePosition( new Vector3( wall.position.x, 0.0f,  Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
-		}
+		playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f,  Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
+
+        // Send locally controlled object positions (z) over network
+        if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
+	}        
+
+	public void ControlPosition()
+	{
+        Vector3 impactPoint = ball.FindImpactPoint( targetMask );
+
+        Vector2 setpoint = new Vector2( Mathf.Clamp( impactPoint.z, -rangeLimits.z, rangeLimits.z ), 0.0f );
+
+        robot.WriteSetpoint( setpoint );
 	}
 
-	// Set the wall's position
-	/*public void SetWalls( Vector2 position )
-	{
-		foreach( Rigidbody wall in horizontalWalls )
-			wall.position = new Vector3( Mathf.Clamp( position.x * boundary, -boundary, boundary ),	0.0f, wall.position.z );
+    void OnTriggerEnter( Collider collider )
+    {
+        Debug.Log( "Trigger on " + collider.tag );
+        robot.SetImpedance( 1.0f, 0.0f );
+    }
 
-		foreach( Rigidbody wall in verticalWalls ) 
-			wall.position = new Vector3( wall.position.x, 0.0f, Mathf.Clamp( position.y * boundary, -boundary, boundary ) );
-	}*/
-
-	private void UpdateClient()
-	{
-        // Get remotely controlled object position (z) and set it locally (x)
-        foreach( Rigidbody wall in horizontalWalls ) 
-            wall.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetremoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION ), -rangeLimits.x, rangeLimits.x ), 0.0f, wall.position.z ) );
-
-		// Send locally controlled object positions (z) over network
-        if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, verticalWalls[ 0 ].position.z );
-	}
-
-	// Returns a equivalente vector position based on horizontal and vertical walls
-	public Vector3 GetPosition()
-	{
-		Vector3 position = new Vector3( horizontalWalls[ 0 ].position.x, 0.0f, verticalWalls[ 0 ].position.z );
-		return position;
-	}
-
-/*	public void ControlPosition()
-	{
-		RaycastHit ballImpact = ball.FindImpact( targetMask );
-		Vector3 playerTrack = ballImpact.point - GetPosition ();
-
-		// Check if the player still able to defend the ball
-		if( playerTrack.magnitude / speed > ballImpact.distance / ball.speed ) 
-		{
-			Vector2 control = new Vector2 
-				(
-				Normalize (OutCut (playerTrack.x, (boundaryDist - Mathf.Abs (ballImpact.point.z)) / ball.speed * speed + outCut)),
-				Normalize (OutCut (playerTrack.z, (boundaryDist - Mathf.Abs (ballImpact.point.x)) / ball.speed * speed + outCut))
-				);
-			MoveWalls (control);
-//			machineScore += speed * Time.deltaTime * Mathf.Abs(control.magnitude);
-			controlActive = true;
-		} else
-			controlActive = false;
-	}
-	
-	float Normalize( float f )
-	{
-		if( f > 0.0f ) return 1.0f;
-		else if( f < 0.0f ) return -1.0f;
-		else return 0.0f;
-	}
-
-	// Set the f value to 0 when less then cut
-	float OutCut( float f, float cut )
-	{
-		if( f > cut ) return f;
-		else if( f < -cut ) return f;
-		else return 0;
-	}*/
+    void OnTriggerExit( Collider collider )
+    {
+        Debug.Log( "Trigger off " + collider.tag );
+        robot.SetImpedance( 0.0f, 0.0f );
+    }
 }

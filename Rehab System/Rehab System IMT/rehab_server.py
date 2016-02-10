@@ -93,8 +93,8 @@ while True:
       if data is not None:
         dataLength = data[ 0 ]
 #        print( 'Received {} from {}'.format( data[ 0:dataLength ], client.address ) )
-        for id in range( 1, dataLength, 6 ):
-          print( 'Received <({},{}): {}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], str(client.address) ) )
+        for id in range( 1, dataLength, 14 ):
+          print( 'Received <({},{}): {},{}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], struct.unpack( 'f', data[ id + 6:id + 10 ] )[ 0 ], str(client.address) ) )
         clientMessagesList[ client ] = data
 
     for sendClient in clientMessagesList:
@@ -104,13 +104,14 @@ while True:
 #        print( 'comparing {} to {}: {}'.format( sendClient.address[0], client.address[0], str(client.address[0] != sendClient.address[0]) ) )
         if client.address != sendClient.address and clientMessagesList[ client ] is not None:
           data = clientMessagesList[ client ]
-          dataLength = data[ 0 ]
-          messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
-          messageLength += ( dataLength - 1 )
-#          for id in range( 0, dataLength, 7 ):
-#            print( 'Sending <({},{}): {}> from {} to {}'.format( data[ id + 1 ], data[ id + 2 ],
-#                                                                 struct.unpack( 'f', data[ id + 3:id + 7 ] )[ 0 ],
-#                                                                 str(client.address), str(sendClient.address) ) )
+          if len(data) > 0:
+            dataLength = data[ 0 ]
+            messageBuffer[ messageLength:messageLength + dataLength - 1 ] = data[ 1:dataLength ]
+            messageLength += ( dataLength - 1 )
+  #          for id in range( 0, dataLength, 7 ):
+  #            print( 'Sending <({},{}): {}> from {} to {}'.format( data[ id + 1 ], data[ id + 2 ],
+  #                                                                 struct.unpack( 'f', data[ id + 3:id + 7 ] )[ 0 ],
+  #                                                                 str(client.address), str(sendClient.address) ) )
       if messageLength > 1:
         messageBuffer[ 0 ] = messageLength
         #print( 'Sending {} bytes to {}'.format( messageBuffer[0], sendClient.address ) )

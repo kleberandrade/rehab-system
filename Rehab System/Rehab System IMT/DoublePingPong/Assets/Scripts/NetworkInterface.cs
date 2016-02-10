@@ -47,7 +47,7 @@ public abstract class NetworkClient : NetworkInterface
 		{
 			Socket handle = (Socket) ar.AsyncState;
 			
-			int bytesSent = handle.EndSend( ar );
+			/*int bytesSent =*/ handle.EndSend( ar );
 			
 			//Debug.Log( "Sent " + bytesSent.ToString() + " bytes to: " + handle.RemoteEndPoint.ToString() );
 		}

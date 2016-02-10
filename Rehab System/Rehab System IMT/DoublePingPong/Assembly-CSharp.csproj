@@ -51,7 +51,6 @@
      <Compile Include="Assets\Scripts\BallController.cs" />
      <Compile Include="Assets\Scripts\Connection.cs" />
      <Compile Include="Assets\Scripts\ConnectionManager.cs" />
-     <Compile Include="Assets\Scripts\EnemyTarget.cs" />
      <Compile Include="Assets\Scripts\GameClient.cs" />
      <Compile Include="Assets\Scripts\Gameplay.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />
@@ -61,11 +60,9 @@
      <Compile Include="Assets\Scripts\NetworkInterface.cs" />
      <Compile Include="Assets\Scripts\PXIeInputAxis.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\RemoteController.cs" />
      <Compile Include="Assets\Scripts\Robot.cs" />
-     <Compile Include="Assets\Scripts\Rotator.cs" />
      <Compile Include="Assets\Scripts\ScaleProtector.cs" />
-     <Compile Include="Assets\Scripts\Stretchable.cs" />
-     <Compile Include="Assets\Scripts\Training.cs" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader2.shader" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader1.shader" />
  <Reference Include="UnityEngine.UI">

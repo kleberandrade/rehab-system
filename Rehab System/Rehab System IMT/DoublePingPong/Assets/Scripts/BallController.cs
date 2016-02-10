@@ -8,10 +8,9 @@ public class BallController : MonoBehaviour
 
 	public float speed;	// Ball speed
 
-    private Rigidbody body;		// Ball rigid body
-    private SphereCollider ballShape;
+    private Rigidbody ball;		// Ball rigid body
 
-    public BoxCollider boundaries;
+    public Collider boundaries;
     private Vector3 rangeLimits = new Vector3( 7.25f, 0.0f, 7.25f );
 
     public bool isPlaying = false;
@@ -21,61 +20,91 @@ public class BallController : MonoBehaviour
 
 	void Awake()
     {
-		body = GetComponent<Rigidbody>();
-        ballShape = GetComponent<SphereCollider>();
+		ball = GetComponent<Rigidbody>();
 	}
 
 	void Start () 
 	{
-		body.velocity = RandVectOnGround() * speed;	// Inicialize with a random velocity
-//		body.velocity = 0.2f * Vector3.down + 0.1f * Vector3.one;
+        ball.angularVelocity = Vector3.zero;
+        ball.velocity = Vector3.zero;
 
         rangeLimits = boundaries.bounds.extents;
 	}
 
 	void FixedUpdate()
 	{
-		if( Mathf.Abs( body.velocity.y ) < Mathf.Epsilon )
-		{
-			if( isPlaying )
-			{
-                if( isMaster )
+        if( isPlaying )
+        {
+            if( isMaster )
+            {
+                ball.velocity *= speed / ball.velocity.magnitude;
+
+                UpdateMasterValues( ball.position, ball.velocity );
+            } 
+            else
+            {
+                float masterBallPositionX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
+                float masterBallPositionZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
+
+                float masterBallVelocityX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
+                float masterBallVelocityZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
+
+                Debug.Log( "Remote position: " + masterBallPositionX.ToString() + "," + masterBallPositionZ.ToString() );
+
+                if( Mathf.Abs( masterBallPositionX - ball.position.x ) < rangeLimits.x && Mathf.Abs( masterBallPositionZ - ball.position.z ) < rangeLimits.z )
                 {
-                    if( Mathf.Abs( body.velocity.magnitude ) < Mathf.Epsilon ) OnTriggerExit( boundaries );
+                    masterBallVelocityX += ( masterBallPositionX - ball.position.x ) / Time.fixedDeltaTime;
+                    masterBallVelocityZ += ( masterBallPositionZ - ball.position.z ) / Time.fixedDeltaTime;
 
-                    gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.POSITION, body.position.x );
-                    gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY, body.velocity.x );
-                    gameClient.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.POSITION, body.position.z );
-                    gameClient.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY, body.velocity.z );
+                    ball.MovePosition( new Vector3( ( masterBallPositionX + ball.position.x ) / 2, ball.position.y, ( masterBallPositionZ + ball.position.z ) / 2 ) );
+
+                    ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
                 }
-				else
-				{
-                    body.MovePosition( new Vector3( Mathf.Clamp( gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ), -rangeLimits.x, rangeLimits.x ),
-                                       0.0f, Mathf.Clamp( gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ), -rangeLimits.z, rangeLimits.z ) ) );
-				}
+                else
+                {
+                    ball.MovePosition( new Vector3( masterBallPositionX, ball.position.y, masterBallPositionZ ) );
 
-			}
-			else 
-			{
-                if( gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) ) isMaster = false;
+                    ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
+                }
+            }
 
-				body.angularVelocity = Vector3.zero;
-				body.velocity = Vector3.zero;
-			}
-		}
+        } 
+        else if( gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) )
+        {
+            isMaster = false;                
+        }
 	}
 
-	void OnTriggerExit( Collider boundaries )
+    private void UpdateMasterValues( Vector3 newPosition, Vector3 newVelocity )
+    {
+        if( isMaster )
+        {
+            ball.MovePosition( newPosition );
+            ball.velocity = newVelocity;
+
+            gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.POSITION, ball.position.x / rangeLimits.x );
+            gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY, ball.velocity.x / rangeLimits.x );
+            gameClient.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.POSITION, ball.position.z / rangeLimits.z );
+            gameClient.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY, ball.velocity.z / rangeLimits.z );
+        }
+    }
+
+    void OnTriggerExit( Collider collider )
 	{
-        body.MovePosition( new Vector3( 0.0f, 10.0f, 0.0f ) );
-        body.velocity = RandVectOnGround() * speed;
+        if( collider.tag == "Boundary" ) UpdateMasterValues( new Vector3( 0.0f, ball.position.y, 0.0f ), RandVectOnGround() * speed );
 	}
+
+    void OnTriggerEnter( Collider collider )
+    {
+        if( collider.tag == "Vertical" ) UpdateMasterValues( ball.position, new Vector3( -ball.velocity.x, 0.0f, ball.velocity.z ) );
+        else if( collider.tag == "Horizontal" ) UpdateMasterValues( ball.position, new Vector3( ball.velocity.x, 0.0f, -ball.velocity.z ) );
+    }
 
     public Vector3 FindImpactPoint( int layerMask )
 	{
 		RaycastHit boundaryHit;
 
-        Physics.Raycast( body.position, body.velocity, out boundaryHit, 60f, layerMask );
+        Physics.Raycast( ball.position, ball.velocity, out boundaryHit, 60f, layerMask );
 		
         return boundaryHit.point;
 	}
@@ -89,12 +118,12 @@ public class BallController : MonoBehaviour
 	public void StartPlay()
 	{
 		isPlaying = true;
-        OnTriggerExit( boundaries );
+        UpdateMasterValues( new Vector3( 0.0f, ball.position.y, 0.0f ), RandVectOnGround() * speed );
 	}
 	public void StopPlay()
 	{
 		isPlaying = false;
-        OnTriggerExit( boundaries );
+        UpdateMasterValues( new Vector3( 0.0f, ball.position.y, 0.0f ), Vector3.zero );
 	}
 
 }

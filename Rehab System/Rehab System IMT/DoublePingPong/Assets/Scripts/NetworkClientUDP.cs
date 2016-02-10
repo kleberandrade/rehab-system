@@ -67,7 +67,7 @@ public class NetworkClientUDP : NetworkClient
 						{
                             int bytesRead = workSocket.Receive( lastMessage );
 
-							//Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
+							Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
 
                             hasNewMessage = true;
 						}

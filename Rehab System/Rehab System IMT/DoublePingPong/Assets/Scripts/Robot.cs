@@ -26,7 +26,6 @@ public class Robot : MonoBehaviour
 
 	// Communication with another scripts
 	public PlayerController player;
-	public BallController ball;
 
 	//private Connection connection;
 	private InputAxis horizontal, vertical;
@@ -106,11 +105,6 @@ public class Robot : MonoBehaviour
 			vertical.Velocity = freeSpace.y;
 			horizontal.Velocity = freeSpace.x;
 
-			vertical.Stiffness = stiffness;
-			horizontal.Stiffness = stiffness;
-			vertical.Damping = damping;
-			horizontal.Damping = damping;
-
 			// Print the all variables
 //			File.AppendAllText( textFile, + Time.time + "\t"
 //			                              + input.x + "\t" 
@@ -142,7 +136,18 @@ public class Robot : MonoBehaviour
 
     public void WriteSetpoint( Vector2 setpoint )
     {
-        if( helperEnabled ) centerSpring = setpoint;
+        if( helperEnabled ) this.setpoint = setpoint;
+    }
+
+    public void SetImpedance( float stiffness, float damping )
+    {
+        if( connected )
+        {
+            vertical.Stiffness = stiffness;
+            horizontal.Stiffness = stiffness;
+            vertical.Damping = damping;
+            horizontal.Damping = damping;
+        }
     }
 
 	void Calibration()

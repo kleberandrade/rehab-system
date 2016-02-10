@@ -55,7 +55,7 @@ public class AxisSelector : MonoBehaviour
 
             if( controlAxisType == InputAxisType.Mouse ) controlAxis = axisManager.GetAxis( "Mouse Y", InputAxisType.Mouse );
             else if( controlAxisType == InputAxisType.Keyboard ) controlAxis = axisManager.GetAxis( "Vertical", InputAxisType.Keyboard );
-            else if( controlAxisType == InputAxisType.AnkleBot ) controlAxis = axisManager.GetAxis( "1", InputAxisType.AnkleBot );
+            else if( controlAxisType == InputAxisType.AnkleBot ) controlAxis = axisManager.GetAxis( "0", InputAxisType.AnkleBot );
             else if( controlAxisType == InputAxisType.PXIe ) controlAxis = axisManager.GetAxis( "0", InputAxisType.PXIe );
         }
 	}
