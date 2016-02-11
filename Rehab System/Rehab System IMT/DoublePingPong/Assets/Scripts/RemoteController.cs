@@ -41,8 +41,7 @@ public class RemoteController : MonoBehaviour
 
         float remotePosition = remoteInput * rangeLimits.x;
 
-        File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" 
-                                     + Mathf.Clamp( remotePosition, -rangeLimits.x, rangeLimits.x ).ToString() + Environment.NewLine );
+        File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + remotePosition.ToString() + Environment.NewLine );
 
         remoteBody.MovePosition( new Vector3( Mathf.Clamp( remotePosition, -rangeLimits.x, rangeLimits.x ), 0.0f, remoteBody.position.z ) );
     }

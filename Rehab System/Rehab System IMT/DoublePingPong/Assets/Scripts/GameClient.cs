@@ -37,7 +37,7 @@ public class GameClient : MonoBehaviour
             localValues[ localKey ] = new float[ 3 ];
         }
 
-        if( Mathf.Abs( localValues[ localKey ][ (int) valueType ] - value ) > 0.05f )
+        if( Mathf.Abs( localValues[ localKey ][ (int) valueType ] - value ) > 0.1f )
         {
           localValues[ localKey ][ (int) valueType ] = value;
           localValuesUpdated[ localKey ] = true;

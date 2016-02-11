@@ -22,6 +22,7 @@ public class BallController : MonoBehaviour
 
     private string logFileName;
 
+	private float targetPositionX = 0.0f, targetPositionZ = 0.0f;
 
 	void Start () 
 	{
@@ -40,40 +41,47 @@ public class BallController : MonoBehaviour
 	{
         if( isPlaying )
         {
-            if( isMaster )
-            {
-                ball.velocity *= speed / ball.velocity.magnitude;
+			if( isMaster ) 
+			{
+				ball.velocity *= speed / ball.velocity.magnitude;
 
-                UpdateMasterValues( ball.position, ball.velocity );
-            } 
-            else
-            {
-                float masterBallPositionX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
-                float masterBallPositionZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
+				UpdateMasterValues( ball.position, ball.velocity );
+			} 
+			else 
+			{
+				float masterBallPositionX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
+				float masterBallPositionZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
 
-                float masterBallVelocityX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
-                float masterBallVelocityZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
+				if( targetPositionX != masterBallPositionX || targetPositionZ != masterBallPositionZ ) 
+				{
+					float masterBallVelocityX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
+					float masterBallVelocityZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
 
-                float ballFollowingErrorX = masterBallPositionX - ball.position.x;
-                float ballFollowingErrorZ = masterBallPositionZ - ball.position.z;
+					float ballFollowingErrorX = masterBallPositionX - ball.position.x;
+					float ballFollowingErrorZ = masterBallPositionZ - ball.position.z;
 
-                if( Mathf.Abs( ballFollowingErrorX ) < rangeLimits.x && Mathf.Abs( ballFollowingErrorZ ) < rangeLimits.z )
-                {
-                    masterBallVelocityX += ballFollowingErrorX / Time.fixedDeltaTime;
-                    masterBallVelocityZ += ballFollowingErrorZ / Time.fixedDeltaTime;
+					if( Mathf.Abs( ballFollowingErrorX ) < rangeLimits.x / 2 && Mathf.Abs( ballFollowingErrorZ ) < rangeLimits.z / 2 ) 
+					{
 
-                    ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
-                }
-                else
-                {
-                    ball.MovePosition( new Vector3( masterBallPositionX, ball.position.y, masterBallPositionZ ) );
+						masterBallVelocityX += ballFollowingErrorX;
+					    masterBallVelocityZ += ballFollowingErrorZ;
 
-                    ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
-                }
-            }
+						ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
+					} 
+					else 
+					{
+						ball.MovePosition( new Vector3( masterBallPositionX, ball.position.y, masterBallPositionZ ) );
 
-            File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
-                                            + ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
+						ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
+					}
+
+					targetPositionX = masterBallPositionX;
+					targetPositionZ = masterBallPositionZ;
+				}
+
+				File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
+					+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
+			}
 
         } 
         else if( gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) )
