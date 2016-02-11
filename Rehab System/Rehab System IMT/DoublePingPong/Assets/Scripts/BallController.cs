@@ -92,11 +92,11 @@ public class BallController : MonoBehaviour
 
     private void UpdateMasterValues( Vector3 newPosition, Vector3 newVelocity )
     {
+		ball.MovePosition( newPosition );
+		ball.velocity = newVelocity;
+
         if( isMaster )
         {
-            ball.MovePosition( newPosition );
-            ball.velocity = newVelocity;
-
             gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.POSITION, ball.position.x / rangeLimits.x );
             gameClient.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY, ball.velocity.x / rangeLimits.x );
             gameClient.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.POSITION, ball.position.z / rangeLimits.z );
