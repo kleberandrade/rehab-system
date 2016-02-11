@@ -15,7 +15,7 @@ public class RemoteController : MonoBehaviour
     public Collider boundaries;
     private Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
 
-    //private string textFile = "./LogFilePos.txt";
+    private string textFile;
 
     private Rigidbody remoteBody;
     private BoxCollider remoteCollider;
@@ -30,19 +30,19 @@ public class RemoteController : MonoBehaviour
         rangeLimits = boundaries.bounds.extents - remoteCollider.bounds.extents;
 
         // Start file for record movements
-        //if (File.Exists (textFile)) File.Delete (textFile);
-        //File.WriteAllText (textFile, "Horizontal\tVertical" + Environment.NewLine);
+        textFile = "./LogFileRemote" + GetInstanceID().ToString() + ".txt";
+        if( File.Exists( textFile ) ) File.Delete( textFile );
     }
 
     void FixedUpdate()
     {
         // Get remotely controlled object position (z) and set it locally (x)
         float remoteInput = gameClient.GetremoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION );
-        //File.WriteAllText( textFile, remoteInput.ToString() + Environment.NewLine );
 
         float remotePosition = remoteInput * rangeLimits.x;
 
-        Debug.Log( "Remote position: " + remoteInput.ToString() + " * " + rangeLimits.x.ToString() + " = " + remotePosition.ToString() );
+        File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" 
+                                     + Mathf.Clamp( remotePosition, -rangeLimits.x, rangeLimits.x ).ToString() + Environment.NewLine );
 
         remoteBody.MovePosition( new Vector3( Mathf.Clamp( remotePosition, -rangeLimits.x, rangeLimits.x ), 0.0f, remoteBody.position.z ) );
     }

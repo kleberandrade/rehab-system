@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.IO;
+using System.Text;
 
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(MeshCollider) ) ]
@@ -18,14 +20,17 @@ public class BallController : MonoBehaviour
     public GameClient gameClient;
     public bool isMaster = true;
 
-	void Awake()
-    {
-		ball = GetComponent<Rigidbody>();
-	}
+    private string logFileName;
+
 
 	void Start () 
 	{
-        ball.angularVelocity = Vector3.zero;
+        // Start file for record movements
+        logFileName = "./LogFileBall" + GetInstanceID().ToString() + ".txt";
+        if( File.Exists( logFileName ) ) File.Delete( logFileName );
+
+        ball = GetComponent<Rigidbody>();
+
         ball.velocity = Vector3.zero;
 
         rangeLimits = boundaries.bounds.extents;
@@ -49,14 +54,13 @@ public class BallController : MonoBehaviour
                 float masterBallVelocityX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
                 float masterBallVelocityZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
 
-                Debug.Log( "Remote position: " + masterBallPositionX.ToString() + "," + masterBallPositionZ.ToString() );
+                float ballFollowingErrorX = masterBallPositionX - ball.position.x;
+                float ballFollowingErrorZ = masterBallPositionZ - ball.position.z;
 
-                if( Mathf.Abs( masterBallPositionX - ball.position.x ) < rangeLimits.x && Mathf.Abs( masterBallPositionZ - ball.position.z ) < rangeLimits.z )
+                if( Mathf.Abs( ballFollowingErrorX ) < rangeLimits.x && Mathf.Abs( ballFollowingErrorZ ) < rangeLimits.z )
                 {
-                    masterBallVelocityX += ( masterBallPositionX - ball.position.x ) / Time.fixedDeltaTime;
-                    masterBallVelocityZ += ( masterBallPositionZ - ball.position.z ) / Time.fixedDeltaTime;
-
-                    ball.MovePosition( new Vector3( ( masterBallPositionX + ball.position.x ) / 2, ball.position.y, ( masterBallPositionZ + ball.position.z ) / 2 ) );
+                    masterBallVelocityX += ballFollowingErrorX / Time.fixedDeltaTime;
+                    masterBallVelocityZ += ballFollowingErrorZ / Time.fixedDeltaTime;
 
                     ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
                 }
@@ -67,6 +71,9 @@ public class BallController : MonoBehaviour
                     ball.velocity = new Vector3( masterBallVelocityX, 0.0f, masterBallVelocityZ );
                 }
             }
+
+            File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
+                                            + ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
 
         } 
         else if( gameClient.HasRemoteKey( (byte) Movable.BALL, 0 ) )

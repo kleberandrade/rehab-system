@@ -23,7 +23,7 @@ public class GameClient : MonoBehaviour
 
 	public void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, /*ConnectionManager.LOCAL_SERVER_HOST*/"192.168.0.102" );
+		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, ConnectionManager.LOCAL_SERVER_HOST );
 		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
 	}
 

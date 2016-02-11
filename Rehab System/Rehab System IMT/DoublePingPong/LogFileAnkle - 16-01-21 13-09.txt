@@ -1,2 +1,0 @@
-Horizontal	Vertical
-Time	SqrPos		Pos		FVel		Vel		Torque	CenterSpring		FreeSpace		KD

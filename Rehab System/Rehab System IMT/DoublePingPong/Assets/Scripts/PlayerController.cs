@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
 	private int targetMask;
 
-	//private string textFile = "./LogFilePos.txt";
+    private string textFile;
 
     private Rigidbody playerBody;
     private BoxCollider playerCollider;
@@ -38,8 +38,8 @@ public class PlayerController : MonoBehaviour
         rangeLimits = boundaries.bounds.extents - playerCollider.bounds.extents;
 
 		// Start file for record movements
-		//if (File.Exists (textFile)) File.Delete (textFile);
-		//File.WriteAllText (textFile, "Horizontal\tVertical" + Environment.NewLine);
+        textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
+		if( File.Exists( textFile ) ) File.Delete( textFile );
 	}
 
 	void FixedUpdate()
@@ -52,9 +52,9 @@ public class PlayerController : MonoBehaviour
 	// Set the wall's speed
     public void MoveWalls( Vector2 input )
 	{
-        //File.WriteAllText( textFile, input.y.ToString() + Environment.NewLine );
+        playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
 
-		playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f,  Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
+        File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
 
         // Send locally controlled object positions (z) over network
         if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
