@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Net.Sockets;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +28,8 @@ public class AnkleBotInputAxis : RemoteInputAxis
 
 	const int DATA_LENGTH = sizeof(byte) + 4 * sizeof(float);
 
+	private static NetworkClientUDP connection = null;
+
 	private static byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 	private static byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
 
@@ -46,7 +49,8 @@ public class AnkleBotInputAxis : RemoteInputAxis
 	{
 		Debug.Log( "Starting connection" );
 		string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, "192.168.0.66" );
-		ConnectionManager.InfoClient.Connect( axisServerHost, 8000 );
+		if( connection == null ) connection = new NetworkClientUDP( new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) );
+		connection.Connect( axisServerHost, 8000 );
 	}
 
 	private void SendMsg()
@@ -59,14 +63,14 @@ public class AnkleBotInputAxis : RemoteInputAxis
 		System.Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, outputBuffer, 1 + INFO_SIZE * ( N_VAR * id + STIFF ), sizeof(float) );
 		System.Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, outputBuffer, 1 + INFO_SIZE * ( N_VAR * id + DAMP ), sizeof(float) );
 		
-		ConnectionManager.InfoClient.SendData( outputBuffer );
+		connection.SendData( outputBuffer );
 
 		return;
 	}
 
 	private void ReadMsg()
 	{
-		ConnectionManager.InfoClient.ReceiveData( inputBuffer );
+		connection.ReceiveData( inputBuffer );
 
 		// Check if message is different than zero
 		foreach( byte element in inputBuffer )
@@ -88,7 +92,7 @@ public class AnkleBotInputAxis : RemoteInputAxis
 
 	public override void Disconnect()
 	{
-		ConnectionManager.InfoClient.Disconnect();
+		connection.Disconnect();
 	}
 
 	~AnkleBotInputAxis()

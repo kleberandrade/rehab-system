@@ -51,6 +51,8 @@ public class NetworkClientUDP : NetworkClient
 	{	
 		isReceiving = true;
 
+		byte[] messageBuffer = new byte[ BUFFER_SIZE ];
+
 		Debug.Log( "NetworkClientUDP: Starting to receive messages" );
 
 		try 
@@ -65,11 +67,15 @@ public class NetworkClientUDP : NetworkClient
 					{
 						try
 						{
-                            int bytesRead = workSocket.Receive( lastMessage );
+							int bytesRead = workSocket.Receive( messageBuffer );
 
 							Debug.Log( "Received " + bytesRead.ToString() + " bytes from : " + workSocket.RemoteEndPoint.ToString() );
 
-                            hasNewMessage = true;
+							if( bytesRead >= BUFFER_SIZE )
+							{
+								Buffer.BlockCopy( messageBuffer, 0, lastMessage, 0, BUFFER_SIZE );
+                            	hasNewMessage = true;
+							}
 						}
 						catch( SocketException e )
 						{

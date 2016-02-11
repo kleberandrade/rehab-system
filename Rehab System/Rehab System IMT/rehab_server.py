@@ -94,7 +94,7 @@ while True:
         if len(data) > 0:
           dataLength = data[ 0 ]
 #          print( 'Received {} from {}'.format( data[ 0:dataLength ], client.address ) )
-          for id in range( 1, dataLength, 14 ):
+#          for id in range( 1, dataLength, 14 ):
 #            print( 'Received <({},{}): {},{}> from {}'.format( data[ id ], data[ id + 1 ], struct.unpack( 'f', data[ id + 2:id + 6 ] )[ 0 ], struct.unpack( 'f', data[ id + 6:id + 10 ] )[ 0 ], str(client.address) ) )
           clientMessagesList[ client ] = data
 
