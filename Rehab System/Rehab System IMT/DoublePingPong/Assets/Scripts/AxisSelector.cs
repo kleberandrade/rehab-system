@@ -25,6 +25,11 @@ public class AxisSelector : MonoBehaviour
 		axisManager = GetComponent<InputAxisManager>();
 
         SetAxis( (int) InputAxisType.Keyboard );
+
+		// hack
+		NetworkClientTCP infoClient = new NetworkClientTCP();
+		infoClient.Connect( "192.168.0.181", 500001 );
+		infoClient.Disconnect();
 	}
 	
 	// Update is called once per frame

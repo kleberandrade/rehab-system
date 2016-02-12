@@ -70,13 +70,16 @@ public class RemoteInputAxis : InputAxis
 {
 	protected byte id;
 
-	public override bool Init( string axisName )
+	public override bool Init( string axisInfo )
 	{
+		string axisName = axisInfo.Split( ':' )[ 0 ];
+		string axisAddress = axisInfo.Split( ':' )[ 1 ];
+
 		base.Init( axisName );
 
         if( byte.TryParse( axisName, out id ) )
         {
-            Connect();
+			Connect( axisAddress );
             return true;
         }
 
@@ -88,7 +91,7 @@ public class RemoteInputAxis : InputAxis
         Disconnect();
     }
 
-	public virtual void Connect() {}
+	public virtual void Connect( string hostName ) {}
 
     public virtual void Disconnect() {}
 }

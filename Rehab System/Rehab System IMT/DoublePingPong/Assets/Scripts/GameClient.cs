@@ -7,7 +7,11 @@ public enum NetworkValue { POSITION, VELOCITY, FORCE };
 
 public class GameClient : MonoBehaviour
 {
+	public const string GAME_SERVER_HOST_ID = "Game Server Host";
+
     private const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
+
+	NetworkClientUDP gameClient = null;
 
     private byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
     private byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
@@ -23,8 +27,9 @@ public class GameClient : MonoBehaviour
 
 	public void Connect()
 	{
-		string gameServerHost = PlayerPrefs.GetString( ConnectionManager.GAME_SERVER_HOST_ID, ConnectionManager.LOCAL_SERVER_HOST );
-		ConnectionManager.GameClient.Connect( gameServerHost, 50004 );
+		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, "localhost" );
+		if( gameClient == null ) gameClient = new NetworkClientUDP();
+		gameClient.Connect( gameServerHost, 50004 );
 	}
 
     public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
@@ -90,9 +95,9 @@ public class GameClient : MonoBehaviour
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
 
-        if( outputMessageLength > 1 ) ConnectionManager.GameClient.SendData( outputBuffer );
+		if( outputMessageLength > 1 ) gameClient.SendData( outputBuffer );
 
-		if( ConnectionManager.GameClient.ReceiveData( inputBuffer ) )
+		if( gameClient.ReceiveData( inputBuffer ) )
 		{
             int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
 
@@ -116,7 +121,7 @@ public class GameClient : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        ConnectionManager.GameClient.Disconnect();
+		gameClient.Disconnect();
     }
 }
 

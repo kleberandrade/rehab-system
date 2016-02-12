@@ -49,7 +49,6 @@
      <Compile Include="Assets\Scripts\AxisSelector.cs" />
      <Compile Include="Assets\Scripts\BallController.cs" />
      <Compile Include="Assets\Scripts\Connection.cs" />
-     <Compile Include="Assets\Scripts\ConnectionManager.cs" />
      <Compile Include="Assets\Scripts\GameClient.cs" />
      <Compile Include="Assets\Scripts\Gameplay.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />

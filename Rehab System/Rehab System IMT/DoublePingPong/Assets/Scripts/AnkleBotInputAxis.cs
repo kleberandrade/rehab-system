@@ -45,12 +45,11 @@ public class AnkleBotInputAxis : RemoteInputAxis
 		ReadMsg();
 	}
 
-	public override void Connect()
+	public override void Connect( string hostName )
 	{
 		Debug.Log( "Starting connection" );
-		string axisServerHost = PlayerPrefs.GetString( ConnectionManager.AXIS_SERVER_HOST_ID, "192.168.0.66" );
 		if( connection == null ) connection = new NetworkClientUDP( new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) );
-		connection.Connect( axisServerHost, 8000 );
+		connection.Connect( "192.168.0.66", 8000 );
 	}
 
 	private void SendMsg()
@@ -81,7 +80,7 @@ public class AnkleBotInputAxis : RemoteInputAxis
 				velocity = BitConverter.ToSingle( inputBuffer, 1 + INFO_SIZE * ( N_VAR * id + VELOCITY ) );
 				force = BitConverter.ToSingle( inputBuffer, 1 + INFO_SIZE * ( N_VAR * id + FORCE ) );
 
-				//Debug.Log ("Robot " + (i+1) + "- Pos: " + position.ToString() + ", Vel:" + velocity.ToString() + ", Acc:" + acceleration.ToString() + ", For:" + force.ToString());
+				Debug.Log( "Robot " + id.ToString() + ", Pos: " + position.ToString() + ", Vel:" + velocity.ToString() + ", Force:" + force.ToString() );
 
 				break;
 			}
