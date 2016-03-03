@@ -55,21 +55,6 @@ public class Robot : MonoBehaviour
 	void Start ()
 	{
         connected = false;
-//		connection = GetComponent<Connection>();
-//		File.WriteAllText (textFile, "Horizontal\t" +
-//		                   			 "Vertical" + 
-//		                   			Environment.NewLine + 
-//									 "Time\t" +
-//									 "SqrPos\t\t" +
-//									 "Pos\t\t" +
-//									 "FVel\t\t" +
-//									 "Vel\t\t" +
-//									 "Torque\t" +
-//		                   			 "CenterSpring\t\t" +
-//		                   			 "FreeSpace\t\t" +
-//		                   			 "Stiffness" +
-//		                   			 "Damping" +
-//		                   			Environment.NewLine);
 
         horizontal = GetComponent<InputAxisManager>().GetAxis( "1" );
         vertical = GetComponent<InputAxisManager>().GetAxis( "0" );
@@ -103,28 +88,16 @@ public class Robot : MonoBehaviour
 			vertical.Position = centerSpring.y;
 			horizontal.Position = centerSpring.x;
 			vertical.Velocity = freeSpace.y;
-			horizontal.Velocity = freeSpace.x;
-
-			// Print the all variables
-//			File.AppendAllText( textFile, + Time.time + "\t"
-//			                              + input.x + "\t" 
-//			                              + input.y  + "\t" );
-//
-//			File.AppendAllText( textFile, vertical.Position + "\t" + vertical.Velocity + "\t" + vertical.Force );
-//			File.AppendAllText( textFile, horizontal.Position + "\t" + horizontal.Velocity + "\t" + horizontal.Force );
-//
-//			File.AppendAllText(textFile, centerSpring.x + "\t");
-//			File.AppendAllText(textFile, centerSpring.y + "\t");
-//			File.AppendAllText(textFile, freeSpace.x + "\t");
-//			File.AppendAllText(textFile, freeSpace.y + "\t");
-//			File.AppendAllText(textFile, Stiffness + "\t");
-//			File.AppendAllText(textFile, D + "\t");
-//
-//			File.AppendAllText(textFile, Environment.NewLine);
-			
+			horizontal.Velocity = freeSpace.x;			
 		} 
+		else
+		{
+			if( horizontal.Position > horizontal.MaxValue ) horizontal.MaxValue = horizontal.Position;
+			else if( horizontal.Position < horizontal.MinValue ) horizontal.MinValue = horizontal.Position;
 
-        Calibration();
+			if( vertical.Position > vertical.MaxValue ) vertical.MaxValue = vertical.Position;
+			else if( vertical.Position < vertical.MinValue ) vertical.MinValue = vertical.Position;
+		}
 	}
 
     public Vector2 ReadInput()
@@ -149,13 +122,4 @@ public class Robot : MonoBehaviour
             horizontal.Damping = damping;
         }
     }
-
-	void Calibration()
-	{
-        if( horizontal.Position > horizontal.MaxValue ) horizontal.MaxValue = horizontal.Position;
-        else if( horizontal.Position < horizontal.MinValue ) horizontal.MinValue = horizontal.Position;
-
-        if( vertical.Position > vertical.MaxValue ) vertical.MaxValue = vertical.Position;
-        else if( vertical.Position < vertical.MinValue ) vertical.MinValue = vertical.Position;
-	}
 }

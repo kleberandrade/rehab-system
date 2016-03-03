@@ -15,10 +15,6 @@ public class PlayerController : MonoBehaviour
 	public Collider boundaries;
     private Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
 
-    public BallController ball;
-
-	private int targetMask;
-
     private string textFile;
 
     private Rigidbody playerBody;
@@ -30,8 +26,6 @@ public class PlayerController : MonoBehaviour
 
 	void Start()
 	{
-        targetMask = LayerMask.GetMask( "Target" );
-
         playerBody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<BoxCollider>();
 
@@ -44,29 +38,25 @@ public class PlayerController : MonoBehaviour
 
 	void FixedUpdate()
 	{
-        MoveWalls( robot.ReadInput() );
+		Vector2 input = robot.ReadInput();
 
-		ControlPosition();
-	}
+		playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
 
-	// Set the wall's speed
-    public void MoveWalls( Vector2 input )
+		File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
+
+		// Send locally controlled object positions (z) over network
+		if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
+	}       
+
+	public float ControlPosition( Vector3 target, out float error )
 	{
-        playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
-
-        File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
-
-        // Send locally controlled object positions (z) over network
-        if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
-	}        
-
-	public void ControlPosition()
-	{
-        Vector3 impactPoint = ball.FindImpactPoint( targetMask );
-
-        Vector2 setpoint = new Vector2( Mathf.Clamp( impactPoint.z, -rangeLimits.z, rangeLimits.z ), 0.0f );
+        Vector2 setpoint = new Vector2( Mathf.Clamp( target.z, -rangeLimits.z, rangeLimits.z ), 0.0f );
 
         robot.WriteSetpoint( setpoint );
+
+		error = Mathf.Abs( ( setpoint.x - playerBody.position.z ) / rangeLimits.z );
+
+		return setpoint.x / rangeLimits.z;
 	}
 
     void OnTriggerEnter( Collider collider )
