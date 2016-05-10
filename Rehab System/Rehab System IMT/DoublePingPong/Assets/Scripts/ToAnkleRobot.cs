@@ -12,7 +12,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
-	public bool activeConnection, activeHelper, followBall;
+	public bool activeConnection, activeHelper, followBall, elipseSpace;
 
 	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 	private float playerScore, machineScore, lazyScore;				// Value Scores
@@ -22,6 +22,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	public Vector2 max, min;		// Input for elipse
 	public Vector2 bases, origin;	// Elipse's parameters
 	public float elipseScale;		// Scale for fitting the moves
+	public float squareScale = 1f;
 
 	// Communication with another scripts
 	public PlayerController player;
@@ -96,7 +97,10 @@ public class ToAnkleRobot : MonoBehaviour {
 				);
 
 			// Move player
-			player.SetWalls(ElipseToSquare(input));
+			if (elipseSpace)
+				player.SetWalls(ElipseToSquare(input));
+			else
+				player.SetWalls(input * squareScale);
 
 			// Player helper
 			if (activeHelper)

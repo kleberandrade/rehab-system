@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
 	private int targetMask;
 
-	private string textFile = @"D:\Users\Thales\Documents\Unity3D\DoublePingPong\LogFilePos.txt";
+//	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System IMT\DoublePingPong\LogFilePosX.txt";
 
 	public Rigidbody[] horizontalWalls;
 	public Rigidbody[] verticalWalls;
@@ -32,14 +32,14 @@ public class PlayerController : MonoBehaviour
 	void Start ()
 	{
 		// Start file for record movements
-		if (File.Exists (textFile)) File.Delete (textFile);
-		File.WriteAllText (textFile, "Horizoltal\tVertical" + Environment.NewLine);
+//		if (File.Exists (textFile)) File.Delete (textFile);
+//		File.WriteAllText (textFile, "Horizoltal\tVertical" + Environment.NewLine);
 	}
 
 	void Update()
 	{
 		// Record movements
-		File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
+//		File.WriteAllText(textFile, horizontalWalls[0].position.x + "\t" + verticalWalls[0].position.z + Environment.NewLine);
 	}
 
 	void FixedUpdate()

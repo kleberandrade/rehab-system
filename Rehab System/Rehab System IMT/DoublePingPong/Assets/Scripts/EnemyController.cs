@@ -44,10 +44,10 @@ public class EnemyController : MonoBehaviour {
 			{
 				if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
 				{
-					if (training.plan.Count == 0)
+//					if (training.plan.Count == 0)
 						enemyBody.velocity = RandVectOnGround()*speed;
-					if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
-						Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
+//					if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
+//						Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
 				}
 				else
 				{

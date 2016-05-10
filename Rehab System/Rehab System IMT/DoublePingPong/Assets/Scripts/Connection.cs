@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
-using System.Collections;
+
 using System;
+using System.IO;
 using System.Text;
+
+using System.Collections;
+
 using System.Net;
 using System.Net.Sockets;
 using System.Linq;
+
 
 public class Connection : MonoBehaviour {
 
@@ -35,8 +40,14 @@ public class Connection : MonoBehaviour {
 	private NetworkClientTCP clientHere = new NetworkClientTCP();
 //================================
 
+	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\Logs\LogFilePos.txt";
+
 	void Start()
 	{
+		// Start file for record movements
+		if (File.Exists (textFile)) File.Delete (textFile);
+		File.WriteAllText (textFile, "Position\t\tVelocity\t\tVelocityF\t\tTorque" + Environment.NewLine);
+
 		Debug.Log ("Starting connection");
 		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
 	//	clientHere.SendString ("Conectado!"); 
@@ -103,8 +114,16 @@ public class Connection : MonoBehaviour {
 				{
 					robotStade[i][j] = BitConverter.ToSingle (buffer, 1 + INFO_SIZE*(j + N_VAR*i));
 				}
-//				Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
+				//				Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
 			}
+			for (int j = 0; j < N_VAR; j++)
+			{
+				for (int i = 0; i < n_Robots; i++)
+				{
+					File.AppendAllText(textFile, robotStade[i][j] + "\t");
+				}
+			}
+			File.AppendAllText(textFile, Environment.NewLine);
 		}
 		return;
 	}
