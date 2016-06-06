@@ -12,7 +12,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	private const int HORIZONTAL = 1;	// or LEFT?		IE - Inversion/Eversion
 	private const float QUADRANTS = 0.70710678118654752440084436210485f;
 
-	public bool activeConnection, activeHelper, followBall, elipseSpace;
+	public bool activeConnection, activeHelper, followBall, elipseSpace, activeDisturber;
 
 	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 	private float playerScore, machineScore, lazyScore;				// Value Scores
@@ -28,6 +28,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	public PlayerController player;
 	public EnemyController enemy;
 	private Connection connection;
+	private Vector2 wallPos;
 
 	// Communication
 	public Vector2 input, enemyPos;
@@ -36,6 +37,9 @@ public class ToAnkleRobot : MonoBehaviour {
 	private int targetMask;
 	public float helperLimit;
 	public float helperFade;
+
+	private float fm, fa, dfm, dfa, dt;
+	private int eventCounter;
 
 	[Space]
 
@@ -69,12 +73,17 @@ public class ToAnkleRobot : MonoBehaviour {
 									 "Pos\t\t" +
 									 "FVel\t\t" +
 									 "Vel\t\t" +
-									 "Torque\t" +
+									 "Torque\t\t" +
+			"EventNumber\t" +
+			"TorqueVec\t\t" +
+			"dTorqueVec\t\t" +
 		                   			 "CenterSpring\t\t" +
 		                   			 "FreeSpace\t\t" +
 		                   			 "K" +
 		                   			 "D" +
 		                   			Environment.NewLine);
+		fm = fa = dt = dfm = dfa = 0f;
+		eventCounter = enemy.eventCounter;
 	}
 
 	void Update()
@@ -98,28 +107,38 @@ public class ToAnkleRobot : MonoBehaviour {
 
 			// Move player
 			if (elipseSpace)
-				player.SetWalls(ElipseToSquare(input));
+				wallPos = ElipseToSquare (input);
 			else
-				player.SetWalls(input * squareScale);
+				wallPos = input * squareScale;
+			
+			player.SetWalls(wallPos);
 
 			// Player helper
 			if (activeHelper)
 				PlayerHelper ();
 
-			if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
-			                connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce)
-				machineScore += Time.deltaTime;
+			if (activeDisturber)
+				PlayerDisturber ();
+			
+			if ((new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
+							 connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce) && activeHelper)
+					machineScore += Time.deltaTime;
 			else
 				if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.VELOCITY),
-			                connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
+			                	connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
 					playerScore += Time.deltaTime;
 
 			// Follow the ball
 			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
-			enemyPos = SquareToElipse (enemyPos);
+
+			if (elipseSpace)
+				enemyPos = SquareToElipse (enemyPos);
+			else
+				enemyPos = enemyPos / squareScale / player.boundaryDist;
+			
 			if (followBall)
 				centerSpring = enemyPos;
-
+			
 			// Set variables to send to robot
 			connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
 			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
@@ -134,12 +153,29 @@ public class ToAnkleRobot : MonoBehaviour {
 			// Print the all variables
 			File.AppendAllText(textFile, 
 			                   + Time.time + "\t"
-			                   + input.x + "\t" 
-			                   + input.y  + "\t");
-			
+							   + wallPos.x + "\t" 
+							   + wallPos.y + "\t");
+
 			for (int j = 0; j < Connection.N_VAR; j++)
 				for (int i = 1; i >= 0; i--)
 					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
+
+			File.AppendAllText(textFile, enemy.eventCounter + "\t");
+
+			fm = Mathf.Sqrt (connection.ReadStatus (0, Connection.FORCE) * connection.ReadStatus (0, Connection.FORCE) +
+						 	 connection.ReadStatus (1, Connection.FORCE) * connection.ReadStatus (1, Connection.FORCE));
+			fa = Mathf.Atan2 (connection.ReadStatus (1, Connection.FORCE),
+							  connection.ReadStatus (0, Connection.FORCE));
+
+			File.AppendAllText(textFile, fm + "\t");
+			File.AppendAllText(textFile, fa + "\t");
+
+			File.AppendAllText(textFile, (fm - dfm) / (Time.time - dt) + "\t");
+			File.AppendAllText(textFile, (fa - dfa) / (Time.time - dt) + "\t");
+
+			dfm = fm;
+			dfa = fa;
+			dt = Time.time;
 
 			File.AppendAllText(textFile, centerSpring.x + "\t");
 			File.AppendAllText(textFile, centerSpring.y + "\t");
@@ -178,7 +214,7 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	void PlayerHelper()
 	{
-		Vector2 impact, impactBoundary, safeArea, track, distance;
+		Vector2 impact, safeArea, track, distance;
 		float impactDist;
 
 		impactDist = enemy.FindImpact (targetMask).distance + helperLimit;
@@ -187,38 +223,72 @@ public class ToAnkleRobot : MonoBehaviour {
 			enemy.FindImpact(targetMask).point.x, 
 			enemy.FindImpact(targetMask).point.z);
 
-		impactBoundary = new Vector2 (
-			Mathf.Clamp(impact.x, -player.boundary, player.boundary), 
-			Mathf.Clamp(impact.y, -player.boundary, player.boundary));
-		
 		safeArea = new Vector2 (
-			player.boundary - Mathf.Abs (impactBoundary.y),
-			player.boundary - Mathf.Abs (impactBoundary.x));
-		
-//		track = new Vector2	(
-//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.x - impact.x), helperLimit),
-//			Mathf.Max( Mathf.Abs(enemy.enemyBody.position.z - impact.y), helperLimit));
+			Mathf.Clamp(player.boundary - Mathf.Abs (impact.y), 0f, player.boundary),
+			Mathf.Clamp(player.boundary - Mathf.Abs (impact.x), 0f, player.boundary));
 
 		track = new Vector2 (impactDist, impactDist);
 		
 		distance = (track + safeArea) / enemy.speed * player.speed;
-		
-		if (helperFade >= 1f)
+
+		if (elipseSpace)
 		{
-			if ((centerSpring - SquareToElipse (impact)).magnitude < 0.05f)
+			if (helperFade > 1f)
 			{
-				centerSpring = SquareToElipse (impact);
-				freeSpace = SquareToElipse (distance);
+				if ((centerSpring - SquareToElipse (impact)).magnitude < 0.05f)
+				{
+					centerSpring = SquareToElipse (impact);
+					freeSpace = SquareToElipse (distance);
+				} else
+				{
+					helperFade = 0f;
+				}
+			} else
+			{
+				centerSpring = Vector2.Lerp (centerSpring, SquareToElipse (impact), helperFade);
+				freeSpace = Vector2.Lerp (freeSpace, SquareToElipse (distance), helperFade);
+				helperFade += Time.deltaTime;
 			}
-			else
+		} else
+		{
+			if (helperFade > 1f)
+			{
+				if ((centerSpring - (impact / squareScale / player.boundaryDist)).magnitude < 0.05f)
+				{
+					centerSpring = impact / squareScale / player.boundaryDist;
+					freeSpace = distance / squareScale / player.boundaryDist;
+				} else
+				{
+					helperFade = 0f;
+				}
+			} else
+			{
+				centerSpring = Vector2.Lerp (centerSpring, impact / squareScale / player.boundaryDist, helperFade);
+				freeSpace = Vector2.Lerp (freeSpace, distance / squareScale / player.boundaryDist, helperFade);
+				helperFade += Time.deltaTime;
+			}
+		}
+	}
+
+	void PlayerDisturber()
+	{
+		if (helperFade >= 0.2f)
+		{
+			if (eventCounter != enemy.eventCounter)
 			{
 				helperFade = 0f;
-			}
+				eventCounter = enemy.eventCounter;
+				Debug.Log ("Event: " + eventCounter + " " + input);
+			} 
 		}
 		else
 		{
-			centerSpring = Vector2.Lerp( centerSpring, SquareToElipse (impact), helperFade);
-			freeSpace = Vector2.Lerp( freeSpace, SquareToElipse (distance), helperFade);
+			centerSpring = Vector2.Lerp (centerSpring, input, helperFade * 5f);
+//			if (elipseSpace)
+				freeSpace = bases / 3;
+//			else
+//				freeSpace = new Vector2(
+			
 			helperFade += Time.deltaTime;
 		}
 	}
@@ -281,17 +351,23 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	public void Connect()
 	{
-		activeConnection = true;
-		gameObject.AddComponent<Connection>();
-		connection = GetComponent<Connection>();
+		if (!activeConnection)
+		{
+			activeConnection = true;
+			gameObject.AddComponent<Connection> ();
+			connection = GetComponent<Connection> ();
+		}
 	}
 
 	public void Disconnect()
 	{
-		activeConnection = false;
-		//connection.CloseConnection();
-		Destroy (GetComponent <Connection>());
-		connection = null;
+		if (activeConnection)
+		{
+			activeConnection = false;
+			//connection.CloseConnection();
+			Destroy (GetComponent <Connection> ());
+			connection = null;
+		}
 	}
 
 }

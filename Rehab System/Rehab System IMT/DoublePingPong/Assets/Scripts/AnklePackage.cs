@@ -70,7 +70,10 @@ public class AnklePackage : MonoBehaviour {
 
 		// Green Lines for helper
 		GL.Color(new Color(0.0f, 0.4f, 0.0f, 1.0f));
-		ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
+		if (package.elipseSpace)
+			ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
+		else
+			RectForm (origin + Vector2.Scale (package.centerSpring - new Vector2(package.freeSpace.x, -package.freeSpace.y), size), Vector2.Scale (package.freeSpace, size) * 2);
 		CrossForm (origin + Vector2.Scale (package.centerSpring, size), 0.02f*size);
 
 		// Red Dot for enemy

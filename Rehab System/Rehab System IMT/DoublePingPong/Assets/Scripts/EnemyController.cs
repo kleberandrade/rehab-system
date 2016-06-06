@@ -20,6 +20,7 @@ public class EnemyController : MonoBehaviour {
 	public Collider show;
 
 	public bool playing;
+	public int eventCounter;
 
 	void Awake(){
 		enemyBody = GetComponent<Rigidbody> ();
@@ -32,6 +33,7 @@ public class EnemyController : MonoBehaviour {
 		enemyBody.velocity = 0.2f * Vector3.down + 0.1f * Vector3.one;
 		onTagPickUp = 0;
 		onWallHit = 0;
+		eventCounter = 0;
 		missWall = false;
 		pickUpMask = LayerMask.GetMask ("PickUpWall");
 	}
@@ -91,6 +93,7 @@ public class EnemyController : MonoBehaviour {
 				enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
 				break;
 			}
+			eventCounter++;
 		}
 	//	multiHitCheck = Time.time;
 		enemyBody.velocity = enemyBody.velocity.normalized*speed;
