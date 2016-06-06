@@ -1,0 +1,8 @@
+﻿<games>
+  <game name="The Catcher" figure="xxx" scene="xxx" category="horizontal"></game>
+  <game name="Happy Fish" figure="xxx" scene="xxx" category="vertical"></game>
+  <game name="Pong" figure="xxx" scene="xxx" category="vertical"></game>
+  <game name="Downhill Race" figure="xxx" scene="xxx" category="vertical"></game>
+  <game name="Roll the Ball" figure="xxx" scene="xxx" category="vertical"></game>
+  <game name="Roll the Ball" figure="xxx" scene="xxx" category="vertical"></game>
+</games>
