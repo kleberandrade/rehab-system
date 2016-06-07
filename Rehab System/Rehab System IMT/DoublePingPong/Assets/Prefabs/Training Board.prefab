@@ -113,6 +113,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1.5, y: 1, z: 1.5}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 474044}
   m_RootOrder: 0
@@ -125,6 +126,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.5, z: 0.6}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 440396}
   m_RootOrder: 1
@@ -137,6 +139,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 451362}
   - {fileID: 437738}
@@ -151,6 +154,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1.1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 440396}
   m_RootOrder: 0
@@ -163,6 +167,7 @@ Transform:
   m_LocalRotation: {x: 0.4619398, y: 0.19134173, z: 0.19134173, w: 0.8446232}
   m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 474044}
   m_RootOrder: 1
@@ -175,6 +180,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 431152}
   - {fileID: 455060}
@@ -361,11 +367,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 159748}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e1ebe5dc29daa346a94be796bfbabe0, type: 3}
+  m_Script: {fileID: 11500000, guid: eb9ddde05830f2b48bceb438e84ec46f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickUpTraining: {fileID: 145808}
-  vectorArrow: {fileID: 440396}
+  pickUpTraining: {fileID: 169516, guid: a80e8ae0a01cdd14683c02ae83aa427f, type: 2}
+  vectorArrow: {fileID: 404326, guid: ef96f2b05bdb96242a94a9506f786478, type: 2}
 --- !u!114 &11441648
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -191,8 +191,8 @@ public class ToAnkleRobot : MonoBehaviour {
 			player.MoveWalls(player.ReadInput());
 			input = new Vector2
 				(
-				player.horizontalWalls [0].position.x/player.boundary,
-				player.verticalWalls [0].position.z/player.boundary
+				player.horizontalWalls [0].position.x/player.boundary/3f,
+				player.verticalWalls [0].position.z/player.boundary/3f
 				);
 		}
 		Calibration (input);
