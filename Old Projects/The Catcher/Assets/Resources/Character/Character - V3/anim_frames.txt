@@ -1,0 +1,6 @@
+0-50:	idle
+51-90:	running
+91-116: falling
+122-137: dizzy
+138-170: sad
+171-206: happy
