@@ -49,6 +49,8 @@
      <Compile Include="Assets\Scripts\Connection.cs" />
      <Compile Include="Assets\Scripts\EnemyController.cs" />
      <Compile Include="Assets\Scripts\EnemyTarget.cs" />
+     <Compile Include="Assets\Scripts\Intro.cs" />
+     <Compile Include="Assets\Scripts\Logger.cs" />
      <Compile Include="Assets\Scripts\NetworkClient.cs" />
      <Compile Include="Assets\Scripts\NetworkClientTCP.cs" />
      <Compile Include="Assets\Scripts\NetworkClientUDP.cs" />
@@ -58,8 +60,6 @@
      <Compile Include="Assets\Scripts\Stretchable.cs" />
      <Compile Include="Assets\Scripts\ToAnkleRobot.cs" />
      <Compile Include="Assets\Scripts\Training.cs" />
-     <None Include="Assets\Textures\Shaders\Shader2.shader" />
-     <None Include="Assets\Textures\Shaders\Shader1.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

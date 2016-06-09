@@ -3,9 +3,6 @@ using UnityEngine.UI;
 using System.Globalization;
 using System.Collections;
 
-using System;
-using System.IO;
-using System.Text;
 
 public class ToAnkleRobot : MonoBehaviour {
 	private const int VERTICAL = 0;		// or RIGHT? 	DP - Dorsiflexion/Plantarflexion
@@ -27,8 +24,8 @@ public class ToAnkleRobot : MonoBehaviour {
 	// Communication with another scripts
 	public PlayerController player;
 	public EnemyController enemy;
-	private Connection connection;
-	private Vector2 wallPos;
+	public Connection connection;
+	private Logger logger;
 
 	// Communication
 	public Vector2 input, enemyPos;
@@ -38,16 +35,15 @@ public class ToAnkleRobot : MonoBehaviour {
 	public float helperLimit;
 	public float helperFade;
 
-	private float fm, fa, dfm, dfa, dt;
+//	private float fm, fa, dfm, dfa, dt;
 	private int eventCounter;
 
 	[Space]
 
+	public Vector2 wallPos;
 	public Vector2 centerSpring;
 	public Vector2 freeSpace;
 	public float K, D;				// Stiffness and Damping
-
-	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
 
 	void Awake () 
 	{
@@ -65,24 +61,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		activeConnection = false;
 //		connection = GetComponent<Connection>();
-		File.WriteAllText (textFile, "Horizontal\t" +
-		                   			 "Vertical" + 
-		                   			Environment.NewLine + 
-									 "Time\t" +
-									 "SqrPos\t\t" +
-									 "Pos\t\t" +
-									 "FVel\t\t" +
-									 "Vel\t\t" +
-									 "Torque\t\t" +
-			"EventNumber\t" +
-			"TorqueVec\t\t" +
-			"dTorqueVec\t\t" +
-		                   			 "CenterSpring\t\t" +
-		                   			 "FreeSpace\t\t" +
-		                   			 "K" +
-		                   			 "D" +
-		                   			Environment.NewLine);
-		fm = fa = dt = dfm = dfa = 0f;
+//		fm = fa = dt = dfm = dfa = 0f;
 		eventCounter = enemy.eventCounter;
 	}
 
@@ -93,6 +72,9 @@ public class ToAnkleRobot : MonoBehaviour {
 		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
 		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
 		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
+
+		if (connection != null)
+			activeConnection = connection.connected;
 	}
 
 	void FixedUpdate () 
@@ -150,50 +132,17 @@ public class ToAnkleRobot : MonoBehaviour {
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
 
-			// Print the all variables
-			File.AppendAllText(textFile, 
-			                   + Time.time + "\t"
-							   + wallPos.x + "\t" 
-							   + wallPos.y + "\t");
+			logger.Register ();
 
-			for (int j = 0; j < Connection.N_VAR; j++)
-				for (int i = 1; i >= 0; i--)
-					File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
-
-			File.AppendAllText(textFile, enemy.eventCounter + "\t");
-
-			fm = Mathf.Sqrt (connection.ReadStatus (0, Connection.FORCE) * connection.ReadStatus (0, Connection.FORCE) +
-						 	 connection.ReadStatus (1, Connection.FORCE) * connection.ReadStatus (1, Connection.FORCE));
-			fa = Mathf.Atan2 (connection.ReadStatus (1, Connection.FORCE),
-							  connection.ReadStatus (0, Connection.FORCE));
-
-			File.AppendAllText(textFile, fm + "\t");
-			File.AppendAllText(textFile, fa + "\t");
-
-			File.AppendAllText(textFile, (fm - dfm) / (Time.time - dt) + "\t");
-			File.AppendAllText(textFile, (fa - dfa) / (Time.time - dt) + "\t");
-
-			dfm = fm;
-			dfa = fa;
-			dt = Time.time;
-
-			File.AppendAllText(textFile, centerSpring.x + "\t");
-			File.AppendAllText(textFile, centerSpring.y + "\t");
-			File.AppendAllText(textFile, freeSpace.x + "\t");
-			File.AppendAllText(textFile, freeSpace.y + "\t");
-			File.AppendAllText(textFile, K + "\t");
-			File.AppendAllText(textFile, D + "\t");
-
-			File.AppendAllText(textFile, Environment.NewLine);
-			
 		} else 
 		{
 			player.MoveWalls(player.ReadInput());
-			input = new Vector2
+			wallPos = new Vector2
 				(
 				player.horizontalWalls [0].position.x/player.boundary/3f,
 				player.verticalWalls [0].position.z/player.boundary/3f
 				);
+			input = wallPos / player.boundary / 3f;
 		}
 		Calibration (input);
 	}
@@ -351,23 +300,20 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	public void Connect()
 	{
-		if (!activeConnection)
-		{
-			activeConnection = true;
-			gameObject.AddComponent<Connection> ();
-			connection = GetComponent<Connection> ();
-		}
+		gameObject.AddComponent<Connection> ();
+		gameObject.AddComponent<Logger> ();
+		connection = GetComponent<Connection> ();
+		logger = GetComponent<Logger> ();
+		logger.connection = connection;
+		logger.robot = this;
 	}
 
 	public void Disconnect()
 	{
-		if (activeConnection)
-		{
-			activeConnection = false;
-			//connection.CloseConnection();
-			Destroy (GetComponent <Connection> ());
-			connection = null;
-		}
+		//connection.CloseConnection();
+		if (connection != null) Destroy (connection);
+		if (logger != null) Destroy (logger);
+//		connection = null;
 	}
 
 }

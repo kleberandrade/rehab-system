@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 
+using System.Threading;
 using System.Collections;
 
 using System.Net;
@@ -36,31 +37,44 @@ public class Connection : MonoBehaviour {
 
 	private float delayCount;
 
+	private Thread connectingThread;
+	private volatile bool stopThread;
+	public bool connected;
+
 //================================
 	private NetworkClientTCP clientHere = new NetworkClientTCP();
 //================================
 
-	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\Logs\LogFilePos.txt";
+//	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\Logs\LogFilePos.txt";
 
 	void Start()
 	{
-		// Start file for record movements
-		if (File.Exists (textFile)) File.Delete (textFile);
-		File.WriteAllText (textFile, "Position\t\tVelocity\t\tVelocityF\t\tTorque" + Environment.NewLine);
-
-		Debug.Log ("Starting connection");
-		clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
-	//	clientHere.SendString ("Conectado!"); 
-	//	clientHere.ReceiveString ();
-		InitializeVariables (2); // Entre com o numero de robos
-	//	ClearMask ();
+		stopThread = false;
+		connectingThread = new Thread (Connect);
+		connectingThread.Start ();
+		connected = clientHere.IsConnected ();
 	}
 
 	void FixedUpdate()
 	{
-		SendMsg ();
-		ClearMask ();
-		ReadMsg ();
+		connected = clientHere.IsConnected ();
+		if (connected)
+		{
+			SendMsg ();
+			ClearMask ();
+			ReadMsg ();
+		}
+	}
+
+	void Connect()
+	{
+		while (!(connected || stopThread))
+		{
+			Debug.Log ("Starting connection");
+			clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
+			clientHere.SendString ("Connected!"); 
+			InitializeVariables (2); // Entre com o numero de robos
+		}
 	}
 
 	public void SetStatus(int robot, float mag, int variable)
@@ -116,14 +130,14 @@ public class Connection : MonoBehaviour {
 				}
 				//				Debug.Log ("Robot " + (i+1) + "- Pos: " + robotStade[i][0].ToString() + ", Vel:" + robotStade[i][1].ToString() + ", Acc:" + robotStade[i][2].ToString() + ", For:" + robotStade[i][3].ToString());
 			}
-			for (int j = 0; j < N_VAR; j++)
+/*			for (int j = 0; j < N_VAR; j++)
 			{
 				for (int i = 0; i < n_Robots; i++)
 				{
 					File.AppendAllText(textFile, robotStade[i][j] + "\t");
 				}
 			}
-			File.AppendAllText(textFile, Environment.NewLine);
+			File.AppendAllText(textFile, Environment.NewLine);*/
 		}
 		return;
 	}
@@ -163,8 +177,10 @@ public class Connection : MonoBehaviour {
 		Destroy (this);
 	}
 
-	~Connection()
+	void OnDestroy()
 	{
+		stopThread = true;
+		connectingThread.Abort ();
 		clientHere.Disconnect ();
 	}
 }
