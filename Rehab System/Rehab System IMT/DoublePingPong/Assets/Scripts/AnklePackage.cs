@@ -26,7 +26,7 @@ public class AnklePackage : MonoBehaviour {
 		colorAlpha = 0.3f;
 	}
 
-	void OnPostRender() 
+	void OnGUI() 
 	{
 		if (!mat) 
 		{
@@ -41,8 +41,8 @@ public class AnklePackage : MonoBehaviour {
 
 		// Scale of space plot
 		size = new Vector2 (
-			space.rect.width * space.localScale.x,
-			space.rect.height * space.localScale.y);
+			space.rect.width * space.lossyScale.x,
+			space.rect.height * space.lossyScale.y);
 
 		// Center of space plot
 		origin = space.position; // + size / 2;
@@ -83,8 +83,8 @@ public class AnklePackage : MonoBehaviour {
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (
-			point.x / Screen.width, 
-			point.y / Screen.height, 0));
+			(point.x - origin.x) / Screen.width, 
+			(point.y - origin.y) / Screen.height, 0));
 		
 		// Black changing alpha for track
 		GL.Color (Color.black);
@@ -94,8 +94,8 @@ public class AnklePackage : MonoBehaviour {
 			for (int i = ankleTrack.Count - 1; i > 0 ; i--)
 				{
 				GL.Color(new Color (0f, 0f, 0f, aux));
-				GL.Vertex(ankleTrack[i - 1]);
-				GL.Vertex(ankleTrack[i]);
+				GL.Vertex(ankleTrack[i - 1] + (Vector3)origin);
+				GL.Vertex(ankleTrack[i] + (Vector3)origin);
 				if (aux > colorAlpha)
 					aux -= colorRate;
 				}
