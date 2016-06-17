@@ -45,11 +45,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\HideShow.cs" />
      <Compile Include="Assets\Scripts\AnklePackage.cs" />
      <Compile Include="Assets\Scripts\Connection.cs" />
      <Compile Include="Assets\Scripts\EnemyController.cs" />
      <Compile Include="Assets\Scripts\EnemyTarget.cs" />
+     <Compile Include="Assets\Scripts\HideShow.cs" />
      <Compile Include="Assets\Scripts\Intro.cs" />
      <Compile Include="Assets\Scripts\Logger.cs" />
      <Compile Include="Assets\Scripts\NetworkClient.cs" />

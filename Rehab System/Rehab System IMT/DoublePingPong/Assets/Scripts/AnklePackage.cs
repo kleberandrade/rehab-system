@@ -83,8 +83,8 @@ public class AnklePackage : MonoBehaviour {
 
 		// Record the track
 		ankleTrack.Add (new Vector3 (
-			(point.x - origin.x) / Screen.width, 
-			(point.y - origin.y) / Screen.height, 0));
+			(point.x - origin.x), 
+			(point.y - origin.y), 0));
 		
 		// Black changing alpha for track
 		GL.Color (Color.black);
@@ -94,8 +94,7 @@ public class AnklePackage : MonoBehaviour {
 			for (int i = ankleTrack.Count - 1; i > 0 ; i--)
 				{
 				GL.Color(new Color (0f, 0f, 0f, aux));
-				GL.Vertex(ankleTrack[i - 1] + (Vector3)origin);
-				GL.Vertex(ankleTrack[i] + (Vector3)origin);
+				Line(ankleTrack[i - 1] + (Vector3)(origin), ankleTrack[i] + (Vector3)origin);
 				if (aux > colorAlpha)
 					aux -= colorRate;
 				}
@@ -103,6 +102,20 @@ public class AnklePackage : MonoBehaviour {
 		GL.End();
 		GL.PopMatrix();
 	}
+
+	void Line(Vector3 start, Vector3 end)
+	{
+		start = new Vector3 (
+			start.x / Screen.width, 
+			start.y / Screen.height, 0);
+
+		end = new Vector3 (
+			end.x / Screen.width, 
+			end.y / Screen.height, 0);
+
+		GL.Vertex(start);
+		GL.Vertex(end);
+		}
 	
 	void RectForm(Vector3 startEdge, Vector3 sizes)
 	{

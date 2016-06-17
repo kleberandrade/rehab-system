@@ -142,7 +142,7 @@ public class ToAnkleRobot : MonoBehaviour {
 				player.horizontalWalls [0].position.x/player.boundary/3f,
 				player.verticalWalls [0].position.z/player.boundary/3f
 				);
-			input = wallPos / player.boundary / 3f;
+			input = wallPos / player.boundary * 5f;
 		}
 		Calibration (input);
 	}
