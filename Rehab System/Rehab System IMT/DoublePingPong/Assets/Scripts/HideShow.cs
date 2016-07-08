@@ -3,7 +3,7 @@ using System.Collections;
 
 public class HideShow : MonoBehaviour {
 
-	private Vector3 hide, show, target;
+	private Vector2 hide, show, target;
 	private RectTransform transf;
 	private float time;
 	public float slideTime;
@@ -12,16 +12,16 @@ public class HideShow : MonoBehaviour {
 	void Start () 
 	{
 		transf = GetComponent<RectTransform> ();
-		show = transf.position;
-		hide = new Vector3 (transf.position.x + transf.sizeDelta.x * transf.lossyScale.x * 0.98f, transf.position.y, transf.position.z);
-		transf.position = target = hide;
+		show = transf.anchoredPosition;
+		hide = new Vector2 (transf.anchoredPosition.x + transf.sizeDelta.x * 0.98f, transf.anchoredPosition.y);
+		transf.anchoredPosition = target = hide;
+		slideTime = 2;
 		time = 0f;
-
 	}
 
 	void Update()
 	{
-		transf.position = Vector3.Lerp (transf.position, target, time * 2f);
+		transf.anchoredPosition = Vector2.Lerp (transf.anchoredPosition, target, time * slideTime);
 		time += Time.deltaTime;
 	}
 	

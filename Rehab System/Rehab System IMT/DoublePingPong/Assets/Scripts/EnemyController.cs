@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class EnemyController : MonoBehaviour {
@@ -8,19 +9,25 @@ public class EnemyController : MonoBehaviour {
 
 	public GameObject pickUp;		// Pickup will appear on the next impact point
 	public RaycastHit enemyTrack;
+	public EnemyTarget currentPickUp;
+
+	public Text defendedText, missedText; 	// UI Scores
+	private int defended, missed;
 
 	private int pickUpMask;			// Mask for the playe where "pickup" will appear
 
-	public Training training;
+	//public Training training;
 
 	[HideInInspector] public Rigidbody enemyBody;		// Enemy rigid body
 
 	public int onTagPickUp, onWallHit;
-	public bool missWall;
 	public Collider show;
 
 	public bool playing;
 	public int eventCounter;
+
+	public Slider speedSlider;
+	public Toggle visualHelp;
 
 	void Awake(){
 		enemyBody = GetComponent<Rigidbody> ();
@@ -34,41 +41,65 @@ public class EnemyController : MonoBehaviour {
 		onTagPickUp = 0;
 		onWallHit = 0;
 		eventCounter = 0;
-		missWall = false;
 		pickUpMask = LayerMask.GetMask ("PickUpWall");
+		defended = missed = 0;
+		currentPickUp = Instantiate(pickUp).gameObject.GetComponent<EnemyTarget>();
+		currentPickUp.isActive = false;
+	}
+
+	void Update()
+	{
+		defendedText.text = "Defended\n" + defended.ToString ("D");
+		missedText.text = "Missed\n" + missed.ToString ("D");
+		speed = speedSlider.value;
 	}
 
 	void FixedUpdate()
 	{
-		if (Mathf.Abs(enemyBody.velocity.y) < Mathf.Epsilon)
+		if (Mathf.Abs (enemyBody.velocity.y) < 0.1f)
 		{
 			if (playing)
 			{
-				if (Mathf.Abs(enemyBody.velocity.magnitude) < Mathf.Epsilon)
+				if (Mathf.Abs (enemyBody.velocity.magnitude) < 0.1f)
 				{
 //					if (training.plan.Count == 0)
-						enemyBody.velocity = RandVectOnGround()*speed;
+					enemyBody.velocity = RandVectOnGround () * speed;
+					UpdatePickUp ();
 //					if ((enemyTrack = FindImpact(pickUpMask)).point != Vector3.zero)
 //						Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
-				}
-				else
+				} else
 				{
 					enemyBody.velocity = enemyBody.velocity.normalized * speed;
 				}
 
-			}
-			else 
+			} else
 			{
-		//		enemyBody.position = new Vector3(enemyBody.position.x,
-		//		                                 -0.5f,
-		//		                                 enemyBody.position.z);
+				//		enemyBody.position = new Vector3(enemyBody.position.x,
+				//		                                 -0.5f,
+				//		                                 enemyBody.position.z);
 				enemyBody.angularVelocity = Vector3.zero;
 				enemyBody.velocity = Vector3.zero;
+				UpdatePickUp (false);
 			}
-		}
+		} else
+			UpdatePickUp (false);
+
+		visualHelp.onValueChanged.AddListener (delegate
+			{
+				UpdatePickUp ();
+			});
 
 		// Alternative enemy control for testing
 		MoveEnemy();
+	}
+
+	void UpdatePickUp()
+	{
+		currentPickUp.isActive = visualHelp.isOn;
+	}
+	void UpdatePickUp(bool value)
+	{
+		currentPickUp.isActive = value;
 	}
 
 	void HitWall(string wall)
@@ -83,15 +114,18 @@ public class EnemyController : MonoBehaviour {
 		else 
 		{
 			switch (wall) {
-			case "Vertical":
-				enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, Random.Range (-speed, speed));
-				break;
-			case "Horizontal": 
-				enemyBody.velocity = new Vector3 (Random.Range (-speed, speed), 0f, -enemyBody.velocity.z);
-				break;
-			case "Tower":
-				enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
-				break;
+				case "Vertical":
+					enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, Random.Range (-speed, speed));
+					defended++;
+					break;
+				case "Horizontal": 
+					enemyBody.velocity = new Vector3 (Random.Range (-speed, speed), 0f, -enemyBody.velocity.z);
+					defended++;
+					break;
+				case "Tower":
+					enemyBody.velocity = new Vector3 (-enemyBody.velocity.x, 0f, -enemyBody.velocity.z);
+					missed++;
+					break;
 			}
 			eventCounter++;
 		}
@@ -104,49 +138,46 @@ public class EnemyController : MonoBehaviour {
 	{
 		show = other;
 		switch (other.gameObject.tag) 
-		{
-		case "Vertical":
-		case "Horizontal":
-		case "Tower":
-			onWallHit ++;
-			HitWall(other.gameObject.tag); 
-			break;
-		case "PickUp":
-			Destroy(other.gameObject);
-			break;
-		case "Sky":
-			enemyBody.position = new Vector3(0f, 23.5f, 0f); // Vector3.zero;
-			enemyBody.velocity = Vector3.zero;
-			break;
-		case "PickUpWall":
-			onTagPickUp ++;
-			break;
-		case "Boundary":
-			missWall = true;
-			break;
-		}
+			{
+			case "Vertical":
+			case "Horizontal":
+			case "Tower":
+				onWallHit ++;
+				HitWall(other.gameObject.tag); 
+				break;
+			case "PickUp":
+				UpdatePickUp(false);
+				break;
+			case "Sky":
+					enemyBody.position = new Vector3(0f, 23.5f, 0f); // Vector3.zero;
+					enemyBody.velocity = Vector3.down;
+					missed++;
+					break;
+			case "PickUpBoundary":
+				onTagPickUp++;
+				break;
+//			case "Boundary":
+//				break;
+			}
 	}
 
 	void OnTriggerExit(Collider other)
 	{
 		switch (other.gameObject.tag) 
-		{
-		case "Vertical":
-		case "Horizontal":
-		case "Tower":
+			{
+			case "Vertical":
+			case "Horizontal":
+			case "Tower":
 			onWallHit --;
 			break;
-		case "PickUpWall":
-			onTagPickUp --;
-			if (onTagPickUp == 0)
-			{
-				enemyTrack = FindImpact(pickUpMask);
-				Instantiate(pickUp, enemyTrack.point, Quaternion.identity);	// Instantiate a new "pickup" 
-			}
-			break;
-		case "Boundary":
-			missWall = false;
-			break;
+			case "PickUpBoundary":
+				onTagPickUp--;
+				if (onTagPickUp == 0)
+					UpdatePickUp ();
+				break;
+//			case "Boundary":
+//				UpdatePickUp (false);
+//				break;
 		}
 	}
 
@@ -154,8 +185,7 @@ public class EnemyController : MonoBehaviour {
 	{
 		RaycastHit boundaryHit;
 
-		Physics.Raycast(enemyBody.position, enemyBody.velocity, out boundaryHit, 60f, mask);
-		
+		Physics.Raycast (enemyBody.position, enemyBody.velocity, out boundaryHit, 60f, mask);
 		return boundaryHit;
 	}
 
