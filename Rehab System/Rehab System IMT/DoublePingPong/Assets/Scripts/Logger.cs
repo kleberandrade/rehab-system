@@ -29,9 +29,9 @@ public class Logger : MonoBehaviour {
 			"K" +
 			"D" +
 			Environment.NewLine);
-		
 	}
-	
+
+
 	// Update is called once per frame
 	public void Register() 
 	{

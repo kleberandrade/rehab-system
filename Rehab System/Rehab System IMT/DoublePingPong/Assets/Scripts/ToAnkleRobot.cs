@@ -11,8 +11,11 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	public bool activeConnection, activeHelper, followBall, elipseSpace, activeDisturber;
 
-	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
-	private float playerScore, machineScore, lazyScore;				// Value Scores
+	public Text playerScoreText, machineScoreText, lazyScoreText, gameTimeText; 	// UI Scores
+	public Text messageText;
+	private string connecting, playing;
+
+	private float playerScore, machineScore, lazyScore, gameTime;				// Value Scores
 	public float lazySpeed, lazyForce;
 	
 	// Envelope do movimento
@@ -38,6 +41,9 @@ public class ToAnkleRobot : MonoBehaviour {
 //	private float fm, fa, dfm, dfa, dt;
 	private int eventCounter;
 
+	public Button connectButton;
+	public InputField totalTime;
+
 	[Space]
 
 	public Vector2 wallPos;
@@ -47,14 +53,20 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	void Awake () 
 	{
+		PlayerPrefs.DeleteAll ();
+
 		targetMask = LayerMask.GetMask ("Target");
 		
-		playerScoreText.text = "Player\n0";
+		playerScoreText.text = "Moving\n0";
 		machineScoreText.text = "Machine\n0";
-		lazyScoreText.text = "Lazy Time\n0";
-		playerScore = 0;
-		machineScore = 0;
-		lazyScore = 0;
+		lazyScoreText.text = "Lazy\n0";
+		gameTimeText.text = "Total\n0";
+		playerScore = 0f;
+		machineScore = 0f;
+		lazyScore = 0f;
+		gameTime = 0f;
+		connecting = "No connection.";
+		playing = "Game Stopped.";
 	}
 
 	void Start ()
@@ -63,15 +75,26 @@ public class ToAnkleRobot : MonoBehaviour {
 //		connection = GetComponent<Connection>();
 //		fm = fa = dt = dfm = dfa = 0f;
 		eventCounter = enemy.eventCounter;
+		connectButton.onClick.AddListener (Connect);
 	}
 
 	void Update()
 	{
 		// Update scores
-		lazyScore = Time.time - (playerScore + machineScore);
-		playerScoreText.text = "Player\n" + playerScore.ToString ("F1");
-		machineScoreText.text = "Machine\n" + machineScore.ToString ("F1");
-		lazyScoreText.text = "Lazy Time\n" + lazyScore.ToString("F1");
+//		lazyScore = Time.time - (playerScore + machineScore);
+		playerScoreText.text = "Moving\n" + TimeFormat(playerScore, "00.0");
+		machineScoreText.text = "Machine\n" + TimeFormat(machineScore, "00.0");
+		lazyScoreText.text = "Lazy\n" + TimeFormat(lazyScore, "00.0");
+		gameTimeText.text = "Total\n" + TimeFormat(gameTime, "00");
+		messageText.text = connecting + "\n" + playing;
+
+		if (totalTime.text != "")
+			if ((gameTime > 60 * int.Parse (totalTime.text)) && (enemy.GameStatus() == 2))
+			{
+				enemy.Finish ();
+			}
+
+		DataManager.Instance.UpdateROM (playerScore, lazyScore, max.y, min.y, max.x, min.x);
 
 		if (connection != null)
 			activeConnection = connection.connected;
@@ -79,8 +102,42 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	void FixedUpdate () 
 	{
+
+		switch (enemy.GameStatus ())
+		{
+			case 0:
+				playing = "Game Paused.";
+				break;
+			case 2:
+				playing = "Playing!";
+				gameTime += Time.deltaTime;
+				break;
+			case 3:
+				playing = "Game Stopped.";
+				if (totalTime.text == "")
+					totalTime.placeholder.GetComponent<Text> ().text = "Play Time in minutes";
+				totalTime.interactable = true;
+				break;
+			default:
+				totalTime.interactable = false;
+				if (totalTime.text == "")
+					totalTime.placeholder.GetComponent<Text> ().text = "Infinity time";
+				playing = "Starting.";
+				break;
+		}
+
+		// Follow the ball
+		enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
+
+		if (elipseSpace)
+			enemyPos = SquareToElipse (enemyPos);
+		else
+			enemyPos = enemyPos / squareScale / player.boundaryDist/3f;
+		
 		if (activeConnection)
 		{
+			connecting = "Connected!";
+
 			input = new Vector2
 				(
 				connection.ReadStatus(HORIZONTAL, Connection.POSITION),
@@ -102,22 +159,15 @@ public class ToAnkleRobot : MonoBehaviour {
 			if (activeDisturber)
 				PlayerDisturber ();
 			
-			if ((new Vector2(connection.ReadStatus(HORIZONTAL, Connection.FORCE),
-							 connection.ReadStatus(HORIZONTAL, Connection.FORCE)).magnitude > lazyForce) && activeHelper)
-					machineScore += Time.deltaTime;
+			if ((new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.FORCE),
+				    connection.ReadStatus (HORIZONTAL, Connection.FORCE)).magnitude > lazyForce) && activeHelper)
+				machineScore += Time.deltaTime;
+			else if (new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.VELOCITY),
+				     connection.ReadStatus (HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
+				playerScore += Time.deltaTime;
 			else
-				if (new Vector2(connection.ReadStatus(HORIZONTAL, Connection.VELOCITY),
-			                	connection.ReadStatus(HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
-					playerScore += Time.deltaTime;
+				lazyScore += Time.deltaTime;
 
-			// Follow the ball
-			enemyPos = new Vector2 (enemy.enemyBody.position.x, enemy.enemyBody.position.z);
-
-			if (elipseSpace)
-				enemyPos = SquareToElipse (enemyPos);
-			else
-				enemyPos = enemyPos / squareScale / player.boundaryDist;
-			
 			if (followBall)
 				centerSpring = enemyPos;
 			
@@ -137,6 +187,21 @@ public class ToAnkleRobot : MonoBehaviour {
 		} else 
 		{
 			player.MoveWalls(player.ReadInput());
+			switch (enemy.GameStatus ())
+			{
+				case 2:
+					if (player.ReadInput ().magnitude > lazySpeed)
+						playerScore += Time.deltaTime;
+					else
+						lazyScore += Time.deltaTime;
+					break;
+				case 4:
+					playerScore = 0f;
+					lazyScore = 0f;
+					gameTime = 0f;
+					break;
+			}
+
 			wallPos = new Vector2
 				(
 				player.horizontalWalls [0].position.x/player.boundary/3f,
@@ -146,6 +211,12 @@ public class ToAnkleRobot : MonoBehaviour {
 		}
 		Calibration (input);
 	}
+
+	string TimeFormat(float time, string format)
+	{
+		return ((int)time / 60).ToString ("D2") + ":" + (time % 60).ToString (format);
+	}
+
 
 	void Calibration(Vector2 position)
 	{
@@ -300,20 +371,37 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	public void Connect()
 	{
-		gameObject.AddComponent<Connection> ();
-		gameObject.AddComponent<Logger> ();
-		connection = GetComponent<Connection> ();
-		logger = GetComponent<Logger> ();
+		connecting = "Trying to connect...";
+
+		connection = gameObject.AddComponent<Connection> ();
+		logger = gameObject.AddComponent<Logger> ();
+		//connection = GetComponent<Connection> ();
+		//logger = GetComponent<Logger> ();
 		logger.connection = connection;
 		logger.robot = this;
+
+		Text aux_text = connectButton.gameObject.GetComponentInChildren<Text> ();
+		aux_text.text = "Disconnect";
+		aux_text.color = new Color (1f, (216f/255f), 0f);
+		connectButton.gameObject.GetComponentInChildren<Image> ().color = Color.red;
+		connectButton.onClick.RemoveListener (Connect);
+		connectButton.onClick.AddListener (Disconnect);
 	}
 
 	public void Disconnect()
 	{
+		connecting = "Connection aborted.";
 		//connection.CloseConnection();
 		if (connection != null) Destroy (connection);
 		if (logger != null) Destroy (logger);
 //		connection = null;
-	}
+
+		Text aux_text = connectButton.gameObject.GetComponentInChildren<Text> ();
+		aux_text.text = "Connect";
+		aux_text.color = Color.black;
+		connectButton.gameObject.GetComponentInChildren<Image> ().color = new Color(0f, (192f/255f), 1f);
+		connectButton.onClick.RemoveListener (Disconnect);
+		connectButton.onClick.AddListener (Connect);
+		}
 
 }

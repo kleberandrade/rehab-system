@@ -3,19 +3,26 @@ using System.Collections;
 
 public class HideShow : MonoBehaviour {
 
+	enum Axis {vertical, horizontal};
+
 	private Vector2 hide, show, target;
 	private RectTransform transf;
 	private float time;
-	public float slideTime;
+	public float slideTime, distance;
+
+	[SerializeField] Axis axis;
 
 	// Use this for initialization
 	void Start () 
 	{
 		transf = GetComponent<RectTransform> ();
 		show = transf.anchoredPosition;
-		hide = new Vector2 (transf.anchoredPosition.x + transf.sizeDelta.x * 0.98f, transf.anchoredPosition.y);
+		if (axis == Axis.horizontal)
+			hide = transf.anchoredPosition + Vector2.Scale (transf.sizeDelta, Vector2.right * distance);
+		else
+			hide = transf.anchoredPosition + Vector2.Scale (transf.sizeDelta, Vector2.up * distance);
 		transf.anchoredPosition = target = hide;
-		slideTime = 2;
+		slideTime = 2.5f;
 		time = 0f;
 	}
 

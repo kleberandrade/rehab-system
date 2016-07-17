@@ -92,16 +92,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589752ff76b638342ab8909991d9044a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
+  speed: 3
   pickUp: {fileID: 106026, guid: 4f457d8b056b1a2418ec831e353faf88, type: 2}
-  training: {fileID: 0}
+  currentPickUp: {fileID: 0}
+  defendedText: {fileID: 0}
+  missedText: {fileID: 0}
   enemyBody: {fileID: 0}
   onTagPickUp: 0
   onWallHit: 0
-  missWall: 0
   show: {fileID: 0}
   playing: 0
   eventCounter: 0
+  speedSlider: {fileID: 0}
+  visualHelp: {fileID: 0}
+  playButton: {fileID: 0}
 --- !u!135 &13522690
 SphereCollider:
   m_ObjectHideFlags: 1

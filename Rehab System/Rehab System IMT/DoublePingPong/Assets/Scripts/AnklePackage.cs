@@ -15,15 +15,19 @@ public class AnklePackage : MonoBehaviour {
 
 	public ToAnkleRobot package;
 
-	private List<Vector3> ankleTrack;
+	private List<Vector2> ankleTrack;
+	private float recStep;
+	private float recTime;
 
 	private float colorRate, colorAlpha;
 
 	void Start() 
 	{
-		ankleTrack = new List<Vector3> ();
-		colorRate = 0.01f;
+		ankleTrack = new List<Vector2> ();
+		colorRate = 0.1f;
 		colorAlpha = 0.3f;
+		recTime = 0f;
+		recStep = 0.5f;
 	}
 
 	void OnGUI() 
@@ -68,23 +72,26 @@ public class AnklePackage : MonoBehaviour {
 		ElipseForm (point, 0.03f*size);
 		CrossForm (point, 0.02f*size);
 
-		// Green Lines for helper
+/*		// Green Lines for helper
 		GL.Color(new Color(0.0f, 0.4f, 0.0f, 1.0f));
 		if (package.elipseSpace)
 			ElipseForm (origin + Vector2.Scale (package.centerSpring, size), Vector2.Scale (package.freeSpace, size));
 		else
 			RectForm (origin + Vector2.Scale (package.centerSpring - new Vector2(package.freeSpace.x, -package.freeSpace.y), size), Vector2.Scale (package.freeSpace, size) * 2);
 		CrossForm (origin + Vector2.Scale (package.centerSpring, size), 0.02f*size);
-
+		*/
 		// Red Dot for enemy
 		GL.Color(Color.red);
 		ElipseForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
 		CrossForm (origin + Vector2.Scale (package.enemyPos, size), 0.02f*size);
 
 		// Record the track
-		ankleTrack.Add (new Vector3 (
-			(point.x - origin.x), 
-			(point.y - origin.y), 0));
+		if (recTime <= 0f)
+		{
+			ankleTrack.Add (point - origin);
+			recTime = recStep;
+		} else
+			recTime -= Time.deltaTime;
 		
 		// Black changing alpha for track
 		GL.Color (Color.black);
@@ -94,27 +101,32 @@ public class AnklePackage : MonoBehaviour {
 			for (int i = ankleTrack.Count - 1; i > 0 ; i--)
 				{
 				GL.Color(new Color (0f, 0f, 0f, aux));
-				Line(ankleTrack[i - 1] + (Vector3)(origin), ankleTrack[i] + (Vector3)origin);
+				Line(ankleTrack[i - 1] + origin, ankleTrack[i] + origin);
 				if (aux > colorAlpha)
 					aux -= colorRate;
 				}
 		}
 		GL.End();
 		GL.PopMatrix();
+
+		if (package.enemy.GameStatus () == 4)
+			ankleTrack.Clear ();
 	}
 
-	void Line(Vector3 start, Vector3 end)
+	void Line(Vector2 start, Vector2 end)
 	{
-		start = new Vector3 (
+		Vector3 v3start = new Vector3 (
 			start.x / Screen.width, 
 			start.y / Screen.height, 0);
 
-		end = new Vector3 (
+		Vector3 v3end = new Vector3 (
 			end.x / Screen.width, 
 			end.y / Screen.height, 0);
 
-		GL.Vertex(start);
-		GL.Vertex(end);
+		GL.Vertex(v3start);
+		GL.Vertex(v3end);
+
+
 		}
 	
 	void RectForm(Vector3 startEdge, Vector3 sizes)

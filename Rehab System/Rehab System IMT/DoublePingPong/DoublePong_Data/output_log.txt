@@ -15,44 +15,24 @@ Platform assembly: D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\Re
 Loading D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\DoublePong_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\DoublePong_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\DoublePong_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.063 seconds
+- Completed reload, in  0.076 seconds
 Platform assembly: D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\DoublePong_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\RehabLab\RehabSystem\Rehab System\Rehab System IMT\DoublePingPong\DoublePong_Data\Managed\System.dll (this message is harmless)
-desktop: 1920x1080 60Hz; virtual: 3600x1346 at -1680,-266
 <RI> Initializing input.
 <RI> Input initialized.
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initialized touch support.
-UnloadTime: 1.516258 ms
+UnloadTime: 1.031498 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 20 -> priority: 1 
-  Thread -> id: 2710 -> priority: 1 
+  Thread -> id: 3e04 -> priority: 1 
+  Thread -> id: 4514 -> priority: 1 
 Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 3.640836 ms
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 419.
-Total: 0.251064 ms (FindLiveObjects: 0.019343 ms CreateObjectMapping: 0.016185 ms MarkObjects: 0.195404 ms  DeleteObjects: 0.020132 ms)
-
-Starting connection
+UnloadTime: 3.728475 ms
+DontDestroyOnLoad only work for root GameObjects or components on root GameObjects.
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+(Filename:  Line: 374)
 
-Trying to connect to host 192.168.0.66 and port 8000
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
 
-Connecting to: host: 192.168.0.66 - port: 8000
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
-
-Ip Remote Host: 192.168.0.66
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
-
-Error Connecting: System.Net.Sockets.SocketException: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
-
-  at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
-  at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
-  at NetworkClient.Connect (System.String host, Int32 remotePort, Int32 localPort) [0x00000] in <filename unknown>:0 
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 630.
+Total: 0.477655 ms (FindLiveObjects: 0.035133 ms CreateObjectMapping: 0.018158 ms MarkObjects: 0.400283 ms  DeleteObjects: 0.023290 ms)
 

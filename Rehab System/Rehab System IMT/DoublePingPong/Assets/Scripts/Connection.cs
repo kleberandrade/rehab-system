@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+//using UnityEngine.UI;
 
 using System;
 using System.IO;
@@ -55,6 +56,7 @@ public class Connection : MonoBehaviour {
 		connected = clientHere.IsConnected ();
 	}
 
+
 	void FixedUpdate()
 	{
 		connected = clientHere.IsConnected ();
@@ -71,7 +73,9 @@ public class Connection : MonoBehaviour {
 		while (!(connected || stopThread))
 		{
 			Debug.Log ("Starting connection");
+
 			clientHere.Connect ("192.168.0.66", 8000, 0); // Here 192.168.0.67
+
 			clientHere.SendString ("Connected!"); 
 			InitializeVariables (2); // Entre com o numero de robos
 		}
