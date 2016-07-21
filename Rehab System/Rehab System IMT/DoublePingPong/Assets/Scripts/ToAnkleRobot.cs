@@ -15,7 +15,7 @@ public class ToAnkleRobot : MonoBehaviour {
 	public Text messageText;
 	private string connecting, playing;
 
-	private float playerScore, machineScore, lazyScore, gameTime;				// Value Scores
+	[SerializeField] private float playerScore, machineScore, lazyScore, gameTime;				// Value Scores
 	public float lazySpeed, lazyForce;
 	
 	// Envelope do movimento
@@ -41,7 +41,7 @@ public class ToAnkleRobot : MonoBehaviour {
 //	private float fm, fa, dfm, dfa, dt;
 	private int eventCounter;
 
-	public Button connectButton;
+	public Button connectButton, startButton, stopButton;
 	public InputField totalTime;
 
 	[Space]
@@ -75,6 +75,8 @@ public class ToAnkleRobot : MonoBehaviour {
 //		connection = GetComponent<Connection>();
 //		fm = fa = dt = dfm = dfa = 0f;
 		eventCounter = enemy.eventCounter;
+		startButton.interactable = false;
+		stopButton.interactable = false;
 		connectButton.onClick.AddListener (Connect);
 	}
 
@@ -82,10 +84,10 @@ public class ToAnkleRobot : MonoBehaviour {
 	{
 		// Update scores
 //		lazyScore = Time.time - (playerScore + machineScore);
-		playerScoreText.text = "Moving\n" + TimeFormat(playerScore, "00.0");
-		machineScoreText.text = "Machine\n" + TimeFormat(machineScore, "00.0");
-		lazyScoreText.text = "Lazy\n" + TimeFormat(lazyScore, "00.0");
-		gameTimeText.text = "Total\n" + TimeFormat(gameTime, "00");
+		playerScoreText.text = "Moving\n" + TimeFormat(playerScore, "00.0", 1);
+		machineScoreText.text = "Machine\n" + TimeFormat(machineScore, "00.0", 1);
+		lazyScoreText.text = "Lazy\n" + TimeFormat(lazyScore, "00.0", 1);
+		gameTimeText.text = "Total\n" + TimeFormat(gameTime, "00", 0);
 		messageText.text = connecting + "\n" + playing;
 
 		if (totalTime.text != "")
@@ -97,7 +99,12 @@ public class ToAnkleRobot : MonoBehaviour {
 		DataManager.Instance.UpdateROM (playerScore, lazyScore, max.y, min.y, max.x, min.x);
 
 		if (connection != null)
-			activeConnection = connection.connected;
+		{
+			activeConnection = connection.IsConnected ();
+		} else
+			activeConnection = false;
+
+		startButton.interactable = activeConnection;
 	}
 
 	void FixedUpdate () 
@@ -117,8 +124,10 @@ public class ToAnkleRobot : MonoBehaviour {
 				if (totalTime.text == "")
 					totalTime.placeholder.GetComponent<Text> ().text = "Play Time in minutes";
 				totalTime.interactable = true;
+				if (logger != null) Destroy (logger);
 				break;
 			default:
+				logger = gameObject.AddComponent<Logger> ();
 				totalTime.interactable = false;
 				if (totalTime.text == "")
 					totalTime.placeholder.GetComponent<Text> ().text = "Infinity time";
@@ -158,20 +167,26 @@ public class ToAnkleRobot : MonoBehaviour {
 
 			if (activeDisturber)
 				PlayerDisturber ();
-			
-			if ((new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.FORCE),
-				    connection.ReadStatus (HORIZONTAL, Connection.FORCE)).magnitude > lazyForce) && activeHelper)
-				machineScore += Time.deltaTime;
-			else if (new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.VELOCITY),
-				     connection.ReadStatus (HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
-				playerScore += Time.deltaTime;
-			else
-				lazyScore += Time.deltaTime;
 
-			if (followBall)
-				centerSpring = enemyPos;
+			if (enemy.GameStatus () == 2)
+			{
+				if ((new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.FORCE),
+					    connection.ReadStatus (HORIZONTAL, Connection.FORCE)).magnitude > lazyForce) && activeHelper)
+					machineScore += Time.deltaTime;
+				else if (new Vector2 (connection.ReadStatus (HORIZONTAL, Connection.VELOCITY),
+					         connection.ReadStatus (HORIZONTAL, Connection.VELOCITY)).magnitude > lazySpeed)
+					playerScore += Time.deltaTime;
+				else
+					lazyScore += Time.deltaTime;
+				logger.Register ();
+			}
+
+				if (followBall)
+					centerSpring = enemyPos;
 			
 			// Set variables to send to robot
+			connection.SetStatus ((short)enemy.GameStatus ());
+
 			connection.SetStatus (VERTICAL, centerSpring.y, Connection.CENTERSPRING);
 			connection.SetStatus (HORIZONTAL, centerSpring.x, Connection.CENTERSPRING);
 			connection.SetStatus (VERTICAL, freeSpace.y, Connection.FREESPACE);
@@ -182,10 +197,11 @@ public class ToAnkleRobot : MonoBehaviour {
 			connection.SetStatus (VERTICAL, D, Connection.DAMP);
 			connection.SetStatus (HORIZONTAL, D, Connection.DAMP);
 
-			logger.Register ();
+
 
 		} else 
 		{
+			connecting = "Disconnected!";
 			player.MoveWalls(player.ReadInput());
 			switch (enemy.GameStatus ())
 			{
@@ -212,9 +228,15 @@ public class ToAnkleRobot : MonoBehaviour {
 		Calibration (input);
 	}
 
-	string TimeFormat(float time, string format)
+	string TimeFormat(float time, string format, int round)
 	{
-		return ((int)time / 60).ToString ("D2") + ":" + (time % 60).ToString (format);
+		return Mathf.FloorToInt(time / 60).ToString ("D2") + ":" + (Round(time, round) % 60).ToString (format);
+	}
+
+	float Round (float realNum, int decPlaces)
+	{
+		int aux = Mathf.FloorToInt(realNum * Mathf.Pow (10f, (float)decPlaces));
+		return aux / Mathf.Pow (10f, decPlaces);
 	}
 
 
@@ -371,29 +393,27 @@ public class ToAnkleRobot : MonoBehaviour {
 
 	public void Connect()
 	{
-		connecting = "Trying to connect...";
-
 		connection = gameObject.AddComponent<Connection> ();
-		logger = gameObject.AddComponent<Logger> ();
+/*		logger = gameObject.AddComponent<Logger> ();
 		//connection = GetComponent<Connection> ();
 		//logger = GetComponent<Logger> ();
 		logger.connection = connection;
 		logger.robot = this;
-
+*/
 		Text aux_text = connectButton.gameObject.GetComponentInChildren<Text> ();
 		aux_text.text = "Disconnect";
 		aux_text.color = new Color (1f, (216f/255f), 0f);
 		connectButton.gameObject.GetComponentInChildren<Image> ().color = Color.red;
 		connectButton.onClick.RemoveListener (Connect);
 		connectButton.onClick.AddListener (Disconnect);
+		connectButton.onClick.AddListener (enemy.Finish);
+		connecting = "Trying to connect...";
 	}
 
 	public void Disconnect()
 	{
-		connecting = "Connection aborted.";
 		//connection.CloseConnection();
 		if (connection != null) Destroy (connection);
-		if (logger != null) Destroy (logger);
 //		connection = null;
 
 		Text aux_text = connectButton.gameObject.GetComponentInChildren<Text> ();
@@ -402,6 +422,9 @@ public class ToAnkleRobot : MonoBehaviour {
 		connectButton.gameObject.GetComponentInChildren<Image> ().color = new Color(0f, (192f/255f), 1f);
 		connectButton.onClick.RemoveListener (Disconnect);
 		connectButton.onClick.AddListener (Connect);
-		}
+		startButton.interactable = false;
+		stopButton.interactable = false;
+		connecting = "Connection aborted.";
+	}
 
 }

@@ -4,7 +4,7 @@ using System.Collections;
 
 public class EnemyController : MonoBehaviour {
 
-	enum Status { paused, starting, playing, stoped, reset };
+	enum Status { paused, starting, playing, stopped, reset };
 
 	static int timeToStart = 3;
 
@@ -34,7 +34,7 @@ public class EnemyController : MonoBehaviour {
 	public Slider speedSlider;
 	public Toggle visualHelp;
 
-	public Button playButton;
+	public Button playButton, stopButton;
 
 	[SerializeField] Status gameStatus;
 	public HideShow resultPanel;
@@ -271,6 +271,7 @@ public class EnemyController : MonoBehaviour {
 //		playButton.gameObject.GetComponentInChildren<Image> ().color = Color.red;
 		playButton.onClick.RemoveListener (StartPlay);
 		playButton.onClick.AddListener (StopPlay);
+		stopButton.interactable = true;	
 		resultPanel.Hide ();
 		}
 	public void StopPlay()
@@ -279,7 +280,7 @@ public class EnemyController : MonoBehaviour {
 		SetTextStatus("PAUSED", 1f, 1f);
 
 		Text aux_text = playButton.gameObject.GetComponentInChildren<Text> ();
-		aux_text.text = "START";
+		aux_text.text = "Continue";
 		aux_text.color = Color.black;
 		playButton.gameObject.GetComponentInChildren<Image> ().color = new Color ((16f/255f), (204f/255f), 0f);;
 		playButton.onClick.RemoveListener (StopPlay);
@@ -288,7 +289,7 @@ public class EnemyController : MonoBehaviour {
 
 	public void Finish()
 	{
-		gameStatus = Status.stoped;
+		gameStatus = Status.stopped;
 		SetTextStatus("", 1f, 1f);
 
 		Text aux_text = playButton.gameObject.GetComponentInChildren<Text> ();
@@ -297,7 +298,7 @@ public class EnemyController : MonoBehaviour {
 		playButton.gameObject.GetComponentInChildren<Image> ().color = new Color ((16f/255f), (204f/255f), 0f);;
 		playButton.onClick.RemoveListener (StopPlay);
 		playButton.onClick.AddListener (Reset);
-
+		stopButton.interactable = false;
 		resultPanel.Show ();
 	}
 
@@ -315,6 +316,7 @@ public class EnemyController : MonoBehaviour {
 		//		playButton.gameObject.GetComponentInChildren<Image> ().color = Color.red;
 		playButton.onClick.RemoveListener (Reset);
 		playButton.onClick.AddListener (StopPlay);
+		stopButton.interactable = true;	
 		resultPanel.Hide ();
 	}
 

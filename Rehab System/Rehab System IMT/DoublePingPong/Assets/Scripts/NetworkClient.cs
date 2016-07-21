@@ -13,7 +13,7 @@ public abstract class NetworkClient
 	
 	protected Socket client = null;
 	
-	public const int BUFFER_SIZE = 33;
+	public const int BUFFER_SIZE = 34;
 	protected byte[] inputBuffer = new byte[ BUFFER_SIZE ];
 	protected byte[] outputBuffer = new byte[ BUFFER_SIZE ]; 
 

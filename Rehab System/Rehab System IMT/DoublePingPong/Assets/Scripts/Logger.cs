@@ -10,16 +10,18 @@ public class Logger : MonoBehaviour {
 	public Connection connection;
 	public ToAnkleRobot robot;
 
-	private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+	//private string textFile = @"D:\Users\Thales\Documents\Faculdade\2015 - 201x - Mestrado\AnkleBot\LogFileAnkle - " + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
+	private string textFile = Application.dataPath + "\\Logs\\Session" + DateTime.Now.ToString("yy-MM-dd HH-mm") + ".txt";
 
 	// Use this for initialization
 	void Start () 
 	{
+		Directory.CreateDirectory(Application.dataPath + "\\Logs");
 		File.WriteAllText (textFile, "Time\t" +
 			"SPosX\tSPosY\t" +
 			"EPosX\tEPosY\t" +
 			"FVelX\tFVelY\t" +
-			"VelX\tVelY\t" +
+/*			"VelX\tVelY\t" +
 			"Torque\t\t" +
 //			 "EventNumber\t" +
 //			 "TorqueVec\t\t" +
@@ -27,7 +29,7 @@ public class Logger : MonoBehaviour {
 		    "CtrSprX\tCtrSprY\t" +
 			"FrSpcX\tFrSpcY\t" +
 			"K" +
-			"D" +
+			"D" +*/
 			Environment.NewLine);
 	}
 
@@ -40,7 +42,8 @@ public class Logger : MonoBehaviour {
 			+ robot.wallPos.x + "\t" 
 			+ robot.wallPos.y + "\t");
 
-		for (int j = 0; j < Connection.N_VAR; j++)
+//		for (int j = 0; j < Connection.N_VAR; j++)
+		for (int j = 0; j < 2; j++)
 			for (int i = 1; i >= 0; i--)
 				File.AppendAllText(textFile, connection.ReadStatus(i, j) + "\t");
 
@@ -61,13 +64,13 @@ public class Logger : MonoBehaviour {
 			dfa = fa;
 			dt = Time.time;
 */
-		File.AppendAllText(textFile, robot.centerSpring.x + "\t");
+/*		File.AppendAllText(textFile, robot.centerSpring.x + "\t");
 		File.AppendAllText(textFile, robot.centerSpring.y + "\t");
 		File.AppendAllText(textFile, robot.freeSpace.x + "\t");
 		File.AppendAllText(textFile, robot.freeSpace.y + "\t");
 		File.AppendAllText(textFile, robot.K + "\t");
 		File.AppendAllText(textFile, robot.D + "\t");
-
+*/
 		File.AppendAllText(textFile, Environment.NewLine);
 
 	}
