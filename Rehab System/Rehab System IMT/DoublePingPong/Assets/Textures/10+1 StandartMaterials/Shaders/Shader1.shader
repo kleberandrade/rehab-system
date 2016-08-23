@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+
 Shader "10+1 S_Materials/Shader1" {
    Properties {
       _MainTex ("Base (RGB)", 2D) = "white" {}
@@ -47,8 +50,8 @@ Shader "10+1 S_Materials/Shader1" {
          {
             vertexOutput output;
  
-            float4x4 modelMatrix = _Object2World;
-            float4x4 modelMatrixInverse = _World2Object; 
+            float4x4 modelMatrix = unity_ObjectToWorld;
+            float4x4 modelMatrixInverse = unity_WorldToObject; 
                // unity_Scale.w is unnecessary 
  
             output.tangentWorld = normalize(float3(
@@ -178,8 +181,8 @@ Shader "10+1 S_Materials/Shader1" {
          {
             vertexOutput output;
  
-            float4x4 modelMatrix = _Object2World;
-            float4x4 modelMatrixInverse = _World2Object; 
+            float4x4 modelMatrix = unity_ObjectToWorld;
+            float4x4 modelMatrixInverse = unity_WorldToObject; 
                // unity_Scale.w is unnecessary
  
             output.tangentWorld = normalize(float3(

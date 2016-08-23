@@ -68,18 +68,46 @@ public class LocalInputAxis : InputAxis
 
 public class RemoteInputAxis : InputAxis
 {
-	protected byte id;
-
-	public override bool Init( string axisInfo )
+	private class AxisConnection
 	{
-		string axisName = axisInfo.Split( ':' )[ 0 ];
-		string axisAddress = axisInfo.Split( ':' )[ 1 ];
+		public string hostName;
+		public NetworkClientUDP dataClient = null;
+		public byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+		public byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+
+		public AxisConnection( string hostName )
+		{
+			this.hostName = hostName;
+			dataClient = new NetworkClientUDP();
+			dataClient.Connect( hostName, 50001 );
+		}
+	}
+
+	public const string AXIS_SERVER_HOST = "AXIS_SERVER_HOST";
+
+	const int AXIS_DATA_LENGTH = 7 * sizeof(float);
+	const int INPUT_DATA_LENGTH = 2 * sizeof(byte) + AXIS_DATA_LENGTH;
+	const int OUTPUT_DATA_LENGTH = sizeof(byte) + AXIS_DATA_LENGTH;
+
+	private static List<AxisConnection> axisConnections = new List<AxisConnection>();
+
+	private byte id;
+	private AxisConnection axis;
+
+	public override bool Init( string axisName )
+	{
+		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST, "192.168.0.152" );
 
 		base.Init( axisName );
 
         if( byte.TryParse( axisName, out id ) )
         {
-			Connect( axisAddress );
+			axis = axisConnections.Find( connection => connection.hostName == axisHost );
+			if( axis == null ) 
+			{
+				axis = new AxisConnection( axisHost );
+				axisConnections.Add( axis );
+			}
             return true;
         }
 
@@ -88,12 +116,58 @@ public class RemoteInputAxis : InputAxis
 
     public override void End()
     {
-        Disconnect();
+		//ConnectionManager.InfoClient.Disconnect();
+		axis.dataClient.Disconnect();
     }
 
-	public virtual void Connect( string hostName ) {}
+	public override void Update( float updateTime )
+	{
+		bool newDataReceived = axis.dataClient.ReceiveData( axis.inputBuffer );
 
-    public virtual void Disconnect() {}
+		axis.outputBuffer[ 0 ] = axis.inputBuffer[ 0 ];
+
+		int axesNumber = (int) axis.inputBuffer[ 0 ];
+		for( int axisIndex = 0; axisIndex < axesNumber; axisIndex++ ) 
+		{
+			int inputIDPosition = 1 + axisIndex * INPUT_DATA_LENGTH;
+
+			if( axis.inputBuffer[ inputIDPosition ] == id ) 
+			{
+				int inputDataPosition = inputIDPosition + sizeof(byte);
+
+				position = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition ); 
+				velocity = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + sizeof(float) ); 
+				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 3 * sizeof(float) ); 
+
+				// Debug
+				if( id == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
+
+				int outputIDPosition = 1 + axisIndex * OUTPUT_DATA_LENGTH;
+				int outputMaskPosition = outputIDPosition + sizeof(byte);
+				int outputDataPosition = inputIDPosition + 2 * sizeof(byte);
+
+				axis.outputBuffer[ outputIDPosition ] = id;
+
+				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
+				setpointsMask.SetAll( false );
+
+				Buffer.BlockCopy( BitConverter.GetBytes( feedbackPosition ), 0, axis.outputBuffer, outputDataPosition, sizeof(float) );
+				Buffer.BlockCopy( BitConverter.GetBytes( feedbackVelocity ), 0, axis.outputBuffer, outputDataPosition + sizeof(float), sizeof(float) );
+				Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
+				Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
+
+				// Debug
+				if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - d:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
+					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
+					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
+					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
+
+				break;
+			}
+		}
+
+		if( newDataReceived ) axis.dataClient.SendData( axis.outputBuffer );
+	}
 }
 
 public class MouseInputAxis : LocalInputAxis

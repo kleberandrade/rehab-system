@@ -11,7 +11,7 @@ public abstract class NetworkInterface
 {
 	protected Socket workSocket = null;
 
-	public const int BUFFER_SIZE = 256;
+	public const int BUFFER_SIZE = 512;
 }
 
 public abstract class NetworkClient : NetworkInterface

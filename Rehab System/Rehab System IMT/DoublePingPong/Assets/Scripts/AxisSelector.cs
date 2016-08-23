@@ -27,9 +27,9 @@ public class AxisSelector : MonoBehaviour
         SetAxis( (int) InputAxisType.Keyboard );
 
 		// hack
-		NetworkClientTCP infoClient = new NetworkClientTCP();
-		infoClient.Connect( "192.168.0.181", 500001 );
-		infoClient.Disconnect();
+		//NetworkClientTCP infoClient = new NetworkClientTCP();
+		//infoClient.Connect( PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST, "192.168.0.66" ), 50000 );
+		//infoClient.Disconnect();
 	}
 	
 	// Update is called once per frame
@@ -60,8 +60,7 @@ public class AxisSelector : MonoBehaviour
 
             if( controlAxisType == InputAxisType.Mouse ) controlAxis = axisManager.GetAxis( "Mouse Y", InputAxisType.Mouse );
             else if( controlAxisType == InputAxisType.Keyboard ) controlAxis = axisManager.GetAxis( "Vertical", InputAxisType.Keyboard );
-            else if( controlAxisType == InputAxisType.AnkleBot ) controlAxis = axisManager.GetAxis( "0", InputAxisType.AnkleBot );
-            else if( controlAxisType == InputAxisType.PXIe ) controlAxis = axisManager.GetAxis( "0", InputAxisType.PXIe );
+            else if( controlAxisType == InputAxisType.Remote ) controlAxis = axisManager.GetAxis( "0", InputAxisType.Remote );
         }
 	}
 

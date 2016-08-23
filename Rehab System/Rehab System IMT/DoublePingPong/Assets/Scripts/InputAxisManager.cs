@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-public enum InputAxisType { Keyboard, Mouse, PXIe, AnkleBot };
+public enum InputAxisType { Keyboard, Mouse, Remote };
 
 public class InputAxisManager : MonoBehaviour
 {
@@ -22,8 +22,7 @@ public class InputAxisManager : MonoBehaviour
 		{
 			if( axisType == InputAxisType.Mouse ) newAxis = new MouseInputAxis();
 			else if( axisType == InputAxisType.Keyboard ) newAxis = new KeyboardInputAxis();
-			else if( axisType == InputAxisType.PXIe ) newAxis = new PXIeInputAxis();
-			else if( axisType == InputAxisType.AnkleBot ) newAxis = new AnkleBotInputAxis();
+			else if( axisType == InputAxisType.Remote ) newAxis = new RemoteInputAxis();
 			else return null;
 
 			if( !newAxis.Init( axisID ) ) return null;
