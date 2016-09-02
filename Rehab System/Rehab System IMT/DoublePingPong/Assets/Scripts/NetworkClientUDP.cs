@@ -13,9 +13,9 @@ public class NetworkClientUDP : NetworkClient
     private bool hasNewMessage = false;
 
 	private Thread updateThread = null;
-	private bool isReceiving = false;
+	private volatile bool isReceiving = false;
 
-	private bool isAwaitingConnection = true;
+	private volatile bool isAwaitingConnection = true;
 
 	private object searchLock = new object();
 

@@ -96,7 +96,7 @@ public class RemoteInputAxis : InputAxis
 
 	public override bool Init( string axisName )
 	{
-		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST, "192.168.0.152" );
+		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST, "192.168.0.66" );
 
 		base.Init( axisName );
 
