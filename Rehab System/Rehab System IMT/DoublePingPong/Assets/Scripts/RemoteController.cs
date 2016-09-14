@@ -37,7 +37,7 @@ public class RemoteController : MonoBehaviour
     void FixedUpdate()
     {
         // Get remotely controlled object position (z) and set it locally (x)
-        float remoteInput = gameClient.GetremoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION );
+        float remoteInput = gameClient.GetRemoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION );
 
         float remotePosition = remoteInput * rangeLimits.x;
 

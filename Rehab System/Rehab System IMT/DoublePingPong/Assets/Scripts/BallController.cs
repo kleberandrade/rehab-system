@@ -49,13 +49,13 @@ public class BallController : MonoBehaviour
 			} 
 			else 
 			{
-				float masterBallPositionX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
-				float masterBallPositionZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
+				float masterBallPositionX = gameClient.GetRemoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
+				float masterBallPositionZ = gameClient.GetRemoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
 
 				if( targetPositionX != masterBallPositionX || targetPositionZ != masterBallPositionZ ) 
 				{
-					float masterBallVelocityX = gameClient.GetremoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
-					float masterBallVelocityZ = gameClient.GetremoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
+					float masterBallVelocityX = gameClient.GetRemoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
+					float masterBallVelocityZ = gameClient.GetRemoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
 
 					float ballFollowingErrorX = masterBallPositionX - ball.position.x;
 					float ballFollowingErrorZ = masterBallPositionZ - ball.position.z;

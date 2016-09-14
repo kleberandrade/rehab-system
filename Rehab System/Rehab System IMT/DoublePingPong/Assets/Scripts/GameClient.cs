@@ -15,7 +15,7 @@ public class GameClient : MonoBehaviour
     private const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
 
 	private int localHostID, connectionID, clientID;
-	private int connectionError = 0;
+	private byte connectionError = 0;
 
 	private byte[] inputBuffer = new byte[ PACKET_SIZE ];
 	private byte[] outputBuffer = new byte[ PACKET_SIZE ];
@@ -26,18 +26,18 @@ public class GameClient : MonoBehaviour
 
     void Start()
     {
-		GlobalConfig networkConfig;
+		GlobalConfig networkConfig = new GlobalConfig();
 		networkConfig.MaxPacketSize = PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
 
-		ConnectionConfig connectionConfig;
-		clientID = connectionConfig.AddChannel( QosType.Unreliable );
+		ConnectionConfig connectionConfig = new ConnectionConfig();
+		clientID = connectionConfig.AddChannel( QosType.StateUpdate  ); // QosType.Unreliable sending just most recent
 
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
 		localHostID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
 
 		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, "localhost" );
-		connectionID = NetworkTransport.Connect( localHostID, gameServerHost, GAME_SERVER_PORT, 0, connectionError );
+		connectionID = NetworkTransport.Connect( localHostID, gameServerHost, GAME_SERVER_PORT, 0, out connectionError );
     }
 
     public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
@@ -64,7 +64,7 @@ public class GameClient : MonoBehaviour
         return remoteValues.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) );
     }
 
-    public float GetremoteValue( byte elementID, byte axisIndex, NetworkValue valueType )
+    public float GetRemoteValue( byte elementID, byte axisIndex, NetworkValue valueType )
     {
         float[] values;
 
@@ -74,7 +74,7 @@ public class GameClient : MonoBehaviour
         return 0.0f;
     }
 
-    public KeyValuePair<byte,byte>[] GetremoteKeys() 
+    public KeyValuePair<byte,byte>[] GetRemoteKeys() 
     {
         return remoteValues.Keys.ToArray();
     }
@@ -103,12 +103,12 @@ public class GameClient : MonoBehaviour
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
 
-		if( outputMessageLength > 1 ) NetworkTransport.Send( localHostID, connectionID, clientID, outputBuffer, PACKET_SIZE, connectionError );
+		if( outputMessageLength > 1 ) NetworkTransport.Send( localHostID, connectionID, clientID, outputBuffer, PACKET_SIZE, out connectionError );
 
 		int remoteHostID, remoteConnectionID, remoteServerID, receivedSize;
-		if( NetworkTransport.Receive( remoteHostID, remoteConnectionID, remoteServerID, inputBuffer, PACKET_SIZE, receivedSize, connectionError ) == NetworkEventType.DataEvent )
+		if( NetworkTransport.Receive( out remoteHostID, out remoteConnectionID, out remoteServerID, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError ) == NetworkEventType.DataEvent )
 		{
-			if( connectionError != NetworkError.Ok )
+			if( connectionError != (byte) NetworkError.Ok )
 			{
 	            int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
 
@@ -127,8 +127,12 @@ public class GameClient : MonoBehaviour
 	                //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
 				}
 			}
-		}
-            
+		}       
+	}
+
+	void OnApplicationQuit()
+	{
+		NetworkTransport.Shutdown();
 	}
 }
 
