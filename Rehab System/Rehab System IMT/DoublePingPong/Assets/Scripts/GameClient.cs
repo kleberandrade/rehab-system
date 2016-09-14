@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -9,28 +10,35 @@ public class GameClient : MonoBehaviour
 {
 	public const string GAME_SERVER_HOST_ID = "Game Server Host";
 
+	private const int GAME_SERVER_PORT = 50004;
+	private const int PACKET_SIZE = 512;
     private const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
 
-	NetworkClientUDP gameClient = null;
+	private int localHostID, connectionID, clientID;
+	private int connectionError = 0;
 
-    private byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
-    private byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+	private byte[] inputBuffer = new byte[ PACKET_SIZE ];
+	private byte[] outputBuffer = new byte[ PACKET_SIZE ];
 
     private Dictionary<KeyValuePair<byte,byte>, float[]> localValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
-    private Dictionary<KeyValuePair<byte,byte>, bool> localValuesUpdated = new Dictionary<KeyValuePair<byte, byte>, bool>();
+    private Dictionary<KeyValuePair<byte,byte>, bool> localValuesUpdated = new Dictionary<KeyValuePair<byte,byte>, bool>();
     private Dictionary<KeyValuePair<byte,byte>, float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
 
     void Start()
     {
-        Connect();
-    }
+		GlobalConfig networkConfig;
+		networkConfig.MaxPacketSize = PACKET_SIZE;
+		NetworkTransport.Init( networkConfig );
 
-	public void Connect()
-	{
+		ConnectionConfig connectionConfig;
+		clientID = connectionConfig.AddChannel( QosType.Unreliable );
+
+		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
+		localHostID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
+
 		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, "localhost" );
-		if( gameClient == null ) gameClient = new NetworkClientUDP();
-		gameClient.Connect( gameServerHost, 50004 );
-	}
+		connectionID = NetworkTransport.Connect( localHostID, gameServerHost, GAME_SERVER_PORT, 0, connectionError );
+    }
 
     public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
     {
@@ -95,33 +103,32 @@ public class GameClient : MonoBehaviour
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
 
-		if( outputMessageLength > 1 ) gameClient.SendData( outputBuffer );
+		if( outputMessageLength > 1 ) NetworkTransport.Send( localHostID, connectionID, clientID, outputBuffer, PACKET_SIZE, connectionError );
 
-		if( gameClient.ReceiveData( inputBuffer ) )
+		int remoteHostID, remoteConnectionID, remoteServerID, receivedSize;
+		if( NetworkTransport.Receive( remoteHostID, remoteConnectionID, remoteServerID, inputBuffer, PACKET_SIZE, receivedSize, connectionError ) == NetworkEventType.DataEvent )
 		{
-            int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
-
-            for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
+			if( connectionError != NetworkError.Ok )
 			{
-				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
-                Debug.Log( "Received values for key " + remoteKey.ToString() );
-                if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ 3 ];
-                    
-    			remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
-                remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
-                remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) );
+	            int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
 
-                //remoteValues[ remoteKey ][ (int) NetworkValue.POSITION ] += remoteValues[ remoteKey ][ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
+	            for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
+				{
+					KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
+	                Debug.Log( "Received values for key " + remoteKey.ToString() );
+	                if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ 3 ];
+	                    
+	    			remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
+	                remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
+	                remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) );
 
-                //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
+	                //remoteValues[ remoteKey ][ (int) NetworkValue.POSITION ] += remoteValues[ remoteKey ][ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
+
+	                //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
+				}
 			}
 		}
             
 	}
-
-    void OnApplicationQuit()
-    {
-		gameClient.Disconnect();
-    }
 }
 
