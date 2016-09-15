@@ -22,12 +22,15 @@ public class PlayerController : MonoBehaviour
 
     public Robot robot;
 
-	public GameClient gameClient;
+	public GameObject connectionManager;
+	private GameConnection gameConnection;
 
 	void Start()
 	{
         playerBody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<BoxCollider>();
+
+		gameConnection = connectionManager.GetComponent<GameClient>();
 
         rangeLimits = boundaries.bounds.extents - playerCollider.bounds.extents;
 
@@ -42,10 +45,10 @@ public class PlayerController : MonoBehaviour
 
 		playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
 
-		File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
+		//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
 
 		// Send locally controlled object positions (z) over network
-		if( robot.Connected ) gameClient.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
+		if( robot.Connected ) gameConnection.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
 	}       
 
 	public float ControlPosition( Vector3 target, out float error )

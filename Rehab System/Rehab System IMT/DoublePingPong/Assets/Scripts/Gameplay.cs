@@ -6,6 +6,8 @@ public enum Movable { WALL = 0, BALL = 2 };
 
 public class Gameplay : MonoBehaviour 
 {
+	public static bool isServer = true;
+
 	public Slider setpointSlider;
 	private Image sliderHandle;
 

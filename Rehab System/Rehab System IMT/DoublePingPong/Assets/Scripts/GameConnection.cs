@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 
 public enum NetworkValue { POSITION, VELOCITY, FORCE };
 
-public class GameConnection : MonoBehaviour
+public abstract class GameConnection : MonoBehaviour
 {
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
 	protected const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
 
-	protected int broadcastHostID = -1;
+	protected const int BROADCAST_KEY = 1000;
+	protected const int BROADCAST_VERSION = 1, BROADCAST_SUBVERSION = 1;
+
+	protected int socketID = -1;
 	protected byte connectionError = 0;
 
 	protected byte[] inputBuffer = new byte[ PACKET_SIZE ];
@@ -20,6 +24,17 @@ public class GameConnection : MonoBehaviour
 	protected Dictionary<KeyValuePair<byte,byte>, float[]> localValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
 	protected Dictionary<KeyValuePair<byte,byte>, bool> localValuesUpdated = new Dictionary<KeyValuePair<byte,byte>, bool>();
 	protected Dictionary<KeyValuePair<byte,byte>, float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
+
+	void Start()
+	{
+		GlobalConfig networkConfig = new GlobalConfig();
+		networkConfig.MaxPacketSize = PACKET_SIZE;
+		NetworkTransport.Init( networkConfig );
+
+		Connect();
+	}
+
+	protected abstract void Connect();
 
     public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
     {
@@ -84,7 +99,7 @@ public class GameConnection : MonoBehaviour
 
 		outputBuffer[ 0 ] = (byte) outputMessageLength;
 
-		SendUpdateMessage();
+		if( outputMessageLength > 1 ) SendUpdateMessage();
 
 		if( ReceiveUpdateMessage() )
 		{
@@ -107,8 +122,13 @@ public class GameConnection : MonoBehaviour
 		}       
 	}
 
-	virtual void SendUpdateMessage();
+	protected abstract void SendUpdateMessage();
 
-	virtual bool ReceiveUpdateMessage();
+	protected abstract bool ReceiveUpdateMessage();
+
+	void OnApplicationQuit()
+	{
+		NetworkTransport.Shutdown();
+	}
 }
 
