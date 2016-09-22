@@ -79,8 +79,8 @@ public class BallController : MonoBehaviour
 					targetPositionZ = masterBallPositionZ;
 				}
 
-				File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
-					+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
+				//File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
+				//	+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
 			}
 
         } 

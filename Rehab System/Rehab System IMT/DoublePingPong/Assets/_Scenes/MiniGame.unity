@@ -184,6 +184,7 @@ GameObject:
   - 23: {fileID: 31549320}
   - 54: {fileID: 7075528}
   - 114: {fileID: 31549324}
+  - 114: {fileID: 31549325}
   m_Layer: 0
   m_Name: West Pad
   m_TagString: Vertical
@@ -269,6 +270,20 @@ MonoBehaviour:
   elementID: 0
   boundaries: {fileID: 395675361}
   robot: {fileID: 236470447}
+  connectionManager: {fileID: 318300296}
+--- !u!114 &31549325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 31549319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elementID: 0
+  boundaries: {fileID: 395675361}
   connectionManager: {fileID: 318300296}
 --- !u!1 &87474705
 GameObject:
@@ -591,6 +606,7 @@ GameObject:
   - 4: {fileID: 318300297}
   - 114: {fileID: 318300298}
   - 114: {fileID: 318300299}
+  - 114: {fileID: 318300300}
   m_Layer: 0
   m_Name: Playing Board
   m_TagString: Untagged
@@ -623,7 +639,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 318300296}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abe0f66ffa9707f41acdb5b3bd434e50, type: 3}
   m_Name: 
@@ -639,6 +655,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee8a16065b2febb4eaf40da21c2971b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &318300300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 318300296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0fcd23607255eb498c51385196b4a83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameplay: {fileID: 1464675928}
+  multiplayer: {fileID: 1464675929}
 --- !u!1 &351389717
 GameObject:
   m_ObjectHideFlags: 0
@@ -2063,6 +2092,7 @@ GameObject:
   - 64: {fileID: 1464675926}
   - 23: {fileID: 1464675925}
   - 114: {fileID: 1464675928}
+  - 114: {fileID: 1464675929}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -2140,7 +2170,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1464675923}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2961aeb84ae738c45b7bf77bda7f0b66, type: 3}
   m_Name: 
@@ -2148,6 +2178,21 @@ MonoBehaviour:
   setpointSlider: {fileID: 2105704039}
   ball: {fileID: 8477717}
   player: {fileID: 31549324}
+  bat: {fileID: 1545227076}
+--- !u!114 &1464675929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1464675923}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bde92b2a27e2f824fb1528e4f7635ccd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ball: {fileID: 8477717}
+  player: {fileID: 31549325}
+  bat: {fileID: 1545227075}
 --- !u!1 &1491532017
 GameObject:
   m_ObjectHideFlags: 0
@@ -2261,6 +2306,7 @@ GameObject:
   - 23: {fileID: 1545227071}
   - 54: {fileID: 7075531}
   - 114: {fileID: 1545227075}
+  - 114: {fileID: 1545227076}
   m_Layer: 0
   m_Name: North Pad
   m_TagString: Horizontal
@@ -2340,7 +2386,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1545227070}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3244d13a85e7d8479e4c5e9f33cfbf0, type: 3}
+  m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elementID: 0
+  boundaries: {fileID: 395675361}
+  connectionManager: {fileID: 318300296}
+--- !u!114 &1545227076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1545227070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4424cb617aaee4499d0f9d1644e32ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   elementID: 0
@@ -2438,6 +2498,7 @@ GameObject:
   - 23: {fileID: 1681065536}
   - 54: {fileID: 7075529}
   - 114: {fileID: 1681065540}
+  - 114: {fileID: 1681065541}
   m_Layer: 0
   m_Name: East Pad
   m_TagString: Vertical
@@ -2523,6 +2584,20 @@ MonoBehaviour:
   elementID: 0
   boundaries: {fileID: 395675361}
   robot: {fileID: 236470447}
+  connectionManager: {fileID: 318300296}
+--- !u!114 &1681065541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1681065535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elementID: 0
+  boundaries: {fileID: 395675361}
   connectionManager: {fileID: 318300296}
 --- !u!1 &1716501750
 GameObject:
@@ -2903,6 +2978,7 @@ GameObject:
   - 23: {fileID: 2010514587}
   - 54: {fileID: 7075530}
   - 114: {fileID: 2010514591}
+  - 114: {fileID: 2010514592}
   m_Layer: 0
   m_Name: South Pad
   m_TagString: Horizontal
@@ -2982,7 +3058,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2010514586}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3244d13a85e7d8479e4c5e9f33cfbf0, type: 3}
+  m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elementID: 0
+  boundaries: {fileID: 395675361}
+  connectionManager: {fileID: 318300296}
+--- !u!114 &2010514592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2010514586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4424cb617aaee4499d0f9d1644e32ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   elementID: 0

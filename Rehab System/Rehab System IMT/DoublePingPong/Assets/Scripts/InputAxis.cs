@@ -71,14 +71,14 @@ public class RemoteInputAxis : InputAxis
 	private class AxisConnection
 	{
 		public string hostName;
-		public NetworkClientUDP dataClient = null;
-		public byte[] inputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
-		public byte[] outputBuffer = new byte[ NetworkInterface.BUFFER_SIZE ];
+		public AxisDataClient dataClient = null;
+		public byte[] inputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
+		public byte[] outputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
 
 		public AxisConnection( string hostName )
 		{
 			this.hostName = hostName;
-			dataClient = new NetworkClientUDP();
+			dataClient = new AxisDataClient();
 			dataClient.Connect( hostName, 50001 );
 		}
 	}

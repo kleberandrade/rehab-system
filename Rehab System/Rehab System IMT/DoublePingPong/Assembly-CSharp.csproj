@@ -45,22 +45,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\AxisClient.cs" />
+     <Compile Include="Assets\Scripts\AxisDataClient.cs" />
+     <Compile Include="Assets\Scripts\AxisInfoStateClient.cs" />
      <Compile Include="Assets\Scripts\AxisSelector.cs" />
      <Compile Include="Assets\Scripts\BallController.cs" />
+     <Compile Include="Assets\Scripts\BatController.cs" />
      <Compile Include="Assets\Scripts\Controller.cs" />
      <Compile Include="Assets\Scripts\GameClient.cs" />
      <Compile Include="Assets\Scripts\GameConnection.cs" />
+     <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\GameServer.cs" />
      <Compile Include="Assets\Scripts\Gameplay.cs" />
      <Compile Include="Assets\Scripts\InputAxis.cs" />
      <Compile Include="Assets\Scripts\InputAxisManager.cs" />
      <Compile Include="Assets\Scripts\MasterController.cs" />
-     <Compile Include="Assets\Scripts\NetworkClientTCP.cs" />
-     <Compile Include="Assets\Scripts\NetworkClientUDP.cs" />
-     <Compile Include="Assets\Scripts\NetworkInterface.cs" />
+     <Compile Include="Assets\Scripts\Multiplayer.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
-     <Compile Include="Assets\Scripts\RemoteController.cs" />
      <Compile Include="Assets\Scripts\Robot.cs" />
+     <Compile Include="Assets\Scripts\SlaveController.cs" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader2.shader" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader1.shader" />
  <Reference Include="UnityEngine.UI">

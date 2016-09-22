@@ -7,19 +7,16 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-public abstract class NetworkInterface
+public abstract class AxisClient
 {
+	public const int BUFFER_SIZE = 512;
+
 	protected Socket workSocket = null;
 
-	public const int BUFFER_SIZE = 512;
-}
-
-public abstract class NetworkClient : NetworkInterface
-{
 	private string currentHost = "localhost";
 	private int currentRemotePort = 0;
 
-	public NetworkClient( Socket newSocket = null )
+	public AxisClient( Socket newSocket = null )
 	{
 		workSocket = newSocket;
 	}
@@ -121,102 +118,100 @@ public abstract class NetworkClient : NetworkInterface
 		Debug.Log( "Encerrando conexao" );
 	}
 
-	~NetworkClient() 
+	~AxisClient() 
 	{
 		Disconnect();
 	}
 }
 
-public abstract class NetworkServer : NetworkInterface
-{
-	protected List<Socket> clientSockets = new List<Socket>();
-
-	Thread listeningThread;
-	bool isListening;
-
-	int currentLocalPort = 0;
-
-	public void StartListening( int localPort )
-	{
-		if( !isListening || localPort != currentLocalPort ) 
-		{
-			workSocket.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true );
-			workSocket.ExclusiveAddressUse = false;
-
-			IPEndPoint localIpAddress = new IPEndPoint( IPAddress.Any, localPort );
-			workSocket.Bind( (EndPoint) localIpAddress );
-
-			workSocket.Listen( 10 );
-
-			if (!isListening) 
-			{
-				listeningThread = new Thread( new ThreadStart( ListeningCallBack ) );
-				listeningThread.Start ();
-			}
-		}
-	}
-
-	public void StopListening()
-	{
-		isListening = false;
-		if( listeningThread != null )
-			listeningThread.Join();
-
-		try
-		{
-			workSocket.Close();
-		}
-		catch( Exception e )
-		{
-			Debug.Log( e.ToString() );
-		}
-
-		currentLocalPort = 0;
-	}
-
-	public void ListeningCallBack()
-	{
-		isListening = true;
-
-		Debug.Log( "NetworkServer: Starting to receive messages" );
-
-		try 
-		{
-			while( isListening )
-			{
-				if( workSocket.Available > 0 )
-				{
-					Debug.Log( "NetworkClientUDP: Messages available" );
-
-					try
-					{
-						Socket clientSocket = workSocket.Accept();
-
-						Debug.Log( "Accepted client from : " + clientSocket.RemoteEndPoint.ToString() );
-
-						clientSockets.Add( clientSocket );
-					}
-					catch( SocketException e )
-					{
-						Debug.Log( e.ToString() );
-					}
-				} 
-			}
-		}
-		catch( ObjectDisposedException e ) 
-		{
-			Debug.Log( e.ToString() );
-		}
-
-		StopListening();
-
-		Debug.Log( "NetworkServer: Finishing update thread" );
-	}
-
-	public abstract NetworkClient AcceptClient();
-
-	~NetworkServer()
-	{
-		StopListening();
-	}
-}
+//public abstract class NetworkServer : AxisClient
+//{
+//	protected List<Socket> clientSockets = new List<Socket>();
+//
+//	Thread listeningThread;
+//	bool isListening;
+//
+//	int currentLocalPort = 0;
+//
+//	public void StartListening( int localPort )
+//	{
+//		if( !isListening || localPort != currentLocalPort ) 
+//		{
+//			workSocket.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true );
+//			workSocket.ExclusiveAddressUse = false;
+//
+//			IPEndPoint localIpAddress = new IPEndPoint( IPAddress.Any, localPort );
+//			workSocket.Bind( (EndPoint) localIpAddress );
+//
+//			workSocket.Listen( 10 );
+//
+//			if (!isListening) 
+//			{
+//				listeningThread = new Thread( new ThreadStart( ListeningCallBack ) );
+//				listeningThread.Start ();
+//			}
+//		}
+//	}
+//
+//	public void StopListening()
+//	{
+//		isListening = false;
+//		if( listeningThread != null )
+//			listeningThread.Join();
+//
+//		try
+//		{
+//			workSocket.Close();
+//		}
+//		catch( Exception e )
+//		{
+//			Debug.Log( e.ToString() );
+//		}
+//
+//		currentLocalPort = 0;
+//	}
+//
+//	public void ListeningCallBack()
+//	{
+//		isListening = true;
+//
+//		try 
+//		{
+//			while( isListening )
+//			{
+//				if( workSocket.Available > 0 )
+//				{
+//					Debug.Log( "RobotServer: Messages available" );
+//
+//					try
+//					{
+//						Socket clientSocket = workSocket.Accept();
+//
+//						Debug.Log( "Accepted client from : " + clientSocket.RemoteEndPoint.ToString() );
+//
+//						clientSockets.Add( clientSocket );
+//					}
+//					catch( SocketException e )
+//					{
+//						Debug.Log( e.ToString() );
+//					}
+//				} 
+//			}
+//		}
+//		catch( ObjectDisposedException e ) 
+//		{
+//			Debug.Log( e.ToString() );
+//		}
+//
+//		StopListening();
+//
+//		Debug.Log( "NetworkServer: Finishing update thread" );
+//	}
+//
+//	public abstract NetworkClient AcceptClient();
+//
+//	~NetworkServer()
+//	{
+//		StopListening();
+//	}
+//}

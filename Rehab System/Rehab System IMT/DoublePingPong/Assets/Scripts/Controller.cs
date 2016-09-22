@@ -18,7 +18,7 @@ public abstract class Controller : MonoBehaviour
 	protected string textFile;
 
 	protected Rigidbody body;
-	protected BoxCollider collider;
+	protected BoxCollider box;
 
 	public GameObject connectionManager;
 	protected GameConnection gameConnection;
@@ -26,17 +26,17 @@ public abstract class Controller : MonoBehaviour
 	void Start()
 	{
         body = GetComponent<Rigidbody>();
-        collider = GetComponent<BoxCollider>();
+		box = GetComponent<BoxCollider>();
 
-		if( Gameplay.isServer ) gameConnection = connectionManager.GetComponent<GameServer>();
+		if( GameManager.isMaster ) gameConnection = connectionManager.GetComponent<GameServer>();
 		else gameConnection = connectionManager.GetComponent<GameClient>();
 
-        rangeLimits = boundaries.bounds.extents - collider.bounds.extents;
+		rangeLimits = boundaries.bounds.extents - box.bounds.extents;
 
 		// Start file for record movements
         //textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
 		//if( File.Exists( textFile ) ) File.Delete( textFile );
 	}      
 
-	public abstract float ControlPosition( Vector3 target, out float error );
+	//public abstract float ControlPosition( Vector3 target, out float error );
 }

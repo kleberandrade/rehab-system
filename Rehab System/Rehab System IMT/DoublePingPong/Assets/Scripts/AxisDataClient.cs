@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-public class NetworkClientUDP : NetworkClient 
+public class AxisDataClient : AxisClient 
 {
 	private byte[] lastMessage = new byte[ BUFFER_SIZE ];
     private bool hasNewMessage = false;
@@ -19,7 +19,7 @@ public class NetworkClientUDP : NetworkClient
 
 	private object searchLock = new object();
 
-	public NetworkClientUDP() 
+	public AxisDataClient() 
 	{
 		try 
 		{
@@ -31,7 +31,7 @@ public class NetworkClientUDP : NetworkClient
 		}
 	}
 
-	public NetworkClientUDP( Socket clientSocket ) : base( clientSocket ) {	}
+	public AxisDataClient( Socket clientSocket ) : base( clientSocket ) {	}
 
 	public override void Connect( string host, int remotePort ) 
 	{	
@@ -52,7 +52,7 @@ public class NetworkClientUDP : NetworkClient
 
 		byte[] messageBuffer = new byte[ BUFFER_SIZE ];
 
-		Debug.Log( "NetworkClientUDP: Starting to receive messages" );
+		Debug.Log( "AxisDataClient: Starting to receive messages" );
 
 		try 
 		{
@@ -69,7 +69,7 @@ public class NetworkClientUDP : NetworkClient
 
 				if( workSocket.Available > 0 )
 				{
-					//Debug.Log( "NetworkClientUDP: Messages available" );
+					//Debug.Log( "AxisDataClient: Messages available" );
 					isAwaitingConnection = false;
 
 					lock( searchLock )
@@ -101,7 +101,7 @@ public class NetworkClientUDP : NetworkClient
 		
 		Disconnect();
 			
-		Debug.Log( "NetworkClientUDP: Finishing update thread" );
+		Debug.Log( "AxisDataClient: Finishing update thread" );
 	}
 
 	public override bool ReceiveData( byte[] inputBuffer ) 
@@ -143,7 +143,7 @@ public class NetworkClientUDP : NetworkClient
 		Debug.Log( "Encerrando conexao UDP" );
 	}
 
-	~NetworkClientUDP() 
+	~AxisDataClient() 
 	{
 		Disconnect();
 	}

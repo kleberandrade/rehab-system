@@ -103,7 +103,7 @@ public abstract class GameConnection : MonoBehaviour
 
 		if( ReceiveUpdateMessage() )
 		{
-			int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], NetworkInterface.BUFFER_SIZE - DATA_SIZE );
+			int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], AxisClient.BUFFER_SIZE - DATA_SIZE );
 
 	        for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
 			{

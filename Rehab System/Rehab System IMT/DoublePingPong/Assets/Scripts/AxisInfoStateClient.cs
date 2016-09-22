@@ -5,9 +5,9 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 
-public class NetworkClientTCP : NetworkClient
+public class AxisInfoStateClient : AxisClient
 {	
-	public NetworkClientTCP() 
+	public AxisInfoStateClient() 
 	{	
 		try 
 		{
@@ -21,7 +21,7 @@ public class NetworkClientTCP : NetworkClient
 		
 	}
 
-	public NetworkClientTCP( Socket clientSocket ) : base( clientSocket ) {	}
+	public AxisInfoStateClient( Socket clientSocket ) : base( clientSocket ) {	}
 
 	public override bool ReceiveData( byte[] inputBuffer ) 
 	{	
@@ -80,7 +80,7 @@ public class NetworkClientTCP : NetworkClient
 		Debug.Log( "Encerrando conexao TCP" );
 	}
 
-	~NetworkClientTCP() 
+	~AxisInfoStateClient() 
 	{
 		Disconnect();
 	}
