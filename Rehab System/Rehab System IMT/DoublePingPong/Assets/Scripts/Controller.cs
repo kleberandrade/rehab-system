@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 
 [ RequireComponent( typeof(Rigidbody) ) ]
-[ RequireComponent( typeof(BoxCollider) ) ]
+[ RequireComponent( typeof(Collider) ) ]
 public abstract class Controller : MonoBehaviour 
 {
     public int elementID;
@@ -18,25 +18,21 @@ public abstract class Controller : MonoBehaviour
 	protected string textFile;
 
 	protected Rigidbody body;
-	protected BoxCollider box;
+	protected Collider col;
 
-	public GameObject connectionManager;
 	protected GameConnection gameConnection;
 
 	void Start()
 	{
         body = GetComponent<Rigidbody>();
-		box = GetComponent<BoxCollider>();
+		col = GetComponent<BoxCollider>();
 
-		if( GameManager.isMaster ) gameConnection = connectionManager.GetComponent<GameServer>();
-		else gameConnection = connectionManager.GetComponent<GameClient>();
+		gameConnection = GameManager.GetGameConnection();
 
-		rangeLimits = boundaries.bounds.extents - box.bounds.extents;
+		rangeLimits = boundaries.bounds.extents - col.bounds.extents;
 
 		// Start file for record movements
         //textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
 		//if( File.Exists( textFile ) ) File.Delete( textFile );
 	}      
-
-	//public abstract float ControlPosition( Vector3 target, out float error );
 }

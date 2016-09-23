@@ -66,6 +66,7 @@ public class AxisSelector : MonoBehaviour
 
     public void EndSelection()
     {
+		GameManager.isMaster = false;
         SceneManager.LoadScene( 1 );
     }
 }

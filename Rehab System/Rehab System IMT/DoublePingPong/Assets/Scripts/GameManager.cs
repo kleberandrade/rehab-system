@@ -10,18 +10,23 @@ public class GameManager : MonoBehaviour
 	public Gameplay gameplay;
 	public Multiplayer multiplayer;
 
+	private static GameConnection gameConnection = null;
+
 	// Use this for initialization
 	void Start () 
 	{
-		if( isMaster ) 
+		if( isMaster ) multiplayer.enabled = true;
+		else gameplay.enabled = true;
+	}
+
+	public static GameConnection GetGameConnection()
+	{
+		if( gameConnection == null )
 		{
-			multiplayer.enabled = true;
-			GetComponent<GameServer>().enabled = true;
+			if( isMaster ) gameConnection = new GameServer();
+			else gameConnection = new GameClient();
 		}
-		else 
-		{
-			gameplay.enabled = true;
-			GetComponent<GameClient>().enabled = true;
-		}
+
+		return gameConnection;
 	}
 }

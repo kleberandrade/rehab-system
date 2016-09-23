@@ -7,7 +7,7 @@ public class Gameplay : MonoBehaviour
 	public Slider setpointSlider;
 	private Image sliderHandle;
 
-	public BallController ball;
+	public TargetController ball;
 	public PlayerController player;
 	public SlaveController bat;
 
@@ -33,5 +33,18 @@ public class Gameplay : MonoBehaviour
 		if( error >= 0.7f ) sliderHandle.color = Color.red;
 		else if( error >= 0.3f ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
+	}
+
+	public void StartPlay()
+	{
+		ball.enabled = true;
+		player.enabled = true;
+		bat.enabled = true;
+	}
+	public void StopPlay()
+	{
+		ball.enabled = false;
+		player.enabled = false;
+		bat.enabled = false;
 	}
 }

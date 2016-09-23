@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public enum NetworkValue { POSITION, VELOCITY, FORCE };
 
-public abstract class GameConnection : MonoBehaviour
+public abstract class GameConnection
 {
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
@@ -25,13 +25,18 @@ public abstract class GameConnection : MonoBehaviour
 	protected Dictionary<KeyValuePair<byte,byte>, bool> localValuesUpdated = new Dictionary<KeyValuePair<byte,byte>, bool>();
 	protected Dictionary<KeyValuePair<byte,byte>, float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
 
-	void Start()
+	public GameConnection()
 	{
 		GlobalConfig networkConfig = new GlobalConfig();
 		networkConfig.MaxPacketSize = PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
 
 		Connect();
+	}
+
+	~GameConnection()
+	{
+		NetworkTransport.Shutdown();
 	}
 
 	protected abstract void Connect();
@@ -75,7 +80,7 @@ public abstract class GameConnection : MonoBehaviour
         return remoteValues.Keys.ToArray();
     }
 
-	void FixedUpdate()
+	void UpdateData()
 	{
 		int outputMessageLength = 1;
 
@@ -125,10 +130,5 @@ public abstract class GameConnection : MonoBehaviour
 	protected abstract void SendUpdateMessage();
 
 	protected abstract bool ReceiveUpdateMessage();
-
-	void OnApplicationQuit()
-	{
-		NetworkTransport.Shutdown();
-	}
 }
 

@@ -8,42 +8,15 @@ using System.Text;
 
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(BoxCollider) ) ]
-public class PlayerController : MonoBehaviour 
+public class PlayerController : Controller 
 {
-    public int elementID;
-
-	public Collider boundaries;
-    private Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
-
-    private string textFile;
-
-    private Rigidbody playerBody;
-    private BoxCollider playerCollider;
-
     public Robot robot;
-
-	public GameObject connectionManager;
-	private GameConnection gameConnection;
-
-	void Start()
-	{
-        playerBody = GetComponent<Rigidbody>();
-        playerCollider = GetComponent<BoxCollider>();
-
-		gameConnection = connectionManager.GetComponent<GameClient>();
-
-        rangeLimits = boundaries.bounds.extents - playerCollider.bounds.extents;
-
-		// Start file for record movements
-        textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
-		if( File.Exists( textFile ) ) File.Delete( textFile );
-	}
 
 	void FixedUpdate()
 	{
 		Vector2 input = robot.ReadInput();
 
-		playerBody.MovePosition( new Vector3( playerBody.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
+		body.MovePosition( new Vector3( body.position.x, 0.0f, Mathf.Clamp( input.y, -1.0f, 1.0f ) * rangeLimits.z ) );
 
 		//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
 
@@ -57,7 +30,7 @@ public class PlayerController : MonoBehaviour
 
         robot.WriteSetpoint( setpoint );
 
-		error = Mathf.Abs( ( setpoint.x - playerBody.position.z ) / rangeLimits.z );
+		error = Mathf.Abs( ( setpoint.x - body.position.z ) / rangeLimits.z );
 
 		return setpoint.x / rangeLimits.z;
 	}

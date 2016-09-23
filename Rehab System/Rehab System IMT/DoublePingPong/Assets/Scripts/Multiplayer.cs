@@ -8,17 +8,26 @@ public class Multiplayer : MonoBehaviour
 	public BatController player;
 	public BatController bat;
 
-	private int targetMask;
-
-	private float error = 0.0f;
+	public bool isPlaying = false;
+	private GameConnection gameConnection = null;
 
 	void Start()
 	{
-		targetMask = LayerMask.GetMask( "Target" );
+		player.enabled = true;
+		bat.enabled = true;
+
+		gameConnection = GameManager.GetGameConnection();
+
+		StartCoroutine( WaitClients() );
 	}
 
-	void FixedUpdate()
+	IEnumerator WaitClients()
 	{
-		Vector3 impactPoint = ball.FindImpactPoint( targetMask );
+		while( gameConnection.GetRemoteKeys().Length < 2 ) 
+			yield return new WaitForFixedUpdate();
+
+		Debug.Log( "enough remote keys received" );
+
+		ball.enabled = true;
 	}
 }
