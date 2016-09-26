@@ -8,13 +8,11 @@ public class GameClient : GameConnection
 {
 	public const string GAME_SERVER_HOST_ID = "Game Server Host";
 
-	private int connectionID, clientID;
+	private int connectionID;
+	private int clientID = -1;
 
-	protected override void Connect()
+	protected override void Connect( ConnectionConfig connectionConfig )
     {
-		ConnectionConfig connectionConfig = new ConnectionConfig();
-		clientID = connectionConfig.AddChannel( QosType.StateUpdate  ); // QosType.Unreliable sending just most recent
-
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
 		socketID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
 
@@ -24,35 +22,28 @@ public class GameClient : GameConnection
 
 	protected override void SendUpdateMessage()
 	{
-		Debug.Log( string.Format( "Sending message from host {0} to connection {1} and client {2}", socketID, connectionID, clientID ) );
-		NetworkTransport.Send( socketID, connectionID, clientID, outputBuffer, PACKET_SIZE, out connectionError );
+		Debug.Log( string.Format( "Sending message from host {0} to connection {1} and client {2}", socketID, connectionID, dataChannel ) );
+		NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
 	}
 
-	/*protected override bool ReceiveUpdateMessage()
+	protected override bool ReceiveUpdateMessage()
 	{
-		int remoteConnectionID, serverID, receivedSize;
-		if( NetworkTransport.ReceiveFromHost( broadcastHostID, out remoteConnectionID, out serverID, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError ) == NetworkEventType.BroadcastEvent )
+		int remoteConnectionID, channel, receivedSize;
+		if( NetworkTransport.ReceiveFromHost( socketID, out remoteConnectionID, out channel, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError ) == NetworkEventType.DataEvent )
 		{
-			Debug.Log( "Received broadcast message on connection " + remoteConnectionID.ToString() + " and channel " + serverID.ToString() );
-			if( connectionError == (byte) NetworkError.Ok )
+			if( connectionError == (byte) NetworkError.Ok ) 
 			{
-				NetworkTransport.GetBroadcastConnectionMessage( broadcastHostID, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError );
-				return true;
+				if( channel == eventChannel ) clientID = (int) inputBuffer[ 0 ];
+				else if( channel == dataChannel ) return true;
 			}
 		}
 
 		return false;
-	}*/
+	}
 
-	protected override bool ReceiveUpdateMessage()
+	public int ReceiveClientID()
 	{
-		int remoteConnectionID, serverID, receivedSize;
-		if( NetworkTransport.ReceiveFromHost( socketID, out remoteConnectionID, out serverID, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError ) == NetworkEventType.DataEvent )
-		{
-			if( connectionError == (byte) NetworkError.Ok )  return true;
-		}
-
-		return false;
+		return clientID;
 	}
 }
 

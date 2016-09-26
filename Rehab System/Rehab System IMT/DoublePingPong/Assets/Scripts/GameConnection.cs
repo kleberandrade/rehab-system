@@ -16,6 +16,7 @@ public abstract class GameConnection
 	protected const int BROADCAST_VERSION = 1, BROADCAST_SUBVERSION = 1;
 
 	protected int socketID = -1;
+	protected int eventChannel = -1, dataChannel = -1;
 	protected byte connectionError = 0;
 
 	protected byte[] inputBuffer = new byte[ PACKET_SIZE ];
@@ -31,15 +32,19 @@ public abstract class GameConnection
 		networkConfig.MaxPacketSize = PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
 
-		Connect();
+		ConnectionConfig connectionConfig = new ConnectionConfig();
+		eventChannel = connectionConfig.AddChannel( QosType.Reliable );
+		dataChannel = connectionConfig.AddChannel( QosType.StateUpdate ); // QosType.Unreliable sending just most recent
+
+		Connect( connectionConfig );
 	}
 
-	~GameConnection()
+	public static void Shutdown()
 	{
 		NetworkTransport.Shutdown();
 	}
 
-	protected abstract void Connect();
+	protected abstract void Connect( ConnectionConfig connectionConfig );
 
     public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
     {

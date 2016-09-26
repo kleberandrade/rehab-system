@@ -21,12 +21,12 @@ public class PlayerController : Controller
 		//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
 
 		// Send locally controlled object positions (z) over network
-		if( robot.Connected ) gameConnection.SetLocalValue( (byte) Movable.WALL, 0, NetworkValue.POSITION, input.y );
+		if( robot.Connected ) gameConnection.SetLocalValue( (byte) elementID, 0, NetworkValue.POSITION, input.y );
 	}       
 
 	public float ControlPosition( Vector3 target, out float error )
 	{
-        Vector2 setpoint = new Vector2( Mathf.Clamp( target.z, -rangeLimits.z, rangeLimits.z ), 0.0f );
+		Vector2 setpoint = new Vector2( Mathf.Clamp( target.z, -rangeLimits.z, rangeLimits.z ), 0.0f );
 
         robot.WriteSetpoint( setpoint );
 

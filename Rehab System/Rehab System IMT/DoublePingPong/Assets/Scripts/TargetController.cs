@@ -7,6 +7,8 @@ using System.Text;
 [ RequireComponent( typeof(Collider) ) ]
 public class TargetController : Controller 
 {
+	const byte BALL_ID = 2;
+
     public bool isPlaying = false;
 
 	private float targetPositionX = 0.0f, targetPositionZ = 0.0f;
@@ -15,13 +17,13 @@ public class TargetController : Controller
 	{
         if( isPlaying )
         {
-			float masterBallPositionX = gameConnection.GetRemoteValue( (byte) Movable.BALL, 2, NetworkValue.POSITION ) * rangeLimits.x;
-			float masterBallPositionZ = gameConnection.GetRemoteValue( (byte) Movable.BALL, 0, NetworkValue.POSITION ) * rangeLimits.z;
+			float masterBallPositionX = gameConnection.GetRemoteValue( BALL_ID, 2, NetworkValue.POSITION ) * rangeLimits.x;
+			float masterBallPositionZ = gameConnection.GetRemoteValue( BALL_ID, 0, NetworkValue.POSITION ) * rangeLimits.z;
 
 			if( targetPositionX != masterBallPositionX || targetPositionZ != masterBallPositionZ ) 
 			{
-				float masterBallVelocityX = gameConnection.GetRemoteValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
-				float masterBallVelocityZ = gameConnection.GetRemoteValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
+				float masterBallVelocityX = gameConnection.GetRemoteValue( BALL_ID, 2, NetworkValue.VELOCITY ) * rangeLimits.x;
+				float masterBallVelocityZ = gameConnection.GetRemoteValue( BALL_ID, 0, NetworkValue.VELOCITY ) * rangeLimits.z;
 
 				float ballFollowingErrorX = masterBallPositionX - body.position.x;
 				float ballFollowingErrorZ = masterBallPositionZ - body.position.z;
@@ -77,6 +79,8 @@ public class TargetController : Controller
 
 	public void OnEnable()
 	{
+		body = GetComponent<Rigidbody> ();
+
 		isPlaying = true;
 		body.position = new Vector3( 0.0f, body.position.y, 0.0f );
 		body.velocity = Vector3.zero;

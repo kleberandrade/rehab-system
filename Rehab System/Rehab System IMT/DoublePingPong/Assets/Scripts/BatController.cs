@@ -13,7 +13,7 @@ public class BatController : Controller
     void FixedUpdate()
     {
         // Get remotely controlled object position (z) and set it locally (x)
-		float remoteInput = gameConnection.GetRemoteValue( (byte) Movable.WALL, 0, NetworkValue.POSITION );
+		float remoteInput = gameConnection.GetRemoteValue( (byte) elementID, 0, NetworkValue.POSITION );
 
         float remotePosition = remoteInput * rangeLimits.x;
 

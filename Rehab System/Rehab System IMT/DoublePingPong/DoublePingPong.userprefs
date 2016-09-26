@@ -1,26 +1,20 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\BallController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Gameplay.cs">
     <Files>
-      <File FileName="Assets\Scripts\Gameplay.cs" Line="29" Column="69" />
-      <File FileName="Assets\Scripts\GameClient.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\BallController.cs" Line="48" Column="3" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="28" Column="3" />
-      <File FileName="Assets\Scripts\InputAxis.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\AxisSelector.cs" Line="69" Column="32" />
-      <File FileName="Assets\Scripts\InputAxisManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Robot.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameServer.cs" Line="29" Column="52" />
-      <File FileName="Assets\Scripts\GameConnection.cs" Line="70" Column="24" />
-      <File FileName="Assets\Scripts\Controller.cs" Line="30" Column="52" />
-      <File FileName="Assets\Scripts\MasterController.cs" Line="107" Column="29" />
-      <File FileName="Assets\Scripts\SlaveController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\BatController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Multiplayer.cs" Line="29" Column="42" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="23" Column="3" />
-      <File FileName="Assets\Scripts\AxisClient.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\AxisDataClient.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\TargetController.cs" Line="84" Column="23" />
+      <File FileName="Assets/Scripts/TargetController.cs" Line="58" Column="1" />
+      <File FileName="Assets/Scripts/GameServer.cs" Line="37" Column="39" />
+      <File FileName="Assets/Scripts/BallController.cs" Line="39" Column="1" />
+      <File FileName="Assets/Scripts/BatController.cs" Line="16" Column="70" />
+      <File FileName="Assets/Scripts/SlaveController.cs" Line="16" Column="70" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="33" Column="3" />
+      <File FileName="Assets/Scripts/Robot.cs" Line="27" Column="39" />
+      <File FileName="Assets/Scripts/GameConnection.cs" Line="42" Column="21" />
+      <File FileName="Assets/Scripts/GameClient.cs" Line="27" Column="3" />
+      <File FileName="Assets/Scripts/Controller.cs" Line="30" Column="35" />
+      <File FileName="Assets/Scripts/GameManager.cs" Line="32" Column="3" />
+      <File FileName="Assets/Scripts/Gameplay.cs" Line="66" Column="2" />
+      <File FileName="Assets/Scripts/Multiplayer.cs" Line="19" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

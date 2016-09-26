@@ -7,6 +7,8 @@ using System.Text;
 [ RequireComponent( typeof(Collider) ) ]
 public class BallController : Controller 
 {
+	const byte BALL_ID = 2;
+
 	public float speed;	// Ball speed
 
 	void FixedUpdate()
@@ -21,10 +23,10 @@ public class BallController : Controller
 		body.MovePosition( newPosition );
 		body.velocity = newVelocity;
 
-		gameConnection.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.POSITION, body.position.x / rangeLimits.x );
-		gameConnection.SetLocalValue( (byte) Movable.BALL, 0, NetworkValue.VELOCITY, body.velocity.x / rangeLimits.x );
-		gameConnection.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.POSITION, body.position.z / rangeLimits.z );
-		gameConnection.SetLocalValue( (byte) Movable.BALL, 2, NetworkValue.VELOCITY, body.velocity.z / rangeLimits.z );
+		gameConnection.SetLocalValue( BALL_ID, 0, NetworkValue.POSITION, body.position.x / rangeLimits.x );
+		gameConnection.SetLocalValue( BALL_ID, 0, NetworkValue.VELOCITY, body.velocity.x / rangeLimits.x );
+		gameConnection.SetLocalValue( BALL_ID, 2, NetworkValue.POSITION, body.position.z / rangeLimits.z );
+		gameConnection.SetLocalValue( BALL_ID, 2, NetworkValue.VELOCITY, body.velocity.z / rangeLimits.z );
     }
 
     void OnTriggerExit( Collider collider )

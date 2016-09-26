@@ -22,10 +22,12 @@ public abstract class Controller : MonoBehaviour
 
 	protected GameConnection gameConnection;
 
-	void Start()
+	void Awake()
 	{
-        body = GetComponent<Rigidbody>();
-		col = GetComponent<BoxCollider>();
+		body = GetComponent<Rigidbody>();
+		col = GetComponent<Collider>();
+
+		Debug.Log( string.Format( "Awake() called for {0}. Body: {1} - Collider: {2}", gameObject.name, body, col ) );
 
 		gameConnection = GameManager.GetGameConnection();
 
@@ -34,5 +36,5 @@ public abstract class Controller : MonoBehaviour
 		// Start file for record movements
         //textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
 		//if( File.Exists( textFile ) ) File.Delete( textFile );
-	}      
+	} 
 }

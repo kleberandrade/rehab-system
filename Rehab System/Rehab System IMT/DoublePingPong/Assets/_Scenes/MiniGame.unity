@@ -157,11 +157,10 @@ Rigidbody:
 --- !u!114 &8477717
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11495086, guid: 3514a7e05fce7ed4d94cc94939584ecc,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1491532017}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79126f7e8cf27a640a6d7c0aee908f97, type: 3}
   m_Name: 
@@ -169,7 +168,6 @@ MonoBehaviour:
   elementID: 0
   boundaries: {fileID: 1464675926}
   speed: 5
-  isPlaying: 0
 --- !u!1 &31549319
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +259,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 31549319}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79b72fe511d1158488115bdef67dcc63, type: 3}
   m_Name: 
@@ -275,7 +273,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 31549319}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
   m_Name: 
@@ -2148,10 +2146,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2961aeb84ae738c45b7bf77bda7f0b66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camera: {fileID: 550079182}
   setpointSlider: {fileID: 2105704039}
   ball: {fileID: 1491532023}
-  player: {fileID: 31549324}
-  bat: {fileID: 1545227076}
+  players:
+  - {fileID: 31549324}
+  - {fileID: 1681065540}
+  opponents:
+  - {fileID: 1545227076}
+  - {fileID: 2010514592}
 --- !u!114 &1464675929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2164,8 +2167,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ball: {fileID: 8477717}
-  player: {fileID: 31549325}
-  bat: {fileID: 1545227075}
+  bats:
+  - {fileID: 31549325}
+  - {fileID: 1545227075}
+  - {fileID: 1681065541}
+  - {fileID: 2010514591}
 --- !u!1 &1491532017
 GameObject:
   m_ObjectHideFlags: 0
@@ -2273,7 +2279,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1491532017}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69945d0114e38a54283270a96de974b5, type: 3}
   m_Name: 
@@ -2372,12 +2378,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1545227070}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementID: 0
+  elementID: 1
   boundaries: {fileID: 395675361}
 --- !u!114 &1545227076
 MonoBehaviour:
@@ -2385,12 +2391,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1545227070}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4424cb617aaee4499d0f9d1644e32ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementID: 0
+  elementID: 1
   boundaries: {fileID: 395675361}
 --- !u!1 &1648382676
 GameObject:
@@ -2562,7 +2568,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1681065535}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79b72fe511d1158488115bdef67dcc63, type: 3}
   m_Name: 
@@ -2576,7 +2582,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1681065535}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
   m_Name: 
@@ -3040,12 +3046,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2010514586}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6aefd762ea6a7ab46a1ad5e34c638890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementID: 0
+  elementID: 1
   boundaries: {fileID: 395675361}
 --- !u!114 &2010514592
 MonoBehaviour:
@@ -3053,12 +3059,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2010514586}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4424cb617aaee4499d0f9d1644e32ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementID: 0
+  elementID: 1
   boundaries: {fileID: 395675361}
 --- !u!1 &2022830667
 GameObject:

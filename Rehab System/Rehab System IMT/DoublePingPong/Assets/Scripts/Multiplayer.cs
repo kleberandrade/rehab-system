@@ -5,25 +5,26 @@ using System.Collections;
 public class Multiplayer : MonoBehaviour 
 {
 	public BallController ball;
-	public BatController player;
-	public BatController bat;
+	public BatController[] bats = new BatController[ 4 ];
 
-	public bool isPlaying = false;
-	private GameConnection gameConnection = null;
+	private GameServer gameServer = null;
+
+	void Awake()
+	{
+		foreach( BatController bat in bats )
+			bat.enabled = true;
+
+		gameServer = (GameServer) GameManager.GetGameConnection();
+	}
 
 	void Start()
 	{
-		player.enabled = true;
-		bat.enabled = true;
-
-		gameConnection = GameManager.GetGameConnection();
-
 		StartCoroutine( WaitClients() );
 	}
 
 	IEnumerator WaitClients()
 	{
-		while( gameConnection.GetRemoteKeys().Length < 2 ) 
+		while( gameServer.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
 		Debug.Log( "enough remote keys received" );
