@@ -4,7 +4,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public enum NetworkValue { POSITION, VELOCITY, FORCE };
+public enum NetworkValue : int { POSITION, VELOCITY, FORCE };
+public enum NetworkAxis : byte { X, Y, Z };
 
 public abstract class GameConnection
 {
@@ -46,9 +47,9 @@ public abstract class GameConnection
 
 	protected abstract void Connect( ConnectionConfig connectionConfig );
 
-    public void SetLocalValue( byte elementID, byte axisIndex, NetworkValue valueType, float value ) 
+	public void SetLocalValue( byte elementID, NetworkAxis axisIndex, NetworkValue valueType, float value ) 
     {
-        KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( elementID, axisIndex );
+		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( elementID, (byte) axisIndex );
 
         if( !localValues.ContainsKey( localKey ) ) 
         {
@@ -58,23 +59,23 @@ public abstract class GameConnection
 
         if( Mathf.Abs( localValues[ localKey ][ (int) valueType ] - value ) > 0.1f )
         {
-          localValues[ localKey ][ (int) valueType ] = value;
-          localValuesUpdated[ localKey ] = true;
+		  	localValues[ localKey ][ (int) valueType ] = value;
+          	localValuesUpdated[ localKey ] = true;
 
-          Debug.Log( "Setting " + localKey.ToString() + " position" );
+          	//Debug.Log( "Setting " + localKey.ToString() + " position" );
         }
     }
 
-    public bool HasRemoteKey( byte elementID, byte axisIndex )
+	public bool HasRemoteKey( byte elementID, NetworkAxis axisIndex )
     {
-        return remoteValues.ContainsKey( new KeyValuePair<byte,byte>( elementID, axisIndex ) );
+		return remoteValues.ContainsKey( new KeyValuePair<byte,byte>( elementID, (byte) axisIndex ) );
     }
 
-    public float GetRemoteValue( byte elementID, byte axisIndex, NetworkValue valueType )
+	public float GetRemoteValue( byte elementID, NetworkAxis axisIndex, NetworkValue valueType )
     {
         float[] values;
 
-        if( remoteValues.TryGetValue( new KeyValuePair<byte,byte>( elementID, axisIndex ), out values ) ) 
+		if( remoteValues.TryGetValue( new KeyValuePair<byte,byte>( elementID, (byte) axisIndex ), out values ) ) 
             return values[ (int) valueType ];
 
         return 0.0f;
@@ -85,7 +86,7 @@ public abstract class GameConnection
         return remoteValues.Keys.ToArray();
     }
 
-	void UpdateData()
+	public void UpdateData()
 	{
 		int outputMessageLength = 1;
 
@@ -118,7 +119,7 @@ public abstract class GameConnection
 	        for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
 			{
 				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
-	            Debug.Log( "Received values for key " + remoteKey.ToString() );
+	            //Debug.Log( "Received values for key " + remoteKey.ToString() );
 	            if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ 3 ];
 	                    
 	    		remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );

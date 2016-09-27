@@ -4,14 +4,17 @@ using System.Collections;
 
 public class Gameplay : MonoBehaviour 
 {
-	public Camera camera;
+	public Camera gameCamera;
+
+	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 
 	public Slider setpointSlider;
 	private Image sliderHandle;
 
-	public TargetController ball;
-	public PlayerController[] players = new PlayerController[ 2 ];
-	public SlaveController[] opponents = new SlaveController[ 2 ];
+	public SlaveController ball;
+	public Controller[] verticalBats = new PlayerController[ 2 ];
+	public Controller[] horizontalBats = new SlaveController[ 2 ];
+	private PlayerController player = null;
 
 	private int targetMask;
 
@@ -23,16 +26,21 @@ public class Gameplay : MonoBehaviour
 	{
 		targetMask = LayerMask.GetMask( "Target" );
 
-		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
+		player = verticalBats[ 0 ].GetComponent<PlayerController>();
 
-		gameClient = (GameClient) GameManager.GetGameConnection();
+		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
+	}
+
+	void Start()
+	{
+		gameClient = (GameClient) GameManager.GetConnection();
 	}
 
 	void FixedUpdate()
 	{
 		Vector3 impactPoint = ball.FindImpactPoint( targetMask );
 
-		float setpoint = players[ 0 ].ControlPosition( impactPoint, out error );
+		float setpoint = player.ControlPosition( impactPoint, out error );
 
 		setpointSlider.value = setpoint;
 
@@ -44,30 +52,32 @@ public class Gameplay : MonoBehaviour
 	public void StartPlay()
 	{
 		int clientID = gameClient.ReceiveClientID();
+		Debug.Log( "Client ID received: " + clientID.ToString() );
 		if( clientID == 0 ) 
 		{
-			players[ 0 ].elementID = players[ 1 ].elementID = 0;
-			opponents[ 0 ].elementID = opponents[ 1 ].elementID = 1;
+			verticalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
+			horizontalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
+			player = verticalBats[ 0 ].GetComponent<PlayerController>();
 		} 
 		else if( clientID == 1 ) 
 		{
-			players[ 0 ].elementID = players[ 1 ].elementID = 1;
-			opponents[ 0 ].elementID = opponents[ 1 ].elementID = 0;
-			camera.transform.RotateAround( transform.position, Vector3.up, 90f );
+			horizontalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
+			verticalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
+			player = horizontalBats[ 0 ].GetComponent<PlayerController>();
+			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
 		}
 
-		if( clientID != -1 ) 
-		{
-			ball.enabled = true;
-			players[ 0 ].enabled = players[ 1 ].enabled = true;
-			opponents[ 0 ].enabled = opponents[ 1 ].enabled = true;
-		}
+		if( clientID != -1 ) ball.enabled = true;
 	}
 
 	public void StopPlay()
 	{
 		ball.enabled = false;
-		players[ 0 ].enabled = players[ 1 ].enabled = false;
-		opponents[ 0 ].enabled = opponents[ 1 ].enabled = false;
+		verticalBats[ 0 ].enabled = verticalBats[ 1 ].enabled = false;
+		horizontalBats[ 0 ].enabled = horizontalBats[ 1 ].enabled = false;
 	}
 }

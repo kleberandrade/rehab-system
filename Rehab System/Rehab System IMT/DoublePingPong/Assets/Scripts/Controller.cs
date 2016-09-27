@@ -14,6 +14,7 @@ public abstract class Controller : MonoBehaviour
 
 	public Collider boundaries;
     protected Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
+	protected Vector3 initialPosition = Vector3.zero;
 
 	protected string textFile;
 
@@ -27,14 +28,18 @@ public abstract class Controller : MonoBehaviour
 		body = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 
-		Debug.Log( string.Format( "Awake() called for {0}. Body: {1} - Collider: {2}", gameObject.name, body, col ) );
+		//Debug.Log( string.Format( "Awake() called for {0}. Body: {1} - Collider: {2}", gameObject.name, body, col ) );
 
-		gameConnection = GameManager.GetGameConnection();
-
-		rangeLimits = boundaries.bounds.extents - col.bounds.extents;
+		rangeLimits = boundaries.bounds.extents - Vector3.one * col.bounds.extents.magnitude;
+		initialPosition = transform.position;
 
 		// Start file for record movements
         //textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
 		//if( File.Exists( textFile ) ) File.Delete( textFile );
-	} 
+	}
+
+	void Start()
+	{
+		gameConnection = GameManager.GetConnection();
+	}
 }

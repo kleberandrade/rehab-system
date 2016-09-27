@@ -9,25 +9,24 @@ public class Multiplayer : MonoBehaviour
 
 	private GameServer gameServer = null;
 
-	void Awake()
+	void Start()
 	{
+		gameServer = (GameServer) GameManager.GetConnection();
+
 		foreach( BatController bat in bats )
 			bat.enabled = true;
 
-		gameServer = (GameServer) GameManager.GetGameConnection();
-	}
-
-	void Start()
-	{
 		StartCoroutine( WaitClients() );
 	}
 
 	IEnumerator WaitClients()
 	{
+		Debug.Log( "Remote keys recieved " + gameServer.GetClientsNumber().ToString() );
+
 		while( gameServer.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
-		Debug.Log( "enough remote keys received" );
+		Debug.Log( "Enough remote keys received" );
 
 		ball.enabled = true;
 	}

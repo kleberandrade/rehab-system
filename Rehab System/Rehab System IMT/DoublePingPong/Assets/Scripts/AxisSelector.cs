@@ -14,7 +14,7 @@ public class AxisSelector : MonoBehaviour
 
 	public int calibratedVariableIndex = 0;
 
-	private InputAxis controlAxis = null;
+	private static InputAxis controlAxis = null;
 	private InputAxisManager axisManager = null;
 
 	public float CurrentAbsoluteValue { get { return currentAbsoluteValues[ calibratedVariableIndex ]; } }
@@ -62,6 +62,11 @@ public class AxisSelector : MonoBehaviour
             else if( controlAxisType == InputAxisType.Keyboard ) controlAxis = axisManager.GetAxis( "Vertical", InputAxisType.Keyboard );
             else if( controlAxisType == InputAxisType.Remote ) controlAxis = axisManager.GetAxis( "0", InputAxisType.Remote );
         }
+	}
+
+	public static InputAxis GetSelectedAxis()
+	{
+		return controlAxis;
 	}
 
     public void EndSelection()

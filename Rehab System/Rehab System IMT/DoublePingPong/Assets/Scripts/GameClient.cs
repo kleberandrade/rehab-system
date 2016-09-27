@@ -14,15 +14,17 @@ public class GameClient : GameConnection
 	protected override void Connect( ConnectionConfig connectionConfig )
     {
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
-		socketID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
+		socketID = NetworkTransport.AddHost( networkTopology );
 
 		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, "127.0.0.1" );
+		Debug.Log( "Connectingo to host " + gameServerHost + " on port " + GAME_SERVER_PORT );
 		connectionID = NetworkTransport.Connect( socketID, gameServerHost, GAME_SERVER_PORT, 0, out connectionError );
+		Debug.Log( string.Format( "Added host {0} and connection {1} with channels {2} and {3}", socketID, connectionID, eventChannel, dataChannel )  );
     }
 
 	protected override void SendUpdateMessage()
 	{
-		Debug.Log( string.Format( "Sending message from host {0} to connection {1} and client {2}", socketID, connectionID, dataChannel ) );
+		//Debug.Log( string.Format( "Sending message from host {0} to connection {1} and client {2}", socketID, connectionID, dataChannel ) );
 		NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
 	}
 
@@ -33,6 +35,7 @@ public class GameClient : GameConnection
 		{
 			if( connectionError == (byte) NetworkError.Ok ) 
 			{
+				//Debug.Log( string.Format( "Received message from connection {0} and channel {1}", connectionID, channel ) );
 				if( channel == eventChannel ) clientID = (int) inputBuffer[ 0 ];
 				else if( channel == dataChannel ) return true;
 			}

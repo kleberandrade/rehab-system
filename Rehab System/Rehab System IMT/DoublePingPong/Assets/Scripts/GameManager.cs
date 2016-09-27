@@ -10,21 +10,29 @@ public class GameManager : MonoBehaviour
 
 	private static GameConnection gameConnection = null;
 
-	// Use this for initialization
-	void Start () 
-	{
-		if( isMaster ) multiplayer.enabled = true;
-		else gameplay.enabled = true;
-	}
 
-	public static GameConnection GetGameConnection()
+	void Awake()
 	{
 		if( gameConnection == null )
 		{
 			if( isMaster ) gameConnection = new GameServer();
 			else gameConnection = new GameClient();
 		}
+	}
 
+	void Start () 
+	{
+		if( isMaster ) multiplayer.enabled = true;
+		else gameplay.enabled = true;
+	}
+
+	void FixedUpdate()
+	{
+		gameConnection.UpdateData();
+	}
+
+	public static GameConnection GetConnection()
+	{
 		return gameConnection;
 	}
 

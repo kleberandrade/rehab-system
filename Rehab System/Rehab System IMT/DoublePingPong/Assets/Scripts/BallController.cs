@@ -7,8 +7,6 @@ using System.Text;
 [ RequireComponent( typeof(Collider) ) ]
 public class BallController : Controller 
 {
-	const byte BALL_ID = 2;
-
 	public float speed;	// Ball speed
 
 	void FixedUpdate()
@@ -23,10 +21,11 @@ public class BallController : Controller
 		body.MovePosition( newPosition );
 		body.velocity = newVelocity;
 
-		gameConnection.SetLocalValue( BALL_ID, 0, NetworkValue.POSITION, body.position.x / rangeLimits.x );
-		gameConnection.SetLocalValue( BALL_ID, 0, NetworkValue.VELOCITY, body.velocity.x / rangeLimits.x );
-		gameConnection.SetLocalValue( BALL_ID, 2, NetworkValue.POSITION, body.position.z / rangeLimits.z );
-		gameConnection.SetLocalValue( BALL_ID, 2, NetworkValue.VELOCITY, body.velocity.z / rangeLimits.z );
+		gameConnection = GameManager.GetConnection();
+		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
+		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
+		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
+		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
     }
 
     void OnTriggerExit( Collider collider )
@@ -36,8 +35,11 @@ public class BallController : Controller
 
     void OnTriggerEnter( Collider collider )
     {
+		Debug.Log( "Colliding with " + collider.tag );
+
 		if( collider.tag == "Vertical" ) UpdateMasterValues( body.position, new Vector3( -body.velocity.x, 0.0f, body.velocity.z ) );
 		else if( collider.tag == "Horizontal" ) UpdateMasterValues( body.position, new Vector3( body.velocity.x, 0.0f, -body.velocity.z ) );
+		else if( collider.tag == "Tower" ) UpdateMasterValues( body.position, new Vector3( -body.velocity.x, 0.0f, -body.velocity.z ) );
     }
 
 	Vector3 GenerateStartVector()
@@ -48,8 +50,10 @@ public class BallController : Controller
 
 	public void OnEnable()
 	{
+		//rangeLimits = boundaries.bounds.extents + Vector3.one * col.bounds.extents.magnitude;
 		UpdateMasterValues( new Vector3( 0.0f, body.position.y, 0.0f ), GenerateStartVector() * speed );
 	}
+
 	public void OnDisable()
 	{
 		UpdateMasterValues( new Vector3( 0.0f, body.position.y, 0.0f ), Vector3.zero );

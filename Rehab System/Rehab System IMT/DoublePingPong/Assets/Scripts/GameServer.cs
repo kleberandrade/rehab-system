@@ -7,17 +7,23 @@ using System.Collections.Generic;
 public class GameServer : GameConnection
 {
 	private byte connectedClients = 0;
+	private List<int> clientConnections = new List<int>();
 
 	protected override void Connect( ConnectionConfig connectionConfig )
     {
 		HostTopology networkTopology = new HostTopology( connectionConfig, 10 );
 		socketID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
+
+		Debug.Log( string.Format( "Added host {0} with channels {1} and {2}", socketID, eventChannel, dataChannel )  );
     }
 
 	protected override void SendUpdateMessage()
 	{
-		NetworkTransport.StartSendMulticast( socketID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
-		NetworkTransport.FinishSendMulticast( socketID, out connectionError );
+		//Debug.Log( "Sending multicast message to channel " + dataChannel.ToString() );
+		foreach( int connectionID in clientConnections )
+			NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
+		//NetworkTransport.StartSendMulticast( socketID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
+		//NetworkTransport.FinishSendMulticast( socketID, out connectionError );
 	}
 
 	protected override bool ReceiveUpdateMessage()
@@ -26,16 +32,14 @@ public class GameServer : GameConnection
 		NetworkEventType networkEvent = NetworkTransport.ReceiveFromHost( socketID, out connectionID, out channel, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError );
 		if( connectionError == (byte) NetworkError.Ok ) 
 		{
-			Debug.Log( string.Format( "Received message from connection {0} and client {1}", connectionID, channel ) );
+			//Debug.Log( string.Format( "Received message of type {0} from connection {1} and client {2}", networkEvent, connectionID, channel ) );
 			if( networkEvent == NetworkEventType.ConnectEvent ) 
 			{
-				if( channel == eventChannel ) 
-				{
-					inputBuffer[ 0 ] = connectedClients++;
-					NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1, out connectionError );
-				}
-				else if( channel == dataChannel ) 
-					NetworkTransport.SendMulticast( socketID, connectionID, out connectionError );
+				inputBuffer[ 0 ] = connectedClients++;
+				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1, out connectionError );
+				//Debug.Log( "Sending ID " + connectedClients.ToString() + " back" );
+				//Debug.Log( "Adding connection " + connectionID.ToString() + " to multicast group" );
+				clientConnections.Add( connectionID ); 
 			}
 		    else if( networkEvent == NetworkEventType.DataEvent ) return true;
 		}
