@@ -10,8 +10,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 100
-  companyName: DefaultCompany
-  productName: 'Starter Pack #1'
+  companyName: ReRob Laboratory
+  productName: Double Ping-Pong
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenStyle: 0

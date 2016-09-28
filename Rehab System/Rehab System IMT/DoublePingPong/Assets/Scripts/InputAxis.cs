@@ -83,7 +83,7 @@ public class RemoteInputAxis : InputAxis
 		}
 	}
 
-	public const string AXIS_SERVER_HOST = "AXIS_SERVER_HOST";
+	public const string AXIS_SERVER_HOST_ID = "Axis Server Host";
 
 	const int AXIS_DATA_LENGTH = 7 * sizeof(float);
 	const int INPUT_DATA_LENGTH = 2 * sizeof(byte) + AXIS_DATA_LENGTH;
@@ -96,7 +96,7 @@ public class RemoteInputAxis : InputAxis
 
 	public override bool Init( string axisName )
 	{
-		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST, "192.168.0.66" );
+		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST_ID, "127.0.0.1" );
 
 		base.Init( axisName );
 

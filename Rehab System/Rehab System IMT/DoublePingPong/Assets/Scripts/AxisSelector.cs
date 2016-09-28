@@ -52,6 +52,18 @@ public class AxisSelector : MonoBehaviour
 		}
 	}
 
+	public void SetAxisServer( string serverHost )
+	{
+		Debug.Log( "Setting axis server host as " + serverHost );
+		PlayerPrefs.SetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, serverHost );
+	}
+
+	public void SetGameServer( string serverHost )
+	{
+		Debug.Log( "Setting game server host as " + serverHost );
+		PlayerPrefs.SetString( GameClient.GAME_SERVER_HOST_ID, serverHost );
+	}
+
     public void SetAxis( Int32 typeIndex )
     {
         if( Enum.IsDefined( typeof(InputAxisType), typeIndex ) )
