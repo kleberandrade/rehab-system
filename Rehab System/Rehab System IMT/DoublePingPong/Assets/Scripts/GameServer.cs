@@ -32,7 +32,7 @@ public class GameServer : GameConnection
 		NetworkEventType networkEvent = NetworkTransport.ReceiveFromHost( socketID, out connectionID, out channel, inputBuffer, PACKET_SIZE, out receivedSize, out connectionError );
 		if( connectionError == (byte) NetworkError.Ok ) 
 		{
-			//Debug.Log( string.Format( "Received message of type {0} from connection {1} and client {2}", networkEvent, connectionID, channel ) );
+			Debug.Log( string.Format( "Received message of type {0} from connection {1} and client {2}", networkEvent, connectionID, channel ) );
 			if( networkEvent == NetworkEventType.ConnectEvent ) 
 			{
 				inputBuffer[ 0 ] = connectedClients++;

@@ -11,7 +11,7 @@ public class BallController : Controller
 
 	void FixedUpdate()
 	{
-        body.velocity *= speed / body.velocity.magnitude;
+		body.velocity *= speed / body.velocity.magnitude;
 
 		UpdateMasterValues( body.position, body.velocity );
 	}
@@ -35,7 +35,7 @@ public class BallController : Controller
 
     void OnTriggerEnter( Collider collider )
     {
-		Debug.Log( "Colliding with " + collider.tag );
+		Debug.Log( "Colliding with " + collider.tag + " on layer " + collider.gameObject.layer );
 
 		if( collider.tag == "Vertical" ) UpdateMasterValues( body.position, new Vector3( -body.velocity.x, 0.0f, body.velocity.z ) );
 		else if( collider.tag == "Horizontal" ) UpdateMasterValues( body.position, new Vector3( body.velocity.x, 0.0f, -body.velocity.z ) );
@@ -50,13 +50,12 @@ public class BallController : Controller
 
 	public void OnEnable()
 	{
-		//rangeLimits = boundaries.bounds.extents + Vector3.one * col.bounds.extents.magnitude;
-		UpdateMasterValues( new Vector3( 0.0f, body.position.y, 0.0f ), GenerateStartVector() * speed );
+		UpdateMasterValues( initialPosition, GenerateStartVector() * speed );
 	}
 
 	public void OnDisable()
 	{
-		UpdateMasterValues( new Vector3( 0.0f, body.position.y, 0.0f ), Vector3.zero );
+		UpdateMasterValues( initialPosition, Vector3.zero );
 	}
 
 }

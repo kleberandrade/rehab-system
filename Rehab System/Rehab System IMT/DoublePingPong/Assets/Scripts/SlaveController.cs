@@ -31,21 +31,12 @@ public class SlaveController : Controller
 		//	+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
 	}
 
-	/*void OnTriggerExit( Collider collider )
-	{
-		if( collider.tag == "Boundary" ) 
-		{
-			body.position = new Vector3( 0.0f, body.position.y, 0.0f );
-			body.velocity = Vector3.zero;
-		}
-	}*/
-
-	void OnTriggerEnter( Collider collider )
+	/*void OnTriggerEnter( Collider collider )
 	{
 		if( collider.tag == "Vertical" ) body.velocity = new Vector3( -body.velocity.x, 0.0f, body.velocity.z );
 		else if( collider.tag == "Horizontal" ) body.velocity = new Vector3( body.velocity.x, 0.0f, -body.velocity.z );
 		else if( collider.tag == "Tower" ) body.velocity = new Vector3( -body.velocity.x, 0.0f, -body.velocity.z );
-	}
+	}*/
 
 	public Vector3 FindImpactPoint( int layerMask )
 	{

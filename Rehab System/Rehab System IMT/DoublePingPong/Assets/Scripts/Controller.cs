@@ -19,18 +19,18 @@ public abstract class Controller : MonoBehaviour
 	protected string textFile;
 
 	protected Rigidbody body;
-	protected Collider col;
 
 	protected GameConnection gameConnection;
 
 	void Awake()
 	{
 		body = GetComponent<Rigidbody>();
-		col = GetComponent<Collider>();
+
+		body.velocity = Vector3.zero;
 
 		//Debug.Log( string.Format( "Awake() called for {0}. Body: {1} - Collider: {2}", gameObject.name, body, col ) );
 
-		rangeLimits = boundaries.bounds.extents - Vector3.one * col.bounds.extents.magnitude;
+		rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
 		initialPosition = transform.position;
 
 		// Start file for record movements

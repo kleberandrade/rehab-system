@@ -21,13 +21,19 @@ public class Multiplayer : MonoBehaviour
 
 	IEnumerator WaitClients()
 	{
-		Debug.Log( "Remote keys recieved " + gameServer.GetClientsNumber().ToString() );
+		Debug.Log( "Remote keys received " + gameServer.GetClientsNumber().ToString() );
 
 		while( gameServer.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
 		Debug.Log( "Enough remote keys received" );
 
+		ball.enabled = true;
+	}
+
+	public void ResetBall()
+	{
+		ball.enabled = false;
 		ball.enabled = true;
 	}
 }

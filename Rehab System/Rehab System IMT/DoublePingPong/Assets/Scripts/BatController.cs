@@ -32,13 +32,11 @@ public class BatController : Controller
 		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
 			                                  0.0f, gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
-		Debug.Log( string.Format( "Bat {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
+		//Debug.Log( string.Format( "Bat {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
 
 		Vector3 followingError = masterPosition - body.position;
 
-		if( followingError.magnitude < rangeLimits.magnitude / 2 ) masterVelocity += followingError;
-		else body.MovePosition( masterPosition );
-
+		body.MovePosition( masterPosition );
 		body.velocity = masterVelocity;
 
 		// Send locally controlled object position over network
