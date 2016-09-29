@@ -43,20 +43,23 @@ public class PlayerController : Controller
 
 	public float ControlPosition( Vector3 target, out float error )
 	{
-		// FIX THAT !!!!
+		float currentPosition = Vector3.Dot( body.position - initialPosition, transform.right );
+		float maxSetpoint = Mathf.Abs( Vector3.Dot( rangeLimits, transform.right ) );
 
-		float targetPosition = Mathf.Clamp( target.x, -rangeLimits.x, rangeLimits.x );
-		float setpoint = Mathf.Lerp( body.position.x, targetPosition, MOVE_INTERVAL );
+		float targetSetpoint = Vector3.Dot( target - initialPosition, transform.right );
+		//targetSetpoint = Mathf.Clamp( targetSetpoint, -maxSetpoint, maxSetpoint );
+
+		float currentSetpoint = Mathf.Lerp( currentPosition, targetSetpoint, MOVE_INTERVAL );
 
 		if( controlAxis != null && helperEnabled )
 		{
-			controlAxis.Position = setpoint;
-			controlAxis.Velocity = ( targetPosition - body.position.x ) / MOVE_INTERVAL;
+			controlAxis.Position = currentSetpoint;
+			controlAxis.Velocity = ( targetSetpoint - currentPosition ) / MOVE_INTERVAL;
 		}
 
-		error = Mathf.Abs( ( setpoint - body.position.x ) / rangeLimits.x );
+		error = Mathf.Abs( ( currentSetpoint - currentPosition ) / maxSetpoint );
 
-		return targetPosition / rangeLimits.x;
+		return targetSetpoint / maxSetpoint;
 	}
 
 	void OnEnable()
