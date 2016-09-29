@@ -34,8 +34,6 @@ public class BatController : Controller
 
 		//Debug.Log( string.Format( "Bat {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
 
-		Vector3 followingError = masterPosition - body.position;
-
 		body.MovePosition( masterPosition );
 		body.velocity = masterVelocity;
 
