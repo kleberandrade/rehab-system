@@ -61,7 +61,7 @@ public class PlayerController : Controller
 
 	void OnEnable()
 	{
-		controlAxis = AxisSelector.GetSelectedAxis();
+		controlAxis = Configuration.GetSelectedAxis();
 	}
 
 	public void Connect()

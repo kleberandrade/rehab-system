@@ -96,7 +96,7 @@ public class RemoteInputAxis : InputAxis
 
 	public override bool Init( string axisName )
 	{
-		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST_ID, "127.0.0.1" );
+		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 
 		base.Init( axisName );
 
@@ -116,7 +116,6 @@ public class RemoteInputAxis : InputAxis
 
     public override void End()
     {
-		//ConnectionManager.InfoClient.Disconnect();
 		axis.dataClient.Disconnect();
     }
 
@@ -158,9 +157,9 @@ public class RemoteInputAxis : InputAxis
 
 				// Debug
 				if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - d:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
-					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
-					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
-					BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
+														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
+														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
+														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
 
 				break;
 			}

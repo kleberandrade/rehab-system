@@ -16,7 +16,7 @@ public class GameClient : GameConnection
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
 		socketID = NetworkTransport.AddHost( networkTopology );
 
-		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, "127.0.0.1" );
+		string gameServerHost = PlayerPrefs.GetString( GAME_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 		Debug.Log( "Connectingo to host " + gameServerHost + " on port " + GAME_SERVER_PORT );
 		connectionID = NetworkTransport.Connect( socketID, gameServerHost, GAME_SERVER_PORT, 0, out connectionError );
 		Debug.Log( string.Format( "Added host {0} and connection {1} with channels {2} and {3}", socketID, connectionID, eventChannel, dataChannel )  );
