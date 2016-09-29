@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 public class GameServer : GameConnection
 {
-	private byte connectedClients = 0;
 	private List<int> clientConnections = new List<int>();
 
 	protected override void Connect( ConnectionConfig connectionConfig )
@@ -35,7 +34,7 @@ public class GameServer : GameConnection
 			Debug.Log( string.Format( "Received message of type {0} from connection {1} and client {2}", networkEvent, connectionID, channel ) );
 			if( networkEvent == NetworkEventType.ConnectEvent ) 
 			{
-				inputBuffer[ 0 ] = connectedClients++;
+				inputBuffer[ 0 ] = (byte) clientConnections.Count;
 				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1, out connectionError );
 				//Debug.Log( "Sending ID " + connectedClients.ToString() + " back" );
 				//Debug.Log( "Adding connection " + connectionID.ToString() + " to multicast group" );
@@ -49,7 +48,7 @@ public class GameServer : GameConnection
 
 	public int GetClientsNumber()
 	{
-		return remoteValues.Count;
+		return clientConnections.Count;
 	}
 }
 

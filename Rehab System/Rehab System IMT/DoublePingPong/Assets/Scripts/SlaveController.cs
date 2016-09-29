@@ -12,11 +12,11 @@ public class SlaveController : Controller
 {
 	void FixedUpdate()
 	{
-		Vector3 masterPosition = new Vector3( gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.X, NetworkValue.POSITION ),
-											  0.0f, gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
+		Vector3 masterPosition = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
+											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
 
-		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
-											  0.0f, gameConnection.GetRemoteValue( (byte) elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
+		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
+											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
 		Debug.Log( string.Format( "Slave {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
 

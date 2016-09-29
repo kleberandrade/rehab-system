@@ -23,7 +23,7 @@ public class Multiplayer : MonoBehaviour
 	{
 		Debug.Log( "Remote keys received " + gameServer.GetClientsNumber().ToString() );
 
-		while( gameServer.GetClientsNumber() < 4 ) 
+		while( gameServer.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
 		Debug.Log( "Enough remote keys received" );

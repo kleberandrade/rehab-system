@@ -47,9 +47,9 @@ public abstract class GameConnection
 
 	protected abstract void Connect( ConnectionConfig connectionConfig );
 
-	public void SetLocalValue( byte elementID, NetworkAxis axisIndex, NetworkValue valueType, float value ) 
+	public void SetLocalValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType, float value ) 
     {
-		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( elementID, (byte) axisIndex );
+		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex );
 
         if( !localValues.ContainsKey( localKey ) ) 
         {
@@ -66,25 +66,25 @@ public abstract class GameConnection
         }
     }
 
-	public bool HasRemoteKey( byte elementID, NetworkAxis axisIndex )
+	public bool HasRemoteKey( int elementID, NetworkAxis axisIndex )
     {
-		return remoteValues.ContainsKey( new KeyValuePair<byte,byte>( elementID, (byte) axisIndex ) );
+		return remoteValues.ContainsKey( new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex ) );
     }
 
-	public float GetRemoteValue( byte elementID, NetworkAxis axisIndex, NetworkValue valueType )
+	public float GetRemoteValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType )
     {
         float[] values;
 
-		if( remoteValues.TryGetValue( new KeyValuePair<byte,byte>( elementID, (byte) axisIndex ), out values ) ) 
+		if( remoteValues.TryGetValue( new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex ), out values ) ) 
             return values[ (int) valueType ];
 
         return 0.0f;
     }
 
-    public KeyValuePair<byte,byte>[] GetRemoteKeys() 
-    {
-        return remoteValues.Keys.ToArray();
-    }
+//    public KeyValuePair<byte,byte>[] GetRemoteKeys() 
+//    {
+//        return remoteValues.Keys.ToArray();
+//    }
 
 	public void UpdateData()
 	{

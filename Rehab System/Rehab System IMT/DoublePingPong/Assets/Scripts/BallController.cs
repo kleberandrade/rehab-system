@@ -22,10 +22,10 @@ public class BallController : Controller
 		body.velocity = newVelocity;
 
 		gameConnection = GameManager.GetConnection();
-		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-		gameConnection.SetLocalValue( (byte) elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+		gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
+		gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
+		gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
+		gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
     }
 
     void OnTriggerExit( Collider collider )
