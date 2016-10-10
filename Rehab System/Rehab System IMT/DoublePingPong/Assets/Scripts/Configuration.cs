@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+
+using SimpleJSON;
 
 [ RequireComponent( typeof(InputAxisManager) ) ]
 public class Configuration : MonoBehaviour
@@ -23,6 +26,8 @@ public class Configuration : MonoBehaviour
 
 	public float CurrentAbsoluteValue { get { return currentAbsoluteValues[ calibratedVariableIndex ]; } }
 
+	private AxisInfoStateClient infoStateClient;
+
 	// Use this for initialization
 	void Start()
 	{
@@ -33,10 +38,7 @@ public class Configuration : MonoBehaviour
 		axisServerEntry.text = PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 		gameServerEntry.text = PlayerPrefs.GetString( GameClient.GAME_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 
-		// hack
-		//NetworkClientTCP infoClient = new NetworkClientTCP();
-		//infoClient.Connect( PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST, Configuration.DEFAULT_IP_HOST ), 50000 );
-		//infoClient.Disconnect();
+		infoStateClient = new AxisInfoStateClient();
 	}
 	
 	// Update is called once per frame
@@ -88,8 +90,56 @@ public class Configuration : MonoBehaviour
 		return controlAxis;
 	}
 
-    public void EndSelection()
+	public void RefreshAxesInfo()
+	{
+		byte[] infoBuffer = new byte[ AxisClient.BUFFER_SIZE ];
+
+		infoStateClient.Connect( PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST ), 50000 );
+
+		infoStateClient.SendData( infoBuffer );
+		if( infoStateClient.ReceiveData( infoBuffer ) )
+		{
+			string infoString = Encoding.ASCII.GetString( infoBuffer );
+			var axesInfo = JSON.Parse( infoString );
+			Debug.Log( "Received info: " + axesInfo.ToString() );
+		}
+
+	}
+
+	public void SetSelectedAxisMax( int sliderIndex )
+	{
+		Debug.Log( "Set axis Max" );
+		if( controlAxis != null ) controlAxis.MaxValue = calibrationSliders[ sliderIndex ].value;
+	}
+
+	public void SetSelectedAxisMin( int sliderIndex )
+	{
+		Debug.Log( "Set axis Min" );
+		if( controlAxis != null ) controlAxis.MinValue = calibrationSliders[ sliderIndex ].value;
+	}
+
+	public void SetAxisOffset( bool enabled )
+	{
+		if( enabled ) 
+		{
+			Debug.Log( "Offset begin" );
+			infoStateClient.SendData( new byte[] { 1, 0, 5 } );
+		}
+		else 
+		{
+			Debug.Log( "Offset end" );
+			infoStateClient.SendData( new byte[] { 1, 0, 4 } );
+			if( controlAxis != null )
+			{
+				controlAxis.PositionOffset = calibrationSliders[ 0 ].value;
+				controlAxis.ForceOffset = calibrationSliders[ 2 ].value;
+			}
+		}
+	}
+
+    public void EndConfiguration()
     {
+		infoStateClient.Disconnect();
 		GameManager.isMaster = false;
         SceneManager.LoadScene( 1 );
     }

@@ -71,7 +71,13 @@ public abstract class AxisClient
 				IPAddress ipRemoteHost = Dns.GetHostEntry( host ).AddressList[ 0 ];
 				Debug.Log( ipRemoteHost.ToString() );
 				IPEndPoint remoteIpAddress = new IPEndPoint( ipRemoteHost, remotePort );
-				workSocket.BeginConnect( (EndPoint) remoteIpAddress, connectCallback, workSocket );
+				IAsyncResult connectionResult = workSocket.BeginConnect( (EndPoint) remoteIpAddress, connectCallback, workSocket );
+
+				if( ! connectionResult.AsyncWaitHandle.WaitOne( 5000, true ) )
+				{
+					workSocket.Close();
+					throw new ApplicationException( "Failed to connect server." );
+				}
 
 				currentHost = host;
 				currentRemotePort = remotePort;
