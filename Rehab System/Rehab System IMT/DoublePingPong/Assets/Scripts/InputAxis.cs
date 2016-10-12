@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
+public enum AxisVariable { POSITION, VELOCITY, FORCE, ACCELERATION, STIFFNESS, DAMPING };
+
 public class InputAxis
 {
 	protected string id;
@@ -13,7 +15,7 @@ public class InputAxis
 	private float positionOffset = 0.0f, forceOffset = 0.0f;
 	private float maxValue = 0.0f, minValue = 0.0f, range = 1.0f;
 
-	protected float feedbackPosition = 0.0f, feedbackVelocity = 0.0f;
+	protected float feedbackPosition = 0.0f, feedbackVelocity = 0.0f, feedbackForce = 0.0f;
 	protected float stiffness = 0.0f, damping = 0.0f;
 
     protected BitArray setpointsMask = new BitArray( 4, false );
@@ -40,7 +42,7 @@ public class InputAxis
 
 	public float Position { get { return position - positionOffset; } set { feedbackPosition = value + positionOffset; setpointsMask[ 0 ] = true; } }
 	public float Velocity { get { return velocity; } set { feedbackVelocity = value; setpointsMask[ 1 ] = true; } }
-	public float Force { get { return force - forceOffset; } }
+	public float Force { get { return force - forceOffset; } set { feedbackForce = value + forceOffset; setpointsMask[ 2 ] = true; } }
 
 	public float PositionOffset { set { positionOffset = value; } }
 	public float ForceOffset { set { forceOffset = value; } }
@@ -174,7 +176,7 @@ public class RemoteInputAxis : InputAxis
 
 				position = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition ); 
 				velocity = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + sizeof(float) ); 
-				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 3 * sizeof(float) ); 
+				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 2 * sizeof(float) ); 
 
 				// Debug
 				if( id == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
@@ -194,14 +196,15 @@ public class RemoteInputAxis : InputAxis
 				{
 					Buffer.BlockCopy( BitConverter.GetBytes( feedbackPosition ), 0, axis.outputBuffer, outputDataPosition, sizeof(float) );
 					Buffer.BlockCopy( BitConverter.GetBytes( feedbackVelocity ), 0, axis.outputBuffer, outputDataPosition + sizeof(float), sizeof(float) );
+					Buffer.BlockCopy( BitConverter.GetBytes( feedbackForce ), 0, axis.outputBuffer, outputDataPosition + 2 * sizeof(float), sizeof(float) );
 					Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
 					Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
 
 					// Debug
-					if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - d:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
+					if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - s:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
 															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
-															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
-															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
+															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 2 * sizeof(float) ), 
+															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ) ) );
 				}
 
 				break;

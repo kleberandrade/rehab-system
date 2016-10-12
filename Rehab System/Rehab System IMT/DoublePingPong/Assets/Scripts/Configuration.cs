@@ -15,6 +15,7 @@ public class Configuration : MonoBehaviour
 
 	public InputField axisServerEntry, gameServerEntry;
 
+	public Toggle[] controlToggles = new Toggle[ 3 ];
 	public Slider[] calibrationSliders = new Slider[ 3 ];
 	public Text[] valueDisplays = new Text[ 3 ];
 	private float[] currentAbsoluteValues = new float[ 3 ];
@@ -65,11 +66,9 @@ public class Configuration : MonoBehaviour
 
 		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
 		{
-			if( calibrationSliders[ variableIndex ] ) 
-				calibrationSliders[ variableIndex ].value = currentAbsoluteValues[ variableIndex ];
-
-			if( valueDisplays[ variableIndex ] ) 
-				valueDisplays[ variableIndex ].text = currentAbsoluteValues[ variableIndex ].ToString( "+#0.000;-#0.000; #0.000" );
+			calibrationSliders[ variableIndex ].interactable = controlToggles[ variableIndex ].isOn;
+			calibrationSliders[ variableIndex ].value = currentAbsoluteValues[ variableIndex ];
+			valueDisplays[ variableIndex ].text = currentAbsoluteValues[ variableIndex ].ToString( "+#0.000;-#0.000; #0.000" );
 		}
 	}
 
@@ -155,6 +154,21 @@ public class Configuration : MonoBehaviour
 				controlAxis.ForceOffset = calibrationSliders[ 2 ].value;
 			}
 		}
+	}
+
+	public void SetControl()
+	{
+		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
+			calibrationSliders[ variableIndex ].interactable = controlToggles[ variableIndex ].isOn;
+	}
+
+	public void SetSetpoint( float setpoint )
+	{
+		Debug.Log( "Setting setpoint: " + setpoint.ToString() );
+
+		if( controlToggles[ 0 ].isOn ) controlAxis.Position = calibrationSliders[ 0 ].value;
+		if( controlToggles[ 1 ].isOn ) controlAxis.Velocity = calibrationSliders[ 1 ].value;
+		if( controlToggles[ 2 ].isOn ) controlAxis.Force = calibrationSliders [ 2 ].value;
 	}
 
     public void EndConfiguration()
