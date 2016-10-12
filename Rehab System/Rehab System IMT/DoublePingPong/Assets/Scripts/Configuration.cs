@@ -24,6 +24,8 @@ public class Configuration : MonoBehaviour
 	private static InputAxis controlAxis = null;
 	private InputAxisManager axisManager = null;
 
+	public Dropdown axisSelector;
+
 	public float CurrentAbsoluteValue { get { return currentAbsoluteValues[ calibratedVariableIndex ]; } }
 
 	private AxisInfoStateClient infoStateClient;
@@ -32,8 +34,12 @@ public class Configuration : MonoBehaviour
 	void Start()
 	{
 		axisManager = GetComponent<InputAxisManager>();
+		axisManager.ResetDefaultAxes();
 
-        SetSelectedAxis( (int) InputAxisType.Keyboard );
+		axisSelector.ClearOptions();
+		axisSelector.AddOptions( InputAxisManager.DEFAULT_AXIS_NAMES );
+
+        SetSelectedAxis( 0 );
 
 		axisServerEntry.text = PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 		gameServerEntry.text = PlayerPrefs.GetString( GameClient.GAME_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
@@ -49,15 +55,21 @@ public class Configuration : MonoBehaviour
 			currentAbsoluteValues[ 0 ] = controlAxis.Position;
 			currentAbsoluteValues[ 1 ] = controlAxis.Velocity;
 			currentAbsoluteValues[ 2 ] = controlAxis.Force;
+		}
+		else
+		{
+			currentAbsoluteValues[ 0 ] = 0.0f;
+			currentAbsoluteValues[ 1 ] = 0.0f;
+			currentAbsoluteValues[ 2 ] = 0.0f;
+		}
 
-			for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
-			{
-				if( calibrationSliders[ variableIndex ] ) 
-					calibrationSliders[ variableIndex ].value = currentAbsoluteValues[ variableIndex ];
-				
-				if( valueDisplays[ variableIndex ] ) 
-					valueDisplays[ variableIndex ].text = currentAbsoluteValues[ variableIndex ].ToString( "+#0.000;-#0.000; #0.000" );
-			}
+		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
+		{
+			if( calibrationSliders[ variableIndex ] ) 
+				calibrationSliders[ variableIndex ].value = currentAbsoluteValues[ variableIndex ];
+
+			if( valueDisplays[ variableIndex ] ) 
+				valueDisplays[ variableIndex ].text = currentAbsoluteValues[ variableIndex ].ToString( "+#0.000;-#0.000; #0.000" );
 		}
 	}
 
@@ -75,14 +87,7 @@ public class Configuration : MonoBehaviour
 
     public void SetSelectedAxis( Int32 typeIndex )
     {
-        if( Enum.IsDefined( typeof(InputAxisType), typeIndex ) )
-        {
-            InputAxisType controlAxisType = (InputAxisType) typeIndex;
-
-            if( controlAxisType == InputAxisType.Mouse ) controlAxis = axisManager.GetAxis( "Mouse Y", InputAxisType.Mouse );
-            else if( controlAxisType == InputAxisType.Keyboard ) controlAxis = axisManager.GetAxis( "Vertical", InputAxisType.Keyboard );
-            else if( controlAxisType == InputAxisType.Remote ) controlAxis = axisManager.GetAxis( "0", InputAxisType.Remote );
-        }
+		controlAxis = axisManager.GetAxis( axisSelector.captionText.text );
 	}
 
 	public static InputAxis GetSelectedAxis()
@@ -99,9 +104,24 @@ public class Configuration : MonoBehaviour
 		infoStateClient.SendData( infoBuffer );
 		if( infoStateClient.ReceiveData( infoBuffer ) )
 		{
+			axisManager.ResetDefaultAxes();
+
+			axisSelector.ClearOptions();
+			axisSelector.AddOptions( InputAxisManager.DEFAULT_AXIS_NAMES );				
+
 			string infoString = Encoding.ASCII.GetString( infoBuffer );
-			var axesInfo = JSON.Parse( infoString );
-			Debug.Log( "Received info: " + axesInfo.ToString() );
+			var remoteInfo = JSON.Parse( infoString );
+			Debug.Log( "Received info: " + remoteInfo.ToString() );
+
+			List<string> remoteAxisNames = new List<string>();
+			var remoteAxesList = remoteInfo[ "axes" ].AsArray;
+			for( int remoteAxisIndex = 0; remoteAxisIndex < remoteAxesList.Count; remoteAxisIndex++ )
+			{
+				string remoteAxisName = remoteAxesList[ remoteAxisIndex ].Value;
+				axisManager.AddRemoteAxis( remoteAxisName, remoteAxisIndex.ToString() );
+				remoteAxisNames.Add( remoteAxisName );
+			}
+			axisSelector.AddOptions( remoteAxisNames );
 		}
 
 	}
@@ -123,12 +143,12 @@ public class Configuration : MonoBehaviour
 		if( enabled ) 
 		{
 			Debug.Log( "Offset begin" );
-			infoStateClient.SendData( new byte[] { 1, 0, 5 } );
+			if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 5 } );
 		}
 		else 
 		{
 			Debug.Log( "Offset end" );
-			infoStateClient.SendData( new byte[] { 1, 0, 4 } );
+			if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 4 } );
 			if( controlAxis != null )
 			{
 				controlAxis.PositionOffset = calibrationSliders[ 0 ].value;

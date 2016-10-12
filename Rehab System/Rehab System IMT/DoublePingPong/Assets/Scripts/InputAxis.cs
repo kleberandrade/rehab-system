@@ -6,8 +6,8 @@ using System.IO;
 
 public class InputAxis
 {
-	protected string name;
-	public string Name { get { return name; } }
+	protected string id;
+	public string ID { get { return id; } }
 
 	protected float position = 0.0f, velocity = 0.0f, force = 0.0f;
 	private float positionOffset = 0.0f, forceOffset = 0.0f;
@@ -18,9 +18,9 @@ public class InputAxis
 
     protected BitArray setpointsMask = new BitArray( 4, false );
 
-	public virtual bool Init( string axisName )
+	public virtual bool Init( string axisID )
 	{
-		name = axisName;
+		id = axisID;
 
 		return true;
 	}
@@ -58,28 +58,64 @@ public class InputAxis
     public float MinValue { get { return minValue; } set { minValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
 }
 
-public class LocalInputAxis : InputAxis
+
+public class MouseInputAxis : InputAxis
 {
+	public static readonly List<string> DEFAULT_AXIS_NAMES = new List<string> { "Mouse X", "Mouse Y" };
+
+	public override bool Init( string axisID ) 
+	{
+		base.Init( axisID );
+
+		if( DEFAULT_AXIS_NAMES.Contains( axisID ) ) return true;
+
+		return false;
+	}
+
 	public override void Update( float updateTime )
 	{
+		velocity = Input.GetAxis( id ) / updateTime;
 		position += velocity * updateTime;
 	}
 }
+
+public class KeyboardInputAxis : InputAxis
+{
+	public static readonly List<string> DEFAULT_AXIS_NAMES = new List<string> { "Horizontal", "Vertical" };
+
+	public override bool Init( string axisID ) 
+	{
+		base.Init( axisID );
+
+		if( DEFAULT_AXIS_NAMES.Contains( axisID ) ) return true;
+
+		return false;
+	}
+
+	public override void Update( float updateTime )
+	{
+		velocity = Input.GetAxis( id );
+		position += velocity * updateTime;
+	}
+}
+
+
 
 public class RemoteInputAxis : InputAxis
 {
 	private class AxisConnection
 	{
-		public string hostName;
+		public string hostID;
 		public AxisDataClient dataClient = null;
 		public byte[] inputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
 		public byte[] outputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
+		public bool outputUpdated = false;
 
-		public AxisConnection( string hostName )
+		public AxisConnection( string hostID )
 		{
-			this.hostName = hostName;
+			this.hostID = hostID;
 			dataClient = new AxisDataClient();
-			dataClient.Connect( hostName, 50001 );
+			dataClient.Connect( hostID, 50001 );
 		}
 	}
 
@@ -94,15 +130,17 @@ public class RemoteInputAxis : InputAxis
 	private byte id;
 	private AxisConnection axis;
 
-	public override bool Init( string axisName )
+	public override bool Init( string axisID )
 	{
+		Debug.Log( "Initializing remote input axis with ID " + axisID.ToString() );
+
 		string axisHost = PlayerPrefs.GetString( AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 
-		base.Init( axisName );
+		base.Init( axisID );
 
-        if( byte.TryParse( axisName, out id ) )
+        if( byte.TryParse( axisID, out id ) )
         {
-			axis = axisConnections.Find( connection => connection.hostName == axisHost );
+			axis = axisConnections.Find( connection => connection.hostID == axisHost );
 			if( axis == null ) 
 			{
 				axis = new AxisConnection( axisHost );
@@ -150,58 +188,31 @@ public class RemoteInputAxis : InputAxis
 				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
 				setpointsMask.SetAll( false );
 
-				Buffer.BlockCopy( BitConverter.GetBytes( feedbackPosition ), 0, axis.outputBuffer, outputDataPosition, sizeof(float) );
-				Buffer.BlockCopy( BitConverter.GetBytes( feedbackVelocity ), 0, axis.outputBuffer, outputDataPosition + sizeof(float), sizeof(float) );
-				Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
-				Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
+				if( ! Mathf.Approximately( feedbackPosition, BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ) ) ) axis.outputUpdated = true;
 
-				// Debug
-				if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - d:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
-														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
-														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
-														BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
+				if( axis.outputUpdated )
+				{
+					Buffer.BlockCopy( BitConverter.GetBytes( feedbackPosition ), 0, axis.outputBuffer, outputDataPosition, sizeof(float) );
+					Buffer.BlockCopy( BitConverter.GetBytes( feedbackVelocity ), 0, axis.outputBuffer, outputDataPosition + sizeof(float), sizeof(float) );
+					Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
+					Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
+
+					// Debug
+					if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - d:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
+															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
+															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ), 
+															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 5 * sizeof(float) ) ) );
+				}
 
 				break;
 			}
 		}
 
-		if( newDataReceived ) axis.dataClient.SendData( axis.outputBuffer );
-	}
-}
-
-public class MouseInputAxis : LocalInputAxis
-{
-	public override bool Init( string axisName ) 
-	{
-		base.Init( axisName );
-
-		if( axisName == "Mouse X" || axisName == "Mouse Y" ) return true;
-
-		return false;
-	}
-
-	public override void Update( float updateTime )
-	{
-		velocity = Input.GetAxis( name ) / updateTime;
-		base.Update( updateTime );
-	}
-}
-
-public class KeyboardInputAxis : LocalInputAxis
-{
-	public override bool Init( string axisName ) 
-	{
-		base.Init( axisName );
-
-		if( axisName == "Horizontal" || axisName == "Vertical" ) return true;
-
-		return false;
-	}
-
-	public override void Update( float updateTime )
-	{
-		velocity = Input.GetAxis( name );
-		base.Update( updateTime );
+		if( newDataReceived && axis.outputUpdated ) 
+		{
+			axis.dataClient.SendData( axis.outputBuffer );
+			axis.outputUpdated = false;
+		}
 	}
 }
 

@@ -4,54 +4,72 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-
-public enum InputAxisType { Keyboard, Mouse, Remote };
+using System.Linq;
 
 public class InputAxisManager : MonoBehaviour
 {
 	//private static StreamWriter inputLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\input.txt", false );
 	//private static StreamWriter trajectoryLog = new StreamWriter( "c:\\Users\\Adriano\\Documents\\trajectory.txt", false );
 
-	private static List<InputAxis> inputAxes = new List<InputAxis>();
+	public static readonly List<string> DEFAULT_AXIS_NAMES = KeyboardInputAxis.DEFAULT_AXIS_NAMES.Concat( MouseInputAxis.DEFAULT_AXIS_NAMES ).ToList();
 
-	public InputAxis GetAxis( string axisID, InputAxisType axisType = InputAxisType.Mouse )
+	private static Dictionary<string, InputAxis> inputAxes = new Dictionary<string, InputAxis>();
+
+	public void ResetDefaultAxes()
 	{
-		InputAxis newAxis = inputAxes.Find( axis => axisID == axis.Name );
+		ClearAxes();
+
+		foreach( string axisName in KeyboardInputAxis.DEFAULT_AXIS_NAMES )
+		{
+			InputAxis keyboardAxis = new KeyboardInputAxis();
+			keyboardAxis.Init( axisName );
+			inputAxes[ axisName ] = keyboardAxis;
+		}
+
+		foreach( string axisName in MouseInputAxis.DEFAULT_AXIS_NAMES )
+		{
+			InputAxis mouseAxis = new MouseInputAxis();
+			mouseAxis.Init( axisName );
+			inputAxes[ axisName ] = mouseAxis;
+		}
+	}
+
+	public void AddRemoteAxis( string axisName, string axisID )
+	{
+		InputAxis newAxis = GetAxis( axisName );
 
 		if( newAxis == null ) 
 		{
-			if( axisType == InputAxisType.Mouse ) newAxis = new MouseInputAxis();
-			else if( axisType == InputAxisType.Keyboard ) newAxis = new KeyboardInputAxis();
-			else if( axisType == InputAxisType.Remote ) newAxis = new RemoteInputAxis();
-			else return null;
-
-			if( !newAxis.Init( axisID ) ) return null;
-
-			inputAxes.Add( newAxis );
+			newAxis = new RemoteInputAxis();
+			if( newAxis.Init( axisID ) ) inputAxes[ axisName ] = newAxis;
 		}
-
-		return newAxis;
 	}
 
-	public void RemoveAxis( string axisID )
+	public InputAxis GetAxis( string axisName )
 	{
-		inputAxes.RemoveAll( axis => axisID == axis.Name );
+		if( inputAxes.ContainsKey( axisName ) ) return inputAxes[ axisName ];
+		else return null;
+	}
+
+	public void ClearAxes()
+	{
+		foreach( InputAxis inputAxis in inputAxes.Values )
+			inputAxis.End();
+
+		inputAxes.Clear();
 	}
 
 	void FixedUpdate()
 	{
 		float elapsedTime = Time.deltaTime;
 
-		foreach( InputAxis inputAxis in inputAxes )
+		foreach( InputAxis inputAxis in inputAxes.Values )
 			inputAxis.Update( elapsedTime );
 	}
 
     void OnApplicationQuit()
 	{
-        foreach( InputAxis inputAxis in inputAxes )
-            inputAxis.End();
-
-        inputAxes.Clear();
+		ClearAxes();
 
 		//inputLog.Close();
 		//trajectoryLog.Close();
