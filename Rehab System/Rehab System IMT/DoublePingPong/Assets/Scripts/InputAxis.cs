@@ -129,7 +129,7 @@ public class RemoteInputAxis : InputAxis
 
 	private static List<AxisConnection> axisConnections = new List<AxisConnection>();
 
-	private byte id;
+	private byte index;
 	private AxisConnection axis;
 
 	public override bool Init( string axisID )
@@ -140,7 +140,7 @@ public class RemoteInputAxis : InputAxis
 
 		base.Init( axisID );
 
-        if( byte.TryParse( axisID, out id ) )
+		if( byte.TryParse( axisID, out index ) )
         {
 			axis = axisConnections.Find( connection => connection.hostID == axisHost );
 			if( axis == null ) 
@@ -170,7 +170,7 @@ public class RemoteInputAxis : InputAxis
 		{
 			int inputIDPosition = 1 + axisIndex * INPUT_DATA_LENGTH;
 
-			if( axis.inputBuffer[ inputIDPosition ] == id ) 
+			if( axis.inputBuffer[ inputIDPosition ] == index ) 
 			{
 				int inputDataPosition = inputIDPosition + sizeof(byte);
 
@@ -179,13 +179,13 @@ public class RemoteInputAxis : InputAxis
 				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 2 * sizeof(float) ); 
 
 				// Debug
-				if( id == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
+				if( index == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
 
 				int outputIDPosition = 1 + axisIndex * OUTPUT_DATA_LENGTH;
 				int outputMaskPosition = outputIDPosition + sizeof(byte);
 				int outputDataPosition = inputIDPosition + 2 * sizeof(byte);
 
-				axis.outputBuffer[ outputIDPosition ] = id;
+				axis.outputBuffer[ outputIDPosition ] = index;
 
 				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
 				setpointsMask.SetAll( false );
@@ -201,7 +201,7 @@ public class RemoteInputAxis : InputAxis
 					Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
 
 					// Debug
-					if( id == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - s:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
+					if( index == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - s:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
 															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
 															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 2 * sizeof(float) ), 
 															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ) ) );
