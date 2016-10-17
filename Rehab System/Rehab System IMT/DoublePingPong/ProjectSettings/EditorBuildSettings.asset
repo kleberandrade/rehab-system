@@ -16,6 +16,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/Configuration.unity
   - enabled: 1
-    path: Assets/_Scenes/Gameplay.unity
+    path: Assets/_Scenes/DoublePong.unity
   - enabled: 0
-    path: Assets/_Scenes/ForceFeedback.unity
+    path: Assets/_Scenes/BoxInSky.unity

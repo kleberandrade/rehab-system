@@ -44,8 +44,8 @@ public class Gameplay : MonoBehaviour
 
 		setpointSlider.value = setpoint;
 
-		if( error >= 0.7f ) sliderHandle.color = Color.red;
-		else if( error >= 0.3f ) sliderHandle.color = Color.yellow;
+		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
+		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
 	}
 

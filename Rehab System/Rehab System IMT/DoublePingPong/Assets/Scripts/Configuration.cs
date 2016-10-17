@@ -128,13 +128,42 @@ public class Configuration : MonoBehaviour
 	public void SetSelectedAxisMax( int sliderIndex )
 	{
 		Debug.Log( "Set axis Max" );
-		if( controlAxis != null ) controlAxis.MaxValue = calibrationSliders[ sliderIndex ].value;
+		if( controlAxis != null ) 
+		{
+			controlAxis.MaxValue = calibrationSliders[ sliderIndex ].value;
+			calibrationSliders[ 0 ].maxValue = controlAxis.MaxValue;
+		}
 	}
 
 	public void SetSelectedAxisMin( int sliderIndex )
 	{
 		Debug.Log( "Set axis Min" );
-		if( controlAxis != null ) controlAxis.MinValue = calibrationSliders[ sliderIndex ].value;
+		if( controlAxis != null ) 
+		{
+			controlAxis.MinValue = calibrationSliders[ sliderIndex ].value;
+			calibrationSliders[ sliderIndex ].minValue = controlAxis.MinValue;
+		}
+	}
+
+	private IEnumerator WaitForOffset()
+	{
+		yield return new WaitForSecondsRealtime( 1.0f );
+
+		Debug.Log( "Offset end" );
+		if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 4 } );
+		if( controlAxis != null )
+		{
+			controlAxis.PositionOffset = calibrationSliders[ 0 ].value;
+			controlAxis.ForceOffset = calibrationSliders[ 2 ].value;
+		}
+	}
+
+	public void GetAxisOffset()
+	{
+		Debug.Log( "Offset begin" );
+		if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 5 } );
+
+		StartCoroutine( WaitForOffset() );
 	}
 
 	public void SetAxisOffset( bool enabled )

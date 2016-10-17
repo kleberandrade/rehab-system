@@ -10,34 +10,28 @@ using System.Text;
 [ RequireComponent( typeof(BoxCollider) ) ]
 public class PlayerController : Controller 
 {
+	public const float ERROR_THRESHOLD = 0.35f;
+
 	const float MOVE_INTERVAL = 1.0f;
 
 	private InputAxis controlAxis = null;
-	private bool connected = false, helperEnabled = false;
+	private bool helperEnabled = false;
 
 	void FixedUpdate()
 	{
 		if( controlAxis != null )
 		{
-			if( connected )
-			{
-				float input = controlAxis.NormalizedPosition;
-				Debug.Log( "Input position: " + (transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x )).ToString() );
-				body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
+			float input = controlAxis.NormalizedPosition;
+			Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
+			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
 
-				//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
+			//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
 
-				// Send locally controlled object position over network
-				gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-				gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-				gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-				gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
-			} 
-			else
-			{
-				if( controlAxis.Position > controlAxis.MaxValue ) controlAxis.MaxValue = controlAxis.Position;
-				else if( controlAxis.Position < controlAxis.MinValue ) controlAxis.MinValue = controlAxis.Position;
-			}
+			// Send locally controlled object position over network
+			gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
+			gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
+			gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
+			gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
 		}
 	}       
 
@@ -51,13 +45,15 @@ public class PlayerController : Controller
 
 		float currentSetpoint = Mathf.Lerp( currentPosition, targetSetpoint, MOVE_INTERVAL );
 
-		if( controlAxis != null && helperEnabled )
+		error = Mathf.Abs( ( currentSetpoint - currentPosition ) / maxSetpoint );
+
+		if( controlAxis != null && helperEnabled && error > ERROR_THRESHOLD )
 		{
+			Debug.Log( "Outside move box: (error: " + error.ToString() + ")" );
 			controlAxis.Position = currentSetpoint;
 			controlAxis.Velocity = ( targetSetpoint - currentPosition ) / MOVE_INTERVAL;
+			controlAxis.Stiffness = 30.0f;
 		}
-
-		error = Mathf.Abs( ( currentSetpoint - currentPosition ) / maxSetpoint );
 
 		return targetSetpoint / maxSetpoint;
 	}
@@ -65,11 +61,6 @@ public class PlayerController : Controller
 	void OnEnable()
 	{
 		controlAxis = Configuration.GetSelectedAxis();
-	}
-
-	public void Connect()
-	{
-		connected = true;
 	}
 
 	public void EnableHelper()
@@ -80,12 +71,12 @@ public class PlayerController : Controller
     void OnTriggerEnter( Collider collider )
     {
         //Debug.Log( "Trigger on " + collider.tag );
-		if( controlAxis != null ) controlAxis.Stiffness = 1.0f;
+		if( controlAxis != null ) controlAxis.Stiffness = 60.0f;
     }
 
     void OnTriggerExit( Collider collider )
     {
         //Debug.Log( "Trigger off " + collider.tag );
-		if( controlAxis != null ) controlAxis.Stiffness = 0.0f;
+		if( controlAxis != null ) controlAxis.Stiffness = 60.0f;
     }
 }
