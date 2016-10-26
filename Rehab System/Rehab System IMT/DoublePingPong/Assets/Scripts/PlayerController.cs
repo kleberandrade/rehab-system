@@ -22,7 +22,7 @@ public class PlayerController : Controller
 		if( controlAxis != null )
 		{
 			float input = controlAxis.NormalizedPosition;
-			Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
+			//Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
 			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
 
 			//File.AppendAllText( textFile, Time.realtimeSinceStartup.ToString() + "\t" + playerBody.position.z.ToString() + Environment.NewLine );
@@ -49,7 +49,7 @@ public class PlayerController : Controller
 
 		if( controlAxis != null && helperEnabled && error > ERROR_THRESHOLD )
 		{
-			Debug.Log( "Outside move box: (error: " + error.ToString() + ")" );
+			//Debug.Log( "Outside move box: (error: " + error.ToString() + ")" );
 			controlAxis.Position = currentSetpoint;
 			controlAxis.Velocity = ( targetSetpoint - currentPosition ) / MOVE_INTERVAL;
 			controlAxis.Stiffness = 30.0f;

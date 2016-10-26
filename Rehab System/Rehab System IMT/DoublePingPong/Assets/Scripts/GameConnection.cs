@@ -86,7 +86,7 @@ public abstract class GameConnection
 //        return remoteValues.Keys.ToArray();
 //    }
 
-	public void UpdateData()
+	public float UpdateData()
 	{
 		int outputMessageLength = 1;
 
@@ -130,11 +130,15 @@ public abstract class GameConnection
 
 	            //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
 			}
-		}       
+		}
+
+		return GetNetworkDelay();
 	}
 
 	protected abstract void SendUpdateMessage();
 
 	protected abstract bool ReceiveUpdateMessage();
+
+	protected abstract float GetNetworkDelay();
 }
 

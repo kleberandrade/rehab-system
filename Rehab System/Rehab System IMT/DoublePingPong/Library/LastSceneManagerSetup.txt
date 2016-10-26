@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scenes/ForceFeedback.unity
+- path: Assets/_Scenes/Configuration.unity
   isLoaded: 1
   isActive: 1

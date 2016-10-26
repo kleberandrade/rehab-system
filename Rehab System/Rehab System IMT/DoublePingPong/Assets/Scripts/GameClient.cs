@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using System;
 using System.Linq;
@@ -44,9 +45,27 @@ public class GameClient : GameConnection
 		return false;
 	}
 
+	protected override float GetNetworkDelay()
+	{
+		return NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
+	}
+
 	public int ReceiveClientID()
 	{
 		return clientID;
+	}
+
+	public string GetConnectionInfo()
+	{
+		return string.Format( "Socket: {0} Connection: {1} Channel: {2}\n" +
+			                  "Send: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms I/O: {6,3}us Packets Lost: {7}", 
+			                  socketID, connectionID, dataChannel,
+			                  NetworkTransport.GetPacketSentRate( socketID, connectionID, out connectionError ),
+			                  NetworkTransport.GetPacketReceivedRate( socketID, connectionID, out connectionError ),
+			                  NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ),
+			                  NetworkTransport.GetNetIOTimeuS(),
+			                  NetworkTransport.GetNetworkLostPacketNum( socketID, connectionID, out connectionError ) 
+		                    );
 	}
 }
 

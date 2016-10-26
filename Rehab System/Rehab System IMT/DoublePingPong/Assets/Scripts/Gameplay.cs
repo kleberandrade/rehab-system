@@ -47,6 +47,8 @@ public class Gameplay : MonoBehaviour
 		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
 		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
+
+		lazyScoreText.text = gameClient.GetConnectionInfo();
 	}
 
 	public void StartPlay()

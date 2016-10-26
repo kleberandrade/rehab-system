@@ -31,6 +31,15 @@ public class GameManager : MonoBehaviour
 		gameConnection.UpdateData();
 	}
 
+	IEnumerator UpdateNetworkData()
+	{
+		while( Application.isPlaying )
+		{
+			float networkDelay = gameConnection.UpdateData();
+			yield return new WaitForSecondsRealtime( networkDelay );
+		}
+	}
+
 	public static GameConnection GetConnection()
 	{
 		return gameConnection;

@@ -12,7 +12,7 @@ public class AxisInfoStateClient : AxisClient
 		try 
 		{
 			workSocket = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
-			workSocket.ReceiveTimeout = 1000;
+			workSocket.ReceiveTimeout = 5000;
 		}
 		catch( Exception e ) 
 		{

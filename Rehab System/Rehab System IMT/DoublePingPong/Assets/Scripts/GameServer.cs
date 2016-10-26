@@ -46,6 +46,11 @@ public class GameServer : GameConnection
 		return false;
 	}
 
+	protected override float GetNetworkDelay()
+	{
+		return Time.fixedDeltaTime;
+	}
+
 	public int GetClientsNumber()
 	{
 		return clientConnections.Count;

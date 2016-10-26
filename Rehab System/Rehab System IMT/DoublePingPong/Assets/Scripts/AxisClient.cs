@@ -56,15 +56,25 @@ public abstract class AxisClient
 
 	public virtual void Connect( string host, int remotePort ) 
 	{
-		if( !workSocket.Connected || host != currentHost || remotePort != currentRemotePort ) 
+		if( ! workSocket.Connected || host != currentHost || remotePort != currentRemotePort ) 
 		{
 			Debug.Log( "Trying to connect to host " + host + " and port " + remotePort.ToString() );
 			try 
 			{
+				//if( workSocket.IsBound ) 
+				//{
+				//	Debug.Log( "Disconnect previously connected socket" );
+				//	workSocket.Disconnect( true );
+				//	workSocket.Close();
+				//}
+					
 				Debug.Log( "Connecting to: host: " + host + " - port: " + remotePort.ToString() );
 
-				workSocket.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true );
-				workSocket.ExclusiveAddressUse = false;
+				if( ! workSocket.IsBound ) 
+				{
+					workSocket.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true );
+					workSocket.ExclusiveAddressUse = false;
+				}
 				workSocket.ReceiveBufferSize = BUFFER_SIZE;
 				workSocket.SendBufferSize = BUFFER_SIZE;
 
@@ -98,6 +108,7 @@ public abstract class AxisClient
 		{
 			try 
 			{	
+				Debug.Log( "Sending " + outputBuffer.Length.ToString() + " bytes to " + workSocket.RemoteEndPoint.ToString() );
 				workSocket.BeginSend( outputBuffer, 0, outputBuffer.Length, SocketFlags.None, new AsyncCallback( writeCallback ), workSocket );
 			} 
 			catch( Exception e ) 
@@ -111,6 +122,7 @@ public abstract class AxisClient
 	{
 		try
 		{
+			workSocket.Disconnect( true );
 			workSocket.Close();
 		}
 		catch( Exception e )
@@ -129,95 +141,3 @@ public abstract class AxisClient
 		Disconnect();
 	}
 }
-
-//public abstract class NetworkServer : AxisClient
-//{
-//	protected List<Socket> clientSockets = new List<Socket>();
-//
-//	Thread listeningThread;
-//	bool isListening;
-//
-//	int currentLocalPort = 0;
-//
-//	public void StartListening( int localPort )
-//	{
-//		if( !isListening || localPort != currentLocalPort ) 
-//		{
-//			workSocket.SetSocketOption( SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true );
-//			workSocket.ExclusiveAddressUse = false;
-//
-//			IPEndPoint localIpAddress = new IPEndPoint( IPAddress.Any, localPort );
-//			workSocket.Bind( (EndPoint) localIpAddress );
-//
-//			workSocket.Listen( 10 );
-//
-//			if (!isListening) 
-//			{
-//				listeningThread = new Thread( new ThreadStart( ListeningCallBack ) );
-//				listeningThread.Start ();
-//			}
-//		}
-//	}
-//
-//	public void StopListening()
-//	{
-//		isListening = false;
-//		if( listeningThread != null )
-//			listeningThread.Join();
-//
-//		try
-//		{
-//			workSocket.Close();
-//		}
-//		catch( Exception e )
-//		{
-//			Debug.Log( e.ToString() );
-//		}
-//
-//		currentLocalPort = 0;
-//	}
-//
-//	public void ListeningCallBack()
-//	{
-//		isListening = true;
-//
-//		try 
-//		{
-//			while( isListening )
-//			{
-//				if( workSocket.Available > 0 )
-//				{
-//					Debug.Log( "RobotServer: Messages available" );
-//
-//					try
-//					{
-//						Socket clientSocket = workSocket.Accept();
-//
-//						Debug.Log( "Accepted client from : " + clientSocket.RemoteEndPoint.ToString() );
-//
-//						clientSockets.Add( clientSocket );
-//					}
-//					catch( SocketException e )
-//					{
-//						Debug.Log( e.ToString() );
-//					}
-//				} 
-//			}
-//		}
-//		catch( ObjectDisposedException e ) 
-//		{
-//			Debug.Log( e.ToString() );
-//		}
-//
-//		StopListening();
-//
-//		Debug.Log( "NetworkServer: Finishing update thread" );
-//	}
-//
-//	public abstract NetworkClient AcceptClient();
-//
-//	~NetworkServer()
-//	{
-//		StopListening();
-//	}
-//}

@@ -61,7 +61,7 @@ public class AxisDataClient : AxisClient
 				Debug.Log( "Awaiting connection: " + isAwaitingConnection.ToString() );
 				if( isAwaitingConnection ) 
 				{
-					Encoding.ASCII.GetBytes( "Hey Apple !", 0, 10, messageBuffer, 0 );
+					//Encoding.ASCII.GetBytes( "Hey Apple !", 0, 10, messageBuffer, 0 );
 					Debug.Log( "Sending " + messageBuffer.Length.ToString() + " bytes to " + workSocket.RemoteEndPoint.ToString() );
 					workSocket.Send( messageBuffer, 0, messageBuffer.Length, SocketFlags.None );
 					Thread.Sleep( 100 );

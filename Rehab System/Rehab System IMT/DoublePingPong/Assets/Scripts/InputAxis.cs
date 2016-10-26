@@ -18,7 +18,7 @@ public class InputAxis
 	protected float feedbackPosition = 0.0f, feedbackVelocity = 0.0f, feedbackForce = 0.0f;
 	protected float stiffness = 0.0f, damping = 0.0f;
 
-    protected BitArray setpointsMask = new BitArray( 4, false );
+    protected BitArray setpointsMask = new BitArray( 8, false );
 
 	public virtual bool Init( string axisID )
 	{
@@ -47,8 +47,8 @@ public class InputAxis
 	public float PositionOffset { set { positionOffset = value; } }
 	public float ForceOffset { set { forceOffset = value; } }
 
-	public float Stiffness { set { stiffness = value; setpointsMask[ 2 ] = true; } }
-	public float Damping { set { damping = value; setpointsMask[ 3 ] = true; } }
+	public float Stiffness { set { stiffness = value; setpointsMask[ 3 ] = true; } }
+	public float Damping { set { damping = value; setpointsMask[ 4 ] = true; } }
 
 	public float NormalizedPosition { get { return ( 2 * ( position - minValue ) / range - 1.0f ); } 
 		                              set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ 0 ] = true; } }
@@ -179,7 +179,7 @@ public class RemoteInputAxis : InputAxis
 				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 2 * sizeof(float) ); 
 
 				// Debug
-				if( index == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
+				//if( index == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
 
 				int outputIDPosition = 1 + axisIndex * OUTPUT_DATA_LENGTH;
 				int outputMaskPosition = outputIDPosition + sizeof(byte);
@@ -188,9 +188,13 @@ public class RemoteInputAxis : InputAxis
 				axis.outputBuffer[ outputIDPosition ] = index;
 
 				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
+				Debug.Log( "Setting mask: " + setpointsMask.ToString() + " -> " + axis.outputBuffer[ outputMaskPosition ].ToString() );
 				setpointsMask.SetAll( false );
 
-				if( ! Mathf.Approximately( feedbackPosition, BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ) ) ) axis.outputUpdated = true;
+				if( ! Mathf.Approximately( feedbackPosition, position ) ) axis.outputUpdated = true;
+				if( ! Mathf.Approximately( feedbackVelocity, velocity ) ) axis.outputUpdated = true;
+				if( ! Mathf.Approximately( feedbackForce, force ) ) axis.outputUpdated = true;
+				if( ! Mathf.Approximately( stiffness, 0.0f ) ) axis.outputUpdated = true;
 
 				if( axis.outputUpdated )
 				{
@@ -199,19 +203,13 @@ public class RemoteInputAxis : InputAxis
 					Buffer.BlockCopy( BitConverter.GetBytes( feedbackForce ), 0, axis.outputBuffer, outputDataPosition + 2 * sizeof(float), sizeof(float) );
 					Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
 					Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
-
-					// Debug
-					if( index == 0 ) Debug.Log( string.Format( "Sending feedback: p:{0} - v:{1} - f:{2} - s:{3}", BitConverter.ToSingle( axis.outputBuffer, outputDataPosition ), 
-															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + sizeof(float) ), 
-															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 2 * sizeof(float) ), 
-															BitConverter.ToSingle( axis.outputBuffer, outputDataPosition + 4 * sizeof(float) ) ) );
 				}
 
 				break;
 			}
 		}
 
-		if( newDataReceived && axis.outputUpdated ) 
+		if( /*newDataReceived &&*/ axis.outputUpdated ) 
 		{
 			axis.dataClient.SendData( axis.outputBuffer );
 			axis.outputUpdated = false;
