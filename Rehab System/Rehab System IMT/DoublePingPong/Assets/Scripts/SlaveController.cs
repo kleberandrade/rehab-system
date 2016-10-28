@@ -26,9 +26,6 @@ public class SlaveController : Controller
 		else body.MovePosition( masterPosition );
 
 		body.velocity = masterVelocity;
-
-		//File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
-		//	+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );
 	}
 
 	/*void OnTriggerEnter( Collider collider )

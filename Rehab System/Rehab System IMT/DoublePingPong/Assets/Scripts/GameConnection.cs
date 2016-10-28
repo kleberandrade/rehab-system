@@ -7,14 +7,18 @@ using System.Collections.Generic;
 public enum NetworkValue : int { POSITION, VELOCITY, FORCE };
 public enum NetworkAxis : byte { X, Y, Z };
 
+public struct ConnectionInfo
+{
+	public int socketID, connectionID, channel;
+	public float sendRate, receiveRate;
+	public int rtt, ioTime, lostPackets;
+}
+
 public abstract class GameConnection
 {
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
 	protected const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
-
-	protected const int BROADCAST_KEY = 1000;
-	protected const int BROADCAST_VERSION = 1, BROADCAST_SUBVERSION = 1;
 
 	protected int socketID = -1;
 	protected int eventChannel = -1, dataChannel = -1;

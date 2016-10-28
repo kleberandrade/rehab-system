@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Text;
 
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(Collider) ) ]
@@ -15,8 +12,6 @@ public abstract class Controller : MonoBehaviour
 	public Collider boundaries;
     protected Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
 	protected Vector3 initialPosition = Vector3.zero;
-
-	protected string textFile;
 
 	protected Rigidbody body;
 
@@ -32,10 +27,6 @@ public abstract class Controller : MonoBehaviour
 
 		rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
 		initialPosition = transform.position;
-
-		// Start file for record movements
-        //textFile = "./LogFilePlayer" + GetInstanceID().ToString() + ".txt";
-		//if( File.Exists( textFile ) ) File.Delete( textFile );
 	}
 
 	void Start()

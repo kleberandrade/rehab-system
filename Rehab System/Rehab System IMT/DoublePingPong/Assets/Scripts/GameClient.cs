@@ -55,17 +55,18 @@ public class GameClient : GameConnection
 		return clientID;
 	}
 
-	public string GetConnectionInfo()
+	public ConnectionInfo GetConnectionInfo()
 	{
-		return string.Format( "Socket: {0} Connection: {1} Channel: {2}\n" +
-			                  "Send: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms I/O: {6,3}us Packets Lost: {7}", 
-			                  socketID, connectionID, dataChannel,
-			                  NetworkTransport.GetPacketSentRate( socketID, connectionID, out connectionError ),
-			                  NetworkTransport.GetPacketReceivedRate( socketID, connectionID, out connectionError ),
-			                  NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ),
-			                  NetworkTransport.GetNetIOTimeuS(),
-			                  NetworkTransport.GetNetworkLostPacketNum( socketID, connectionID, out connectionError ) 
-		                    );
+		ConnectionInfo currentConnectionInfo = new ConnectionInfo();
+		currentConnectionInfo.socketID = socketID;
+		currentConnectionInfo.connectionID = connectionID;
+		currentConnectionInfo.channel = dataChannel;
+		currentConnectionInfo.sendRate = NetworkTransport.GetPacketSentRate( socketID, connectionID, out connectionError );
+		currentConnectionInfo.receiveRate = NetworkTransport.GetPacketReceivedRate( socketID, connectionID, out connectionError );
+		currentConnectionInfo.rtt = NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError );
+		currentConnectionInfo.lostPackets = NetworkTransport.GetNetworkLostPacketNum( socketID, connectionID, out connectionError );
+
+		return currentConnectionInfo;
 	}
 }
 
