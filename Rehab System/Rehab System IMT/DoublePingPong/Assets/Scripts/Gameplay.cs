@@ -27,7 +27,8 @@ public class Gameplay : MonoBehaviour
 	private GameClient gameClient;
 	private int clientID = -1;
 
-	protected string playerLogFile, slaveLogFile, ballLogFile, networkLogFile;
+	private string playerLogFile, slaveLogFile, ballLogFile, networkLogFile;
+	private float initialLogTime = 0.0f;
 
 	void Awake()
 	{
@@ -77,10 +78,14 @@ public class Gameplay : MonoBehaviour
 
 		if( ball.transform.position != lastBallPosition )
 		{
-			File.AppendAllText( playerLogFile, Time.realtimeSinceStartup.ToString() + "\t" + verticalBats[ 0 ].transform.position.x.ToString() + "\t" + verticalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( slaveLogFile, Time.realtimeSinceStartup.ToString() + "\t" + horizontalBats[ 0 ].transform.position.x.ToString() + "\t" + horizontalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( ballLogFile, Time.realtimeSinceStartup.ToString() + "\t" + ball.transform.position.x.ToString() + "\t" + ball.transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( networkLogFile, Time.realtimeSinceStartup.ToString() + "\t" + currentConnectionInfo.rtt.ToString() + Environment.NewLine );
+			if( initialLogTime == 0.0f ) initialLogTime = Time.realtimeSinceStartup;
+
+			float sampleTime = Time.realtimeSinceStartup - initialLogTime;
+
+			File.AppendAllText( playerLogFile, sampleTime + "\t" + verticalBats[ 0 ].transform.position.x.ToString() + "\t" + verticalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
+			File.AppendAllText( slaveLogFile, sampleTime + "\t" + horizontalBats[ 0 ].transform.position.x.ToString() + "\t" + horizontalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
+			File.AppendAllText( ballLogFile, sampleTime + "\t" + ball.transform.position.x.ToString() + "\t" + ball.transform.position.z.ToString() + Environment.NewLine );
+			File.AppendAllText( networkLogFile, sampleTime + "\t" + currentConnectionInfo.rtt.ToString() + Environment.NewLine );
 		}
 	}
 
