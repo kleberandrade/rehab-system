@@ -60,6 +60,7 @@
      <Compile Include="Assets\Scripts\InputAxis.cs" />
      <Compile Include="Assets\Scripts\InputAxisManager.cs" />
      <Compile Include="Assets\Scripts\Multiplayer.cs" />
+     <Compile Include="Assets\Scripts\NTPClient.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\SimpleJSON.cs" />
      <Compile Include="Assets\Scripts\SlaveController.cs" />

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.IO;
+using System;
 
 public class Gameplay : MonoBehaviour 
 {
@@ -26,6 +27,8 @@ public class Gameplay : MonoBehaviour
 	private GameClient gameClient;
 	private int clientID = -1;
 
+	private DateTime gameTime;
+
 	void Awake()
 	{
 		targetMask = LayerMask.GetMask( "Target" );
@@ -41,6 +44,8 @@ public class Gameplay : MonoBehaviour
 	void Start()
 	{
 		gameClient = (GameClient) GameManager.GetConnection();
+
+		gameTime = NTPClient.GetNetworkTime().ToUniversalTime();
 	}
 
 	void FixedUpdate()
@@ -55,12 +60,12 @@ public class Gameplay : MonoBehaviour
 		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
 		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
+
+		gameTime = gameTime.AddSeconds( Time.fixedDeltaTime );
 	}
 
 	IEnumerator RegisterValues()
 	{
-		float initialLogTime = 0.0f;
-
 		// Set log file names
 		StreamWriter verticalLog = new StreamWriter( "./vertical" + clientID.ToString() + ".log", false );
 		StreamWriter horizontalLog = new StreamWriter( "./horizontal" + clientID.ToString() + ".log", false );
@@ -71,15 +76,12 @@ public class Gameplay : MonoBehaviour
 		{
 			ConnectionInfo currentConnectionInfo = gameClient.GetConnectionInfo();
 
-			lazyScoreText.text =  string.Format( "Client: {0} Socket: {1} Connection: {2} Channel: {3}\nSend: {4,2}KB/s Receive: {5,2}KB/s RTT: {6,3}ms Lost Packets: {7}", 
-				                                 clientID, currentConnectionInfo.socketID, currentConnectionInfo.connectionID, currentConnectionInfo.channel,
+			lazyScoreText.text =  string.Format( "Client: {0} Game Time: {1}\nSend: {2,2}KB/s Receive: {3,2}KB/s RTT: {4,3}ms Lost Packets: {5}", clientID, gameTime.TimeOfDay.ToString(),
 				                                 currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
 
 			if( ball.transform.position != lastBallPosition )
 			{
-				if( initialLogTime == 0.0f ) initialLogTime = Time.realtimeSinceStartup;
-
-				float sampleTime = Time.realtimeSinceStartup - initialLogTime;
+				double sampleTime = gameTime.TimeOfDay.TotalSeconds;
 
 				verticalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, verticalBats[ 0 ].transform.position.z ) );
 				horizontalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, horizontalBats[ 0 ].transform.position.x ) );
