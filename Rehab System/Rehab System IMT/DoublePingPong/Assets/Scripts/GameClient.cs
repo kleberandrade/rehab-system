@@ -12,7 +12,7 @@ public class GameClient : GameConnection
 	private int connectionID;
 	private int clientID = -1;
 
-	protected override void Connect( ConnectionConfig connectionConfig )
+	public override void Connect()
     {
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
 		socketID = NetworkTransport.AddHost( networkTopology );
@@ -50,7 +50,7 @@ public class GameClient : GameConnection
 		return NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
 	}
 
-	public int ReceiveClientID()
+	public int GetClientID()
 	{
 		return clientID;
 	}

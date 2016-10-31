@@ -581,6 +581,7 @@ MonoBehaviour:
   elementID: 1
   boundaries: {fileID: 395675361}
   moveBoxRenderer: {fileID: 1312647344}
+  moveBoxPlane: {fileID: 1312647345}
 --- !u!1 &382993915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1442,6 +1443,7 @@ MonoBehaviour:
   elementID: 3
   boundaries: {fileID: 395675361}
   moveBoxRenderer: {fileID: 1748196676}
+  moveBoxPlane: {fileID: 1748196677}
 --- !u!1 &1036808211
 GameObject:
   m_ObjectHideFlags: 0
@@ -2137,6 +2139,7 @@ MonoBehaviour:
   elementID: 0
   boundaries: {fileID: 395675361}
   moveBoxRenderer: {fileID: 1312647344}
+  moveBoxPlane: {fileID: 1312647345}
 --- !u!1 &1464675923
 GameObject:
   m_ObjectHideFlags: 0
@@ -3448,6 +3451,7 @@ MonoBehaviour:
   elementID: 2
   boundaries: {fileID: 395675361}
   moveBoxRenderer: {fileID: 1748196676}
+  moveBoxPlane: {fileID: 1748196677}
 --- !u!1 &2089567088
 GameObject:
   m_ObjectHideFlags: 0

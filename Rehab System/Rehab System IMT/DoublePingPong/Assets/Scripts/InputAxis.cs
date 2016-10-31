@@ -47,8 +47,8 @@ public class InputAxis
 	public float PositionOffset { set { positionOffset = value; } }
 	public float ForceOffset { set { forceOffset = value; } }
 
-	public float Stiffness { set { stiffness = value; setpointsMask[ 3 ] = true; } }
-	public float Damping { set { damping = value; setpointsMask[ 4 ] = true; } }
+	public float Stiffness { get { return stiffness; } set { stiffness = value; setpointsMask[ (int) AxisVariable.STIFFNESS ] = true; } }
+	public float Damping { get { return damping; } set { damping = value; setpointsMask[ (int) AxisVariable.DAMPING ] = true; } }
 
 	public float NormalizedPosition { get { return ( 2 * ( position - minValue ) / range - 1.0f ); } 
 		                              set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ 0 ] = true; } }
@@ -96,8 +96,10 @@ public class KeyboardInputAxis : InputAxis
 
 	public override void Update( float updateTime )
 	{
+		if( ! Mathf.Approximately( feedbackPosition, position ) ) position = feedbackPosition;
 		velocity = Input.GetAxis( id );
 		position += velocity * updateTime;
+		feedbackPosition = position;
 	}
 }
 
@@ -161,7 +163,7 @@ public class RemoteInputAxis : InputAxis
 
 	public override void Update( float updateTime )
 	{
-		bool newDataReceived = axis.dataClient.ReceiveData( axis.inputBuffer );
+		/*bool newDataReceived =*/ axis.dataClient.ReceiveData( axis.inputBuffer );
 
 		axis.outputBuffer[ 0 ] = axis.inputBuffer[ 0 ];
 
@@ -188,13 +190,13 @@ public class RemoteInputAxis : InputAxis
 				axis.outputBuffer[ outputIDPosition ] = index;
 
 				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
-				Debug.Log( "Setting mask: " + setpointsMask.ToString() + " -> " + axis.outputBuffer[ outputMaskPosition ].ToString() );
+				if( axis.outputBuffer[ outputMaskPosition ] > 0 ) axis.outputUpdated = true;
 				setpointsMask.SetAll( false );
 
-				if( ! Mathf.Approximately( feedbackPosition, position ) ) axis.outputUpdated = true;
-				if( ! Mathf.Approximately( feedbackVelocity, velocity ) ) axis.outputUpdated = true;
-				if( ! Mathf.Approximately( feedbackForce, force ) ) axis.outputUpdated = true;
-				if( ! Mathf.Approximately( stiffness, 0.0f ) ) axis.outputUpdated = true;
+				//if( ! Mathf.Approximately( feedbackPosition, position ) ) axis.outputUpdated = true;
+				//if( ! Mathf.Approximately( feedbackVelocity, velocity ) ) axis.outputUpdated = true;
+				//if( ! Mathf.Approximately( feedbackForce, force ) ) axis.outputUpdated = true;
+				//if( ! Mathf.Approximately( stiffness, 0.0f ) ) axis.outputUpdated = true;
 
 				if( axis.outputUpdated )
 				{
@@ -211,6 +213,7 @@ public class RemoteInputAxis : InputAxis
 
 		if( /*newDataReceived &&*/ axis.outputUpdated ) 
 		{
+			Debug.Log( "Sending setpoints with mask: " + axis.outputBuffer[ 2 ].ToString() );
 			axis.dataClient.SendData( axis.outputBuffer );
 			axis.outputUpdated = false;
 		}

@@ -11,6 +11,8 @@ public abstract class Controller : MonoBehaviour
 
 	public Collider boundaries;
     protected Vector3 rangeLimits = new Vector3( 7.5f, 0.0f, 7.5f );
+
+	protected Vector3 size = Vector3.one;
 	protected Vector3 initialPosition = Vector3.zero;
 
 	protected Rigidbody body;
@@ -23,8 +25,7 @@ public abstract class Controller : MonoBehaviour
 
 		body.velocity = Vector3.zero;
 
-		//Debug.Log( string.Format( "Awake() called for {0}. Body: {1} - Collider: {2}", gameObject.name, body, col ) );
-
+		size = GetComponent<Collider>().bounds.size;
 		rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
 		initialPosition = transform.position;
 	}

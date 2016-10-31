@@ -16,6 +16,8 @@ public struct ConnectionInfo
 
 public abstract class GameConnection
 {
+	protected ConnectionConfig connectionConfig = new ConnectionConfig();
+
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
 	protected const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
@@ -37,11 +39,10 @@ public abstract class GameConnection
 		networkConfig.MaxPacketSize = PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
 
-		ConnectionConfig connectionConfig = new ConnectionConfig();
 		eventChannel = connectionConfig.AddChannel( QosType.Reliable );
 		dataChannel = connectionConfig.AddChannel( QosType.StateUpdate ); // QosType.Unreliable sending just most recent
 
-		Connect( connectionConfig );
+		//Connect( connectionConfig );
 	}
 
 	public static void Shutdown()
@@ -49,7 +50,7 @@ public abstract class GameConnection
 		NetworkTransport.Shutdown();
 	}
 
-	protected abstract void Connect( ConnectionConfig connectionConfig );
+	public abstract void Connect();
 
 	public void SetLocalValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType, float value ) 
     {
@@ -85,14 +86,11 @@ public abstract class GameConnection
         return 0.0f;
     }
 
-//    public KeyValuePair<byte,byte>[] GetRemoteKeys() 
-//    {
-//        return remoteValues.Keys.ToArray();
-//    }
-
 	public float UpdateData()
 	{
 		int outputMessageLength = 1;
+
+		if( socketID == -1 ) return Time.fixedDeltaTime;
 
         foreach( KeyValuePair<byte,byte> localKey in localValues.Keys ) 
 		{

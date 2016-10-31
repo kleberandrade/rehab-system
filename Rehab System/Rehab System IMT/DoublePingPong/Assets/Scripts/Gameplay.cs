@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.IO;
-using System;
 
 public class Gameplay : MonoBehaviour 
 {
@@ -16,8 +15,8 @@ public class Gameplay : MonoBehaviour
 	public SlaveController ball;
 	private Vector3 lastBallPosition;
 
-	public Controller[] verticalBats = new PlayerController[ 2 ];
-	public Controller[] horizontalBats = new SlaveController[ 2 ];
+	public Controller[] verticalBats = new Controller[ 2 ];
+	public Controller[] horizontalBats = new Controller[ 2 ];
 	private PlayerController[] playerBats = new PlayerController[ 2 ];
 
 	private int targetMask;
@@ -26,9 +25,6 @@ public class Gameplay : MonoBehaviour
 
 	private GameClient gameClient;
 	private int clientID = -1;
-
-	private string playerLogFile, slaveLogFile, ballLogFile, networkLogFile;
-	private float initialLogTime = 0.0f;
 
 	void Awake()
 	{
@@ -45,16 +41,6 @@ public class Gameplay : MonoBehaviour
 	void Start()
 	{
 		gameClient = (GameClient) GameManager.GetConnection();
-
-		// Set log file names
-		playerLogFile = "./player" + GetInstanceID().ToString() + ".log";
-		if( File.Exists( playerLogFile ) ) File.Delete( playerLogFile );
-		slaveLogFile = "./slave" + GetInstanceID().ToString() + ".log";
-		if( File.Exists( slaveLogFile ) ) File.Delete( slaveLogFile );
-		ballLogFile = "./ball" + GetInstanceID().ToString() + ".log";
-		if( File.Exists( ballLogFile ) ) File.Delete( ballLogFile );
-		networkLogFile = "./network" + GetInstanceID().ToString() + ".log";
-		if( File.Exists( networkLogFile ) ) File.Delete( networkLogFile );
 	}
 
 	void FixedUpdate()
@@ -69,54 +55,86 @@ public class Gameplay : MonoBehaviour
 		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
 		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
+	}
 
-		ConnectionInfo currentConnectionInfo = gameClient.GetConnectionInfo();
+	IEnumerator RegisterValues()
+	{
+		float initialLogTime = 0.0f;
 
-		lazyScoreText.text =  string.Format( "Socket: {0} Connection: {1} Channel: {2}\nSend: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms Lost Packets: {6}", 
-			                                 currentConnectionInfo.socketID, currentConnectionInfo.connectionID, currentConnectionInfo.channel,
-			                                 currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
+		// Set log file names
+		StreamWriter verticalLog = new StreamWriter( "./vertical" + clientID.ToString() + ".log", false );
+		StreamWriter horizontalLog = new StreamWriter( "./horizontal" + clientID.ToString() + ".log", false );
+		StreamWriter ballLog = new StreamWriter( "./ball" + clientID.ToString() + ".log", false );
+		StreamWriter networkLog = new StreamWriter( "./network" + clientID.ToString() + ".log", false );
 
-		if( ball.transform.position != lastBallPosition )
+		while( Application.isPlaying )
 		{
-			if( initialLogTime == 0.0f ) initialLogTime = Time.realtimeSinceStartup;
+			ConnectionInfo currentConnectionInfo = gameClient.GetConnectionInfo();
 
-			float sampleTime = Time.realtimeSinceStartup - initialLogTime;
+			lazyScoreText.text =  string.Format( "Client: {0} Socket: {1} Connection: {2} Channel: {3}\nSend: {4,2}KB/s Receive: {5,2}KB/s RTT: {6,3}ms Lost Packets: {7}", 
+				                                 clientID, currentConnectionInfo.socketID, currentConnectionInfo.connectionID, currentConnectionInfo.channel,
+				                                 currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
 
-			File.AppendAllText( playerLogFile, sampleTime + "\t" + verticalBats[ 0 ].transform.position.x.ToString() + "\t" + verticalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( slaveLogFile, sampleTime + "\t" + horizontalBats[ 0 ].transform.position.x.ToString() + "\t" + horizontalBats[ 0 ].transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( ballLogFile, sampleTime + "\t" + ball.transform.position.x.ToString() + "\t" + ball.transform.position.z.ToString() + Environment.NewLine );
-			File.AppendAllText( networkLogFile, sampleTime + "\t" + currentConnectionInfo.rtt.ToString() + Environment.NewLine );
+			if( ball.transform.position != lastBallPosition )
+			{
+				if( initialLogTime == 0.0f ) initialLogTime = Time.realtimeSinceStartup;
+
+				float sampleTime = Time.realtimeSinceStartup - initialLogTime;
+
+				verticalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, verticalBats[ 0 ].transform.position.z ) );
+				horizontalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, horizontalBats[ 0 ].transform.position.x ) );
+				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", sampleTime, ball.transform.position.x, ball.transform.position.z ) );
+				networkLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, currentConnectionInfo.rtt ) );
+			}
+
+			yield return new WaitForFixedUpdate();
 		}
+
+		verticalLog.Flush();
+		horizontalLog.Flush();
+		ballLog.Flush();
+		networkLog.Flush();
+	}
+
+	IEnumerator HandleConnection()
+	{
+		while( clientID == -1 && Application.isPlaying )
+		{
+			clientID = gameClient.GetClientID();
+			yield return new WaitForSeconds( 0.1f );
+		}
+
+		if( clientID == 0 ) 
+		{
+			verticalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
+			horizontalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
+			playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PlayerController>();
+			playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PlayerController>();
+		} 
+		else if( clientID == 1 ) 
+		{
+			horizontalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
+			verticalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
+			playerBats[ 0 ] = horizontalBats[ 0 ].GetComponent<PlayerController>();
+			playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PlayerController>();
+			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
+		}
+
+		ball.enabled = true;
+		StartCoroutine( RegisterValues() );
 	}
 
 	public void StartPlay()
 	{
 		if( clientID == -1 )
 		{
-			clientID = gameClient.ReceiveClientID();
-			Debug.Log( "Client ID received: " + clientID.ToString() );
-			if( clientID == 0 ) 
-			{
-				verticalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
-				verticalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
-				horizontalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
-				horizontalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
-				playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PlayerController>();
-				playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PlayerController>();
-			} 
-			else if( clientID == 1 ) 
-			{
-				horizontalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
-				horizontalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
-				verticalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
-				verticalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
-				playerBats[ 0 ] = horizontalBats[ 0 ].GetComponent<PlayerController>();
-				playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PlayerController>();
-				gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
-			}
+			gameClient.Connect();
+			StartCoroutine( HandleConnection() );
 		}
-
-		if( clientID != -1 ) ball.enabled = true;
 	}
 
 	public void StopPlay()

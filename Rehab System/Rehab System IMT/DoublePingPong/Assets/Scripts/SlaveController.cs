@@ -18,8 +18,6 @@ public class SlaveController : Controller
 		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
 											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
-		Debug.Log( string.Format( "Slave {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
-
 		Vector3 followingError = masterPosition - body.position;
 
 		if( followingError.magnitude < rangeLimits.magnitude / 2 ) masterVelocity += followingError;

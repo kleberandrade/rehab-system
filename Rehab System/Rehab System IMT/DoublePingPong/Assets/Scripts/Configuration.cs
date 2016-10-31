@@ -54,14 +54,14 @@ public class Configuration : MonoBehaviour
 		if( controlAxis != null ) 
 		{
 			currentAbsoluteValues[ 0 ] = controlAxis.Position;
-			currentAbsoluteValues[ 1 ] = controlAxis.Velocity;
+			//currentAbsoluteValues[ 1 ] = controlAxis.Velocity;
+			currentAbsoluteValues[ 1 ] = controlAxis.Stiffness;
 			currentAbsoluteValues[ 2 ] = controlAxis.Force;
 		}
 		else
 		{
-			currentAbsoluteValues[ 0 ] = 0.0f;
-			currentAbsoluteValues[ 1 ] = 0.0f;
-			currentAbsoluteValues[ 2 ] = 0.0f;
+			for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
+				currentAbsoluteValues[ variableIndex ] = 0.0f;
 		}
 
 		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
@@ -131,7 +131,13 @@ public class Configuration : MonoBehaviour
 		if( controlAxis != null ) 
 		{
 			controlAxis.MaxValue = calibrationSliders[ sliderIndex ].value;
-			calibrationSliders[ 0 ].maxValue = controlAxis.MaxValue;
+			if( controlAxis.MaxValue >= calibrationSliders[ sliderIndex ].minValue )
+				calibrationSliders[ sliderIndex ].maxValue = controlAxis.MaxValue;
+			else
+			{
+				calibrationSliders[ sliderIndex ].maxValue = calibrationSliders[ sliderIndex ].minValue;
+				calibrationSliders[ sliderIndex ].minValue = controlAxis.MaxValue;
+			}
 		}
 	}
 
@@ -141,7 +147,13 @@ public class Configuration : MonoBehaviour
 		if( controlAxis != null ) 
 		{
 			controlAxis.MinValue = calibrationSliders[ sliderIndex ].value;
-			calibrationSliders[ sliderIndex ].minValue = controlAxis.MinValue;
+			if( controlAxis.MinValue <= calibrationSliders[ sliderIndex ].maxValue )
+				calibrationSliders[ sliderIndex ].minValue = controlAxis.MinValue;
+			else
+			{
+				calibrationSliders[ sliderIndex ].minValue = calibrationSliders[ sliderIndex ].maxValue;
+				calibrationSliders[ sliderIndex ].maxValue = controlAxis.MinValue;
+			}
 		}
 	}
 
@@ -193,11 +205,12 @@ public class Configuration : MonoBehaviour
 
 	public void SetSetpoint( float setpoint )
 	{
-		Debug.Log( "Setting setpoint: " + setpoint.ToString() );
+		//Debug.Log( "Setting setpoint: " + setpoint.ToString() );
 
-		if( controlToggles[ 0 ].isOn ) controlAxis.Position = calibrationSliders[ 0 ].value;
-		if( controlToggles[ 1 ].isOn ) controlAxis.Velocity = calibrationSliders[ 1 ].value;
-		if( controlToggles[ 2 ].isOn ) controlAxis.Force = calibrationSliders [ 2 ].value;
+		if( calibrationSliders[ 0 ].interactable ) controlAxis.Position = setpoint;
+		//if( controlToggles[ 1 ].isOn && ! Mathf.Approximately( controlAxis.Velocity, setpoint ) ) controlAxis.Velocity = setpoint;
+		else if( calibrationSliders[ 1 ].interactable ) controlAxis.Stiffness = setpoint;
+		else if( calibrationSliders[ 2 ].interactable ) controlAxis.Force = setpoint;
 	}
 
     public void EndConfiguration()

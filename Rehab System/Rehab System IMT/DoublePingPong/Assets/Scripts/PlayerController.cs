@@ -13,6 +13,8 @@ public class PlayerController : Controller
 	public const float ERROR_THRESHOLD = 0.35f;
 
 	public MeshRenderer moveBoxRenderer;
+
+	public MeshFilter moveBoxPlane;
 	private Vector3 initialMoveBoxPosition = Vector3.zero;
 	private Vector3 initialMoveBoxScale = Vector3.zero;
 
@@ -42,26 +44,28 @@ public class PlayerController : Controller
 
 	public float ControlPosition( Vector3 target, out float error )
 	{
+		float batLength = Vector3.Dot( size, transform.right );
+
 		float currentPosition = Vector3.Dot( body.position - initialPosition, transform.right );
-		float maxSetpoint = Mathf.Abs( Vector3.Dot( rangeLimits, transform.right ) );
+		float maxSetpoint = Vector3.Dot( rangeLimits, transform.right );
 
 		float targetSetpoint = Vector3.Dot( target - initialPosition, transform.right );
-		//targetSetpoint = Mathf.Clamp( targetSetpoint, -maxSetpoint, maxSetpoint );
+		targetSetpoint = Mathf.Clamp( targetSetpoint, -maxSetpoint, maxSetpoint );
 
-		if( ! Mathf.Approximately( currentTargetSetpoint, targetSetpoint ) ) 
+		if( Mathf.Abs( currentTargetSetpoint - targetSetpoint ) > batLength / 2.0f ) 
 		{
 			movementTime = 0.0f;
 			movementInitialPosition = currentPosition;
-			currentTargetSetpoint = targetSetpoint;
 		}
 
-		float currentSetpoint = Mathf.Lerp( movementInitialPosition, targetSetpoint, movementTime / MAX_MOVEMENT_TIME );
+		currentTargetSetpoint = 0.95f * currentTargetSetpoint + 0.05f * targetSetpoint;
+
+		float currentSetpoint = Mathf.Lerp( movementInitialPosition, currentTargetSetpoint, movementTime / MAX_MOVEMENT_TIME );
 		movementTime += Time.deltaTime;
 
 		error = Mathf.Abs( ( currentSetpoint - currentPosition ) / maxSetpoint );
 
-		float batLength = Vector3.Dot( GetComponent<Collider>().bounds.size, transform.right );
-		moveBoxRenderer.transform.position = initialMoveBoxPosition + transform.right * ( targetSetpoint + currentSetpoint ) / 2.0f;
+		moveBoxRenderer.transform.position = initialMoveBoxPosition + transform.right * ( currentTargetSetpoint + currentSetpoint ) / 2.0f;
 		float moveBoxClearance = Mathf.Abs( ( targetSetpoint - currentSetpoint ) / batLength );
 		//moveBoxRenderer.transform.localScale = Vector3.Scale( initialMoveBoxScale, new Vector3( 1.0f + moveBoxClearance, 1.0f, 1.0f ) );
 		moveBoxRenderer.transform.localScale = new Vector3( 0.55f * ( 1.0f + moveBoxClearance ), 1.0f, 0.08f );
@@ -70,14 +74,14 @@ public class PlayerController : Controller
 		if( controlAxis != null && helperEnabled && error > ERROR_THRESHOLD )
 		{
 			//Debug.Log( "Outside move box: (error: " + error.ToString() + ")" );
-			controlAxis.Position = currentSetpoint;
-			controlAxis.Velocity = ( targetSetpoint - movementInitialPosition ) / MAX_MOVEMENT_TIME;
+			controlAxis.NormalizedPosition = currentSetpoint / maxSetpoint;
+			controlAxis.NormalizedVelocity = ( targetSetpoint - movementInitialPosition ) / ( MAX_MOVEMENT_TIME * maxSetpoint );
 			controlAxis.Stiffness = 30.0f;
 
 			moveBoxRenderer.material.color = new Color( 1.0f, 0.0f, 0.0f, 0.5f );
 		}
 
-		return targetSetpoint / maxSetpoint;
+		return currentTargetSetpoint / maxSetpoint;
 	}
 
 	void OnEnable()
@@ -88,7 +92,7 @@ public class PlayerController : Controller
 		initialMoveBoxPosition = transform.position - new Vector3( 0.0f, 0.99f * GetComponent<Collider>().bounds.extents.y, 0.0f );
 		initialMoveBoxScale = moveBoxRenderer.transform.localScale;
 
-		Debug.Log( "initial move box scale: " + initialMoveBoxScale.ToString() );
+		Debug.Log( string.Format( "Created collider {0} with position {1} size {2} and plane {3}", gameObject.name, initialPosition, size, moveBoxPlane.mesh.bounds.size ) );
 	}
 
 	public void EnableHelper()

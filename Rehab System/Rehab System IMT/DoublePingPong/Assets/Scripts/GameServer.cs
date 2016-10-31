@@ -8,7 +8,7 @@ public class GameServer : GameConnection
 {
 	private List<int> clientConnections = new List<int>();
 
-	protected override void Connect( ConnectionConfig connectionConfig )
+	public override void Connect()
     {
 		HostTopology networkTopology = new HostTopology( connectionConfig, 10 );
 		socketID = NetworkTransport.AddHost( networkTopology, GAME_SERVER_PORT );
@@ -21,7 +21,10 @@ public class GameServer : GameConnection
 		//Debug.Log( "Sending multicast message to channel " + dataChannel.ToString() );
 		foreach( int connectionID in clientConnections )
 			NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
+		
 		//NetworkTransport.StartSendMulticast( socketID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
+		//foreach( int connectionID in clientConnections )
+		//	NetworkTransport.SendMulticast( socketID, connectionID, out connectionError );
 		//NetworkTransport.FinishSendMulticast( socketID, out connectionError );
 	}
 
@@ -36,8 +39,6 @@ public class GameServer : GameConnection
 			{
 				inputBuffer[ 0 ] = (byte) clientConnections.Count;
 				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1, out connectionError );
-				//Debug.Log( "Sending ID " + connectedClients.ToString() + " back" );
-				//Debug.Log( "Adding connection " + connectionID.ToString() + " to multicast group" );
 				clientConnections.Add( connectionID ); 
 			}
 		    else if( networkEvent == NetworkEventType.DataEvent ) return true;
