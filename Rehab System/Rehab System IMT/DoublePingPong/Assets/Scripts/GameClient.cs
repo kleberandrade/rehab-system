@@ -11,6 +11,7 @@ public class GameClient : GameConnection
 
 	private int connectionID;
 	private int clientID = -1;
+	private float clientTime = 0.0f;
 
 	public override void Connect()
     {
@@ -37,7 +38,11 @@ public class GameClient : GameConnection
 			if( connectionError == (byte) NetworkError.Ok ) 
 			{
 				//Debug.Log( string.Format( "Received message from connection {0} and channel {1}", connectionID, channel ) );
-				if( channel == eventChannel ) clientID = (int) inputBuffer[ 0 ];
+				if( channel == eventChannel ) 
+				{
+					clientID = (int) inputBuffer[ 0 ];
+					clientTime = BitConverter.ToSingle( inputBuffer, 1 );
+				}
 				else if( channel == dataChannel ) return true;
 			}
 		}
@@ -53,6 +58,11 @@ public class GameClient : GameConnection
 	public int GetClientID()
 	{
 		return clientID;
+	}
+
+	public float GetClientTime()
+	{
+		return clientTime - NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2.0f;
 	}
 
 	public ConnectionInfo GetConnectionInfo()

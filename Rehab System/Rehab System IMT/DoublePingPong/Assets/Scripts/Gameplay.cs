@@ -27,7 +27,7 @@ public class Gameplay : MonoBehaviour
 	private GameClient gameClient;
 	private int clientID = -1;
 
-	private DateTime gameTime;
+	private float gameTime = 0.0f;
 
 	void Awake()
 	{
@@ -44,8 +44,6 @@ public class Gameplay : MonoBehaviour
 	void Start()
 	{
 		gameClient = (GameClient) GameManager.GetConnection();
-
-		gameTime = NTPClient.GetNetworkTime().ToUniversalTime();
 	}
 
 	void FixedUpdate()
@@ -74,20 +72,18 @@ public class Gameplay : MonoBehaviour
 		{
 			ConnectionInfo currentConnectionInfo = gameClient.GetConnectionInfo();
 
-			lazyScoreText.text =  string.Format( "Client: {0} Game Time: {1}\nSend: {2,2}KB/s Receive: {3,2}KB/s RTT: {4,3}ms Lost Packets: {5}", clientID, gameTime.TimeOfDay.ToString(),
+			lazyScoreText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s\nSend: {2,2}KB/s Receive: {3,2}KB/s RTT: {4,3}ms Lost Packets: {5}", clientID, gameTime,
 				                                 currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
 
 			if( ball.transform.position != lastBallPosition )
 			{
-				double sampleTime = gameTime.TimeOfDay.TotalSeconds;
-
-				verticalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, verticalBats[ 0 ].transform.position.z ) );
-				horizontalLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, horizontalBats[ 0 ].transform.position.x ) );
-				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", sampleTime, ball.transform.position.x, ball.transform.position.z ) );
-				networkLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, currentConnectionInfo.rtt ) );
+				verticalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, verticalBats[ 0 ].transform.position.z ) );
+				horizontalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, horizontalBats[ 0 ].transform.position.x ) );
+				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, ball.transform.position.x, ball.transform.position.z ) );
+				networkLog.WriteLine( string.Format( "{0}\t{1}", gameTime, currentConnectionInfo.rtt ) );
 			}
 
-			gameTime = gameTime.AddSeconds( Time.fixedDeltaTime );
+			gameTime += Time.fixedDeltaTime;
 
 			yield return new WaitForFixedUpdate();
 		}
@@ -125,6 +121,8 @@ public class Gameplay : MonoBehaviour
 			playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PlayerController>();
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
 		}
+
+		gameTime = gameClient.GetClientTime();
 
 		ball.enabled = true;
 		StartCoroutine( RegisterValues() );
