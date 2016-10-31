@@ -60,8 +60,6 @@ public class Gameplay : MonoBehaviour
 		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
 		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
-
-		gameTime = gameTime.AddSeconds( Time.fixedDeltaTime );
 	}
 
 	IEnumerator RegisterValues()
@@ -88,6 +86,8 @@ public class Gameplay : MonoBehaviour
 				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", sampleTime, ball.transform.position.x, ball.transform.position.z ) );
 				networkLog.WriteLine( string.Format( "{0}\t{1}", sampleTime, currentConnectionInfo.rtt ) );
 			}
+
+			gameTime = gameTime.AddSeconds( Time.fixedDeltaTime );
 
 			yield return new WaitForFixedUpdate();
 		}
