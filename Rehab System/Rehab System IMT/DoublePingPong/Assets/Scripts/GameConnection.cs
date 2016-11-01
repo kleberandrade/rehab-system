@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public enum NetworkValue : int { POSITION, VELOCITY, FORCE };
 public enum NetworkAxis : byte { X, Y, Z };
 
 public struct ConnectionInfo
@@ -32,6 +31,8 @@ public abstract class GameConnection
 	protected Dictionary<KeyValuePair<byte,byte>, float[]> localValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
 	protected Dictionary<KeyValuePair<byte,byte>, bool> localValuesUpdated = new Dictionary<KeyValuePair<byte,byte>, bool>();
 	protected Dictionary<KeyValuePair<byte,byte>, float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>, float[]>();
+
+	public static NetworkOperator networkOperator = new NetworkMotionOperator();
 
 	public GameConnection()
 	{
@@ -98,9 +99,11 @@ public abstract class GameConnection
             {
     			outputBuffer[ outputMessageLength ] = localKey.Key;
     			outputBuffer[ outputMessageLength + 1 ] = localKey.Value;
-    			Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 0 ] ), 0, outputBuffer, outputMessageLength + 2, sizeof(float) );
-                Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 1 ] ), 0, outputBuffer, outputMessageLength + 2 + sizeof(float), sizeof(float) );
-                Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 2 ] ), 0, outputBuffer, outputMessageLength + 2 + 2 * sizeof(float), sizeof(float) );
+    			
+				networkOperator.EncodeOutputData( localValues[ localKey ], outputBuffer, outputMessageLength + 2 );
+				//Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 0 ] ), 0, outputBuffer, outputMessageLength + 2, sizeof(float) );
+                //Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 1 ] ), 0, outputBuffer, outputMessageLength + 2 + sizeof(float), sizeof(float) );
+                //Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ 2 ] ), 0, outputBuffer, outputMessageLength + 2 + 2 * sizeof(float), sizeof(float) );
 
     			outputMessageLength += DATA_SIZE;
 
@@ -123,10 +126,11 @@ public abstract class GameConnection
 				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
 	            //Debug.Log( "Received values for key " + remoteKey.ToString() );
 	            if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ 3 ];
-	                    
-	    		remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
-	            remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
-	            remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) ); 
+
+				networkOperator.DecodeInputData( remoteValues[ remoteKey ], inputBuffer, dataOffset + 2 );
+	    		//remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
+	            //remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
+	            //remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) ); 
 
 	            //remoteValues[ remoteKey ][ (int) NetworkValue.POSITION ] += remoteValues[ remoteKey ][ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
 

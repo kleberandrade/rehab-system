@@ -18,10 +18,10 @@ public class SlaveController : Controller
 		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
 											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
-		Vector3 followingError = masterPosition - body.position;
+		//Vector3 followingError = masterPosition - body.position;
 
-		if( followingError.magnitude < rangeLimits.magnitude / 2 ) masterVelocity += followingError;
-		else body.MovePosition( masterPosition );
+		/*if( followingError.magnitude < rangeLimits.magnitude / 2 ) masterVelocity += followingError;
+		else*/ body.MovePosition( masterPosition );
 
 		body.velocity = masterVelocity;
 	}
