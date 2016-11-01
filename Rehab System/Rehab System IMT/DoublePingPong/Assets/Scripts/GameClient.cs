@@ -13,6 +13,8 @@ public class GameClient : GameConnection
 	private int clientID = -1;
 	private float clientTime = 0.0f;
 
+	private int networkDelay = 0;
+
 	public override void Connect()
     {
 		HostTopology networkTopology = new HostTopology( connectionConfig, 1 );
@@ -43,16 +45,24 @@ public class GameClient : GameConnection
 					clientID = (int) inputBuffer[ 0 ];
 					clientTime = BitConverter.ToSingle( inputBuffer, 1 );
 				}
-				else if( channel == dataChannel ) return true;
+				else if( channel == dataChannel ) 
+				{
+					int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], AxisClient.BUFFER_SIZE - DATA_SIZE );
+					int networkTimeStamp = BitConverter.ToInt32( inputBuffer, inputMessageLength ); 
+
+					networkDelay = NetworkTransport.GetRemoteDelayTimeMS( socketID, connectionID, networkTimeStamp, out connectionError );
+
+					return true;
+				}
 			}
 		}
 
 		return false;
 	}
 
-	protected override float GetNetworkDelay()
+	public override int GetNetworkDelay()
 	{
-		return NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
+		return networkDelay;
 	}
 
 	public int GetClientID()
@@ -62,7 +72,7 @@ public class GameClient : GameConnection
 
 	public float GetClientTime()
 	{
-		return clientTime - NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2.0f;
+		return clientTime - (float) ( networkDelay / 1000.0f );
 	}
 
 	public ConnectionInfo GetConnectionInfo()

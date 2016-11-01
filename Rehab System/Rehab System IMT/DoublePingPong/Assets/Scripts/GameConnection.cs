@@ -126,7 +126,7 @@ public abstract class GameConnection
 	                    
 	    		remoteValues[ remoteKey ][ 0 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 );
 	            remoteValues[ remoteKey ][ 1 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + sizeof(float) );
-	            remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) );
+	            remoteValues[ remoteKey ][ 2 ] = BitConverter.ToSingle( inputBuffer, dataOffset + 2 + 2 * sizeof(float) ); 
 
 	            //remoteValues[ remoteKey ][ (int) NetworkValue.POSITION ] += remoteValues[ remoteKey ][ (int) NetworkValue.VELOCITY ] * Time.fixedDeltaTime;
 
@@ -141,6 +141,6 @@ public abstract class GameConnection
 
 	protected abstract bool ReceiveUpdateMessage();
 
-	protected abstract float GetNetworkDelay();
+	public abstract int GetNetworkDelay();
 }
 

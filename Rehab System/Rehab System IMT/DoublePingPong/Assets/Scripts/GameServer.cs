@@ -18,6 +18,9 @@ public class GameServer : GameConnection
 
 	protected override void SendUpdateMessage()
 	{
+		int outputMessageLength = (int) outputBuffer[ 0 ];
+		Buffer.BlockCopy( BitConverter.GetBytes( NetworkTransport.GetNetworkTimestamp() ), 0, outputBuffer, outputMessageLength, sizeof(int) );
+
 		//Debug.Log( "Sending multicast message to channel " + dataChannel.ToString() );
 		foreach( int connectionID in clientConnections )
 			NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
@@ -48,9 +51,9 @@ public class GameServer : GameConnection
 		return false;
 	}
 
-	protected override float GetNetworkDelay()
+	public override int GetNetworkDelay()
 	{
-		return Time.fixedDeltaTime;
+		return (int) ( 1000 * Time.fixedDeltaTime );
 	}
 
 	public int GetClientsNumber()

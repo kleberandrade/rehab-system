@@ -176,8 +176,8 @@ public class RemoteInputAxis : InputAxis
 			{
 				int inputDataPosition = inputIDPosition + sizeof(byte);
 
-				position = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition ); 
-				velocity = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + sizeof(float) ); 
+				position = -BitConverter.ToSingle( axis.inputBuffer, inputDataPosition ); 
+				velocity = -BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + sizeof(float) ); 
 				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 2 * sizeof(float) ); 
 
 				// Debug

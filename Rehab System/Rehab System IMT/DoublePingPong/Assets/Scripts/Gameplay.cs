@@ -72,15 +72,17 @@ public class Gameplay : MonoBehaviour
 		{
 			ConnectionInfo currentConnectionInfo = gameClient.GetConnectionInfo();
 
-			lazyScoreText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s\nSend: {2,2}KB/s Receive: {3,2}KB/s RTT: {4,3}ms Lost Packets: {5}", clientID, gameTime,
-				                                 currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
+			int networkDelay = gameClient.GetNetworkDelay();
+
+			lazyScoreText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s Last Delay: {2}ms\nSend: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms Lost Packets: {6}", clientID, gameTime,
+				                                 networkDelay, currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
 
 			if( ball.transform.position != lastBallPosition )
 			{
 				verticalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, verticalBats[ 0 ].transform.position.z ) );
 				horizontalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, horizontalBats[ 0 ].transform.position.x ) );
 				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, ball.transform.position.x, ball.transform.position.z ) );
-				networkLog.WriteLine( string.Format( "{0}\t{1}", gameTime, currentConnectionInfo.rtt ) );
+				networkLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, currentConnectionInfo.rtt, networkDelay ) );
 			}
 
 			gameTime += Time.fixedDeltaTime;
