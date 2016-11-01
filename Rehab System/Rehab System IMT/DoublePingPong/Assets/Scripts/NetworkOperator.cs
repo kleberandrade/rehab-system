@@ -6,7 +6,6 @@ public enum NetworkValue : int { POSITION, VELOCITY, FORCE };
 public abstract class NetworkOperator
 {
 	public abstract void DecodeInputData( float[] inputValues, byte[] inputBuffer, int dataOffset );
-
 	public abstract void EncodeOutputData( float[] outputValues, byte[] outputBuffer, int dataOffset );
 }
 
@@ -28,17 +27,15 @@ public class NetworkMotionOperator : NetworkOperator
 	}
 }
 
-public class NetworkMotionPredictor : NetworkMotionOperator
+/*public class NetworkMotionPredictor : NetworkMotionOperator
 {
 	public override void DecodeInputData( float[] inputValues, byte[] inputBuffer, int dataOffset )  
 	{
 		base.DecodeInputData( inputValues, inputBuffer, dataOffset );
-
-		inputValues[ (int) NetworkValue.POSITION ] += inputValues[ (int) NetworkValue.VELOCITY ] * 0.0f;//Time.fixedDeltaTime;
 	}
 
 	public override void EncodeOutputData( float[] outputValues, byte[] outputBuffer, int dataOffset )
 	{
 		base.EncodeOutputData( outputValues, outputBuffer, dataOffset );
 	}
-}
+}*/
