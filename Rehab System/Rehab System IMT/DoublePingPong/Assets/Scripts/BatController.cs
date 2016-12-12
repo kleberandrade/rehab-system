@@ -26,11 +26,11 @@ public class BatController : Controller
 
 	void FixedUpdate()
 	{
-		Vector3 masterPosition = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
-			                                  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
+		Vector3 masterPosition = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
+											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
 
-		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
-			                                  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
+		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
+											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
 		//Debug.Log( string.Format( "Bat {0} target: position {1} - velocity {2}", elementID, masterPosition, masterVelocity ) );
 
@@ -38,10 +38,10 @@ public class BatController : Controller
 		body.velocity = masterVelocity;
 
 		// Send locally controlled object position over network
-		gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-		gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-		gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-		gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
+		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
+		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
+		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
 
 		//File.AppendAllText( logFileName, Time.realtimeSinceStartup.ToString() + "\t" 
 		//	+ ball.position.x.ToString() + "\t" + ball.position.z.ToString() + System.Environment.NewLine );

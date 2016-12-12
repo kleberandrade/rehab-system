@@ -35,10 +35,10 @@ public class PlayerController : Controller
 			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
 
 			// Send locally controlled object position over network
-			gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-			gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-			gameConnection.SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-			gameConnection.SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
+			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
+			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
+			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
 		}
 	}       
 

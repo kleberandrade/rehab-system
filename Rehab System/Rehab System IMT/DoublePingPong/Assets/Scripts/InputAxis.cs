@@ -40,9 +40,9 @@ public class InputAxis
 
 	public virtual void Update( float updateTime ) {}
 
-	public float Position { get { return position - positionOffset; } set { feedbackPosition = value + positionOffset; setpointsMask[ 0 ] = true; } }
-	public float Velocity { get { return velocity; } set { feedbackVelocity = value; setpointsMask[ 1 ] = true; } }
-	public float Force { get { return force - forceOffset; } set { feedbackForce = value + forceOffset; setpointsMask[ 2 ] = true; } }
+	public float Position { get { return position - positionOffset; } set { feedbackPosition = value + positionOffset; setpointsMask[ (int) AxisVariable.POSITION ] = true; } }
+	public float Velocity { get { return velocity; } set { feedbackVelocity = value; setpointsMask[ (int) AxisVariable.VELOCITY ] = true; } }
+	public float Force { get { return force - forceOffset; } set { feedbackForce = value + forceOffset; setpointsMask[ (int) AxisVariable.FORCE ] = true; } }
 
 	public float PositionOffset { set { positionOffset = value; } }
 	public float ForceOffset { set { forceOffset = value; } }
@@ -51,9 +51,9 @@ public class InputAxis
 	public float Damping { get { return damping; } set { damping = value; setpointsMask[ (int) AxisVariable.DAMPING ] = true; } }
 
 	public float NormalizedPosition { get { return ( 2 * ( position - minValue ) / range - 1.0f ); } 
-		                              set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ 0 ] = true; } }
+									  set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ (int) AxisVariable.POSITION ] = true; } }
 	public float NormalizedVelocity { get { return ( 2 * velocity / range ); } 
-		                              set { feedbackVelocity = ( value * range / 2.0f ); setpointsMask[ 1 ] = true; } }
+									  set { feedbackVelocity = ( value * range / 2.0f ); setpointsMask[ (int) AxisVariable.VELOCITY ] = true; } }
 	public float NormalizedForce { get { return ( 2 * ( force - minValue ) / range - 1.0f ); } }
 
     public float MaxValue { get { return maxValue; } set { maxValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }

@@ -1,52 +1,61 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+
+public abstract class GameState : MonoBehaviour
+{
+	protected GameConnectionBase connection = null;
+	public GameConnectionBase Connection { get; }
+
+	IEnumerator UpdateNetworkData()
+	{
+		float networkDelay = 0.0f;
+
+		while( Application.isPlaying )
+		{
+			networkDelay = connection.UpdateData( networkDelay );
+			yield return new WaitForSecondsRealtime( networkDelay );
+		}
+	}
+}
+
+public abstract class GameClient : GameState
+{
+	protected Camera gameCamera;
+
+	protected Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
+
+	public Slider setpointSlider;
+	protected Image sliderHandle;
+}
+
+public abstract class GameServer : GameState {}
 
 public class GameManager : MonoBehaviour 
 {
 	public static bool isMaster = true;
 
-	public Gameplay gameplay;
-	public Multiplayer multiplayer;
+	public GameClient client;
+	public GameServer server;
 
-	private static GameConnection gameConnection = null;
-
-
-	void Awake()
-	{
-		if( gameConnection == null )
-		{
-			if( isMaster ) gameConnection = new GameServer();
-			else gameConnection = new GameClient();
-		}
-	}
+	private static GameState game = null;
 
 	void Start () 
 	{
-		if( isMaster ) multiplayer.enabled = true;
-		else gameplay.enabled = true;
+		//game = isMaster ? server : client;
+		if( isMaster ) game = server;
+		else game = client;
+
+		game.enabled = true;
 	}
 
-	void FixedUpdate()
+	public static GameConnectionBase GetConnection()
 	{
-		gameConnection.UpdateData();
-	}
-
-	IEnumerator UpdateNetworkData()
-	{
-		while( Application.isPlaying )
-		{
-			float networkDelay = gameConnection.UpdateData();
-			yield return new WaitForSecondsRealtime( networkDelay );
-		}
-	}
-
-	public static GameConnection GetConnection()
-	{
-		return gameConnection;
+		return game.Connection;
 	}
 
 	void OnApplicationQuit()
 	{
-		GameConnection.Shutdown();
+		GameConnectionBase.Shutdown();
 	}
 }

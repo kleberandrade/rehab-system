@@ -61,10 +61,8 @@ public class InputAxisManager : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		float elapsedTime = Time.deltaTime;
-
 		foreach( InputAxis inputAxis in inputAxes.Values )
-			inputAxis.Update( elapsedTime );
+			inputAxis.Update( Time.fixedDeltaTime );
 	}
 
     void OnApplicationQuit()

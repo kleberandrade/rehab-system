@@ -12,11 +12,11 @@ public class SlaveController : Controller
 {
 	void FixedUpdate()
 	{
-		Vector3 masterPosition = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
-											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
+		Vector3 masterPosition = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
+											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
 
-		Vector3 masterVelocity = new Vector3( gameConnection.GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
-											  0.0f, gameConnection.GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
+		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
+											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
 
 		Vector3 followingError = masterPosition - body.position;
 

@@ -17,8 +17,6 @@ public abstract class Controller : MonoBehaviour
 
 	protected Rigidbody body;
 
-	protected GameConnection gameConnection;
-
 	void Awake()
 	{
 		body = GetComponent<Rigidbody>();
@@ -28,10 +26,5 @@ public abstract class Controller : MonoBehaviour
 		size = GetComponent<Collider>().bounds.size;
 		rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
 		initialPosition = transform.position;
-	}
-
-	void Start()
-	{
-		gameConnection = GameManager.GetConnection();
 	}
 }
