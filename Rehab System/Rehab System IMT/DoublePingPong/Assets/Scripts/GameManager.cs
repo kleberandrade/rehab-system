@@ -25,9 +25,9 @@ public abstract class GameState : MonoBehaviour
 
 public abstract class GameClient : GameState
 {
-	protected Camera gameCamera;
+	public Camera gameCamera;
 
-	protected Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
+	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
 
 	public Slider setpointSlider;
 	protected Image sliderHandle;

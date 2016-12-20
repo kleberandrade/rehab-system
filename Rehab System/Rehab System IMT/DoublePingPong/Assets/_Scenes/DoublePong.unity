@@ -2250,6 +2250,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d46d048e48d924784164d3df779dd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameCamera: {fileID: 550079182}
+  playerScoreText: {fileID: 1063334332}
+  machineScoreText: {fileID: 1051574904}
+  lazyScoreText: {fileID: 1381727666}
   setpointSlider: {fileID: 2105704039}
   ball: {fileID: 1491532023}
   verticalBats:
