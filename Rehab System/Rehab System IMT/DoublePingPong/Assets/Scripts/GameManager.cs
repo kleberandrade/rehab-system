@@ -5,7 +5,11 @@ using System.Collections;
 public abstract class GameState : MonoBehaviour
 {
 	protected GameConnectionBase connection = null;
-	public GameConnectionBase Connection { get; }
+
+	public GameConnectionBase GetConnection() 
+	{ 
+		return connection; 
+	}
 
 	IEnumerator UpdateNetworkData()
 	{
@@ -51,7 +55,7 @@ public class GameManager : MonoBehaviour
 
 	public static GameConnectionBase GetConnection()
 	{
-		return game.Connection;
+		return game.GetConnection();
 	}
 
 	void OnApplicationQuit()

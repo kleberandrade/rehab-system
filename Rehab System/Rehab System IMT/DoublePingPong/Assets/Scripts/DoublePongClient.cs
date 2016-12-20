@@ -31,11 +31,15 @@ public class DoublePongClient : GameClient
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
 
 		lastBallPosition = ball.transform.position;
+
+		connection = new GameClientConnection<MotionFollower>();
+
+		Debug.Log( "Created connection " + connection.ToString() );
 	}
 
 	void Start()
 	{
-		if( connection == null ) connection = new GameClientConnection<MotionFollower>();
+		
 	}
 
 	void FixedUpdate()

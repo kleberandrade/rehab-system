@@ -8,9 +8,14 @@ public class DoublePongServer : GameServer
 	public BallController ball;
 	public BatController[] bats = new BatController[ 4 ];
 
-	void Start()
+	void Awake()
 	{
 		connection = new GameServerConnection<MotionFollower>();
+		Debug.Log( "Created connection " + connection.ToString() );
+	}
+
+	void Start()
+	{
 		connection.Connect();
 
 		foreach( BatController bat in bats )
