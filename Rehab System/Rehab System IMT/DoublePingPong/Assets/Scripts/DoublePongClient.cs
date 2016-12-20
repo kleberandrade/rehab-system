@@ -35,7 +35,7 @@ public class DoublePongClient : GameClient
 
 	void Start()
 	{
-		if( connection == null ) connection = new GameClientConnection<MotionPredictor>();
+		if( connection == null ) connection = new GameClientConnection<MotionFollower>();
 	}
 
 	void FixedUpdate()
@@ -64,7 +64,7 @@ public class DoublePongClient : GameClient
 
 		while( Application.isPlaying )
 		{
-			ConnectionInfo currentConnectionInfo = ((GameClientConnection<MotionPredictor>) connection).GetConnectionInfo();
+			ConnectionInfo currentConnectionInfo = ((GameClientConnection<MotionFollower>) connection).GetConnectionInfo();
 
 			int networkDelay = connection.GetNetworkDelay();
 
@@ -94,7 +94,7 @@ public class DoublePongClient : GameClient
 	{
 		while( clientID == -1 && Application.isPlaying )
 		{
-			clientID = ((GameClientConnection<MotionPredictor>) connection).GetClientID();
+			clientID = ((GameClientConnection<MotionFollower>) connection).GetClientID();
 			yield return new WaitForSeconds( 0.1f );
 		}
 
@@ -118,7 +118,7 @@ public class DoublePongClient : GameClient
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
 		}
 
-		gameTime = ((GameClientConnection<MotionPredictor>) connection).GetClientTime();
+		gameTime = ((GameClientConnection<MotionFollower>) connection).GetClientTime();
 
 		ball.enabled = true;
 		StartCoroutine( RegisterValues() );
@@ -138,10 +138,5 @@ public class DoublePongClient : GameClient
 		ball.enabled = false;
 		verticalBats[ 0 ].enabled = verticalBats[ 1 ].enabled = false;
 		horizontalBats[ 0 ].enabled = horizontalBats[ 1 ].enabled = false;
-	}
-
-	void OnApplicationQuit()
-	{
-		GameConnection<MotionPredictor>.Shutdown();
 	}
 }

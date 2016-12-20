@@ -10,7 +10,7 @@ public class DoublePongServer : GameServer
 
 	void Start()
 	{
-		connection = new GameServerConnection<MotionPredictor>();
+		connection = new GameServerConnection<MotionFollower>();
 		connection.Connect();
 
 		foreach( BatController bat in bats )
@@ -21,7 +21,7 @@ public class DoublePongServer : GameServer
 
 	IEnumerator WaitClients()
 	{
-		while( ((GameServerConnection<MotionPredictor>) connection).GetClientsNumber() < 2 ) 
+		while( ((GameServerConnection<MotionFollower>) connection).GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
 		ball.enabled = true;

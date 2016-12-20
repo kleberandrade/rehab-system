@@ -31,9 +31,26 @@ public class MotionFollower : NetworkCompensator
 
 public class MotionPredictor : MotionFollower
 {
+	float lastMessagePosition = 0.0f;
+	float messageUpdateTime = 0.0f;
+
+	public override void DecodeInputData( float[] inputValues, byte[] inputBuffer, int dataOffset ) 
+	{
+		base.DecodeInputData( inputValues, inputBuffer, dataOffset );
+
+		float trackingError = inputValues[ (int) NetworkValue.POSITION ] - lastMessagePosition;
+		lastMessagePosition = inputValues[ (int) NetworkValue.POSITION ];
+
+		if( messageUpdateTime > 0.0f ) inputValues[ (int) NetworkValue.VELOCITY ] += trackingError / messageUpdateTime;
+			
+		messageUpdateTime = 0.0f;
+	}
+
 	public override void UpdateData( float[] inputValues, float[] outputValues, float updateTime )  
 	{
 		inputValues[ (int) NetworkValue.POSITION ] += inputValues[ (int) NetworkValue.VELOCITY ] * updateTime;
+
+		messageUpdateTime += updateTime;
 	}
 }
 
@@ -65,7 +82,7 @@ public class WaveVariablesMaster : WaveVariablesCompensator
 	{
 		inputValues[ (int) NetworkValue.POSITION ] = outputValues[ (int) NetworkValue.POSITION ];
 		inputValues[ (int) NetworkValue.VELOCITY ] = outputValues[ (int) NetworkValue.VELOCITY ];
-		inputValues[ (int) NetworkValue.FORCE ] = waveImpedance * outputValues[ (int) NetworkValue.VELOCITY ] - (float) Math.Sqrt( 2f * waveImpedance ) * inputWaveVariable;
+		inputValues[ (int) NetworkValue.FORCE ] = waveImpedance * outputValues[ (int) NetworkValue.VELOCITY ] - (float) Math.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
 		forceIntegral = waveImpedance * outputValues[ (int) NetworkValue.POSITION ] - (float) Math.Sqrt( 2 * waveImpedance ) * inputWaveIntegral;
 
 		outputWaveVariable = -inputWaveVariable + (float) Math.Sqrt( 2 * waveImpedance ) * outputValues[ (int) NetworkValue.VELOCITY ];
