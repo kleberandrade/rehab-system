@@ -206,3 +206,7 @@ Rehab System/Rehab System IMT/DoublePingPong/Library/assetDatabase3
 *.txt
 *.dwlt
 *.info
+*.info
+*.log
+*.db
+*.dwlt

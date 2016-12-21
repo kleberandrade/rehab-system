@@ -36,19 +36,19 @@ public class MotionPredictor : MotionFollower
 
 	public override void DecodeInputData( float[] inputValues, byte[] inputBuffer, int dataOffset ) 
 	{
-		float predictedPosition = inputValues[ (int) NetworkValue.POSITION ];
-
 		base.DecodeInputData( inputValues, inputBuffer, dataOffset );
 
-		float trackingError = inputValues[ (int) NetworkValue.POSITION ] - predictedPosition;
-
-		if( messageUpdateTime > 0.0f ) inputValues[ (int) NetworkValue.VELOCITY ] += trackingError / messageUpdateTime;
+		lastMessagePosition = inputValues[ (int) NetworkValue.POSITION ];
 			
 		messageUpdateTime = 0.0f;
 	}
 
 	public override void UpdateData( float[] inputValues, float[] outputValues, float updateTime )  
 	{
+		float trackingError = lastMessagePosition - inputValues[ (int) NetworkValue.POSITION ];
+
+		inputValues[ (int) NetworkValue.VELOCITY ] += trackingError;
+
 		inputValues[ (int) NetworkValue.POSITION ] += inputValues[ (int) NetworkValue.VELOCITY ] * updateTime;
 
 		messageUpdateTime += updateTime;
