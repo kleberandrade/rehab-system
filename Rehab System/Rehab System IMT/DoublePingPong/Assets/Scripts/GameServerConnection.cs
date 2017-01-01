@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public class GameServerConnection<CompensatorType> : GameConnection<CompensatorType> where CompensatorType : NetworkCompensator, new()
+public class GameServerConnection : GameConnection
 {
 	private List<int> clientConnections = new List<int>();
 
@@ -18,9 +18,6 @@ public class GameServerConnection<CompensatorType> : GameConnection<CompensatorT
 
 	protected override void SendUpdateMessage()
 	{
-		int outputMessageLength = (int) outputBuffer[ 0 ];
-		Buffer.BlockCopy( BitConverter.GetBytes( NetworkTransport.GetNetworkTimestamp() ), 0, outputBuffer, outputMessageLength, sizeof(int) );
-
 		//Debug.Log( "Sending multicast message to channel " + dataChannel.ToString() );
 		foreach( int connectionID in clientConnections )
 			NetworkTransport.Send( socketID, connectionID, dataChannel, outputBuffer, PACKET_SIZE, out connectionError );
@@ -44,16 +41,17 @@ public class GameServerConnection<CompensatorType> : GameConnection<CompensatorT
 				Buffer.BlockCopy( BitConverter.GetBytes( Time.realtimeSinceStartup ), 0, inputBuffer, 1, sizeof(float) );
 				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1 + sizeof(double), out connectionError );
 				clientConnections.Add( connectionID ); 
+			} 
+			else if( networkEvent == NetworkEventType.DataEvent ) 
+			{
+				networkDelay = NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
+
+				return true;
 			}
-		    else if( networkEvent == NetworkEventType.DataEvent ) return true;
+			
 		}
 
 		return false;
-	}
-
-	public override int GetNetworkDelay()
-	{
-		return (int) ( 1000 * Time.fixedDeltaTime );
 	}
 
 	public int GetClientsNumber()

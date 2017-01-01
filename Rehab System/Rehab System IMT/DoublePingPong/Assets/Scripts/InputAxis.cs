@@ -110,15 +110,15 @@ public class RemoteInputAxis : InputAxis
 	private class AxisConnection
 	{
 		public string hostID;
-		public AxisDataClient dataClient = null;
-		public byte[] inputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
-		public byte[] outputBuffer = new byte[ AxisClient.BUFFER_SIZE ];
+		public InputAxisDataClient dataClient = null;
+		public byte[] inputBuffer = new byte[ InputAxisClient.BUFFER_SIZE ];
+		public byte[] outputBuffer = new byte[ InputAxisClient.BUFFER_SIZE ];
 		public bool outputUpdated = false;
 
 		public AxisConnection( string hostID )
 		{
 			this.hostID = hostID;
-			dataClient = new AxisDataClient();
+			dataClient = new InputAxisDataClient();
 			dataClient.Connect( hostID, 50001 );
 		}
 	}

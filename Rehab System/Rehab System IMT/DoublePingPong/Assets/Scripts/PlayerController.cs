@@ -10,6 +10,7 @@ using System.Text;
 [ RequireComponent( typeof(BoxCollider) ) ]
 public class PlayerController : Controller 
 {
+	const int POSITION = 0, VELOCITY = 1;
 	public const float ERROR_THRESHOLD = 0.35f;
 
 	public MeshRenderer moveBoxRenderer;
@@ -35,10 +36,10 @@ public class PlayerController : Controller
 			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
 
 			// Send locally controlled object position over network
-			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-			GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, POSITION, body.position.x );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, POSITION, body.position.z );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, VELOCITY, body.velocity.x );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, VELOCITY, body.velocity.z );
 		}
 	}       
 

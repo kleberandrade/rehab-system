@@ -8,14 +8,10 @@ public class DoublePongServer : GameServer
 	public BallController ball;
 	public BatController[] bats = new BatController[ 4 ];
 
-	void Awake()
+	public override void Start()
 	{
-		connection = new GameServerConnection<MotionFollower>();
-		Debug.Log( "Created connection " + connection.ToString() );
-	}
+		base.Start();
 
-	void Start()
-	{
 		connection.Connect();
 
 		foreach( BatController bat in bats )
@@ -26,15 +22,10 @@ public class DoublePongServer : GameServer
 
 	IEnumerator WaitClients()
 	{
-		while( ((GameServerConnection<MotionFollower>) connection).GetClientsNumber() < 2 ) 
+		while( connection.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
 		ball.enabled = true;
-	}
-
-	void FixedUpdate()
-	{
-		connection.UpdateData( Time.fixedDeltaTime );
 	}
 
 //	IEnumerator RegisterValues()

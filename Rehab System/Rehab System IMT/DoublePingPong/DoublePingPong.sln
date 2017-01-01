@@ -1,7 +1,7 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{57D049D9-F096-B0C0-6CA6-95BF8C5C3CEC}") = "DoublePingPong", "Assembly-CSharp.csproj", "{CDC21C26-6846-666C-611D-C20CC36F8010}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoublePingPong", "Assembly-CSharp.csproj", "{CDC21C26-6846-666C-611D-C20CC36F8010}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -29,7 +29,7 @@ public class Configuration : MonoBehaviour
 
 	public float CurrentAbsoluteValue { get { return currentAbsoluteValues[ calibratedVariableIndex ]; } }
 
-	private AxisInfoStateClient infoStateClient;
+	private InputAxisInfoClient infoStateClient;
 
 	// Use this for initialization
 	void Start()
@@ -45,7 +45,7 @@ public class Configuration : MonoBehaviour
 		axisServerEntry.text = PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 		gameServerEntry.text = PlayerPrefs.GetString( GameConnectionBase.GAME_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 
-		infoStateClient = new AxisInfoStateClient();
+		infoStateClient = new InputAxisInfoClient();
 	}
 	
 	// Update is called once per frame
@@ -96,7 +96,7 @@ public class Configuration : MonoBehaviour
 
 	public void RefreshAxesInfo()
 	{
-		byte[] infoBuffer = new byte[ AxisClient.BUFFER_SIZE ];
+		byte[] infoBuffer = new byte[ InputAxisClient.BUFFER_SIZE ];
 
 		infoStateClient.Connect( PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST ), 50000 );
 

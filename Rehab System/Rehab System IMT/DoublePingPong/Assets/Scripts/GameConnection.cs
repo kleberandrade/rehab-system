@@ -3,16 +3,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public enum NetworkAxis : byte { X, Y, Z };
 
-public struct ConnectionInfo
-{
-	public int socketID, connectionID, channel;
-	public float sendRate, receiveRate;
-	public int rtt, ioTime, lostPackets;
-}
-
-public abstract class GameConnectionBase
+public abstract class GameConnection
 {
 	public const string GAME_SERVER_HOST_ID = "Game Server Host";
 
@@ -20,16 +12,29 @@ public abstract class GameConnectionBase
 
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
-	protected const int DATA_SIZE = 2 * sizeof(byte) + 3 * sizeof(float);
+	private const int PACKET_HEADER_LENGTH = sizeof(int);
+
+	public const int TYPE_VALUES_NUMBER = 4;
+	private const int VALUE_HEADER_SIZE = 2;
+	private const int VALUE_DATA_SIZE = TYPE_VALUES_NUMBER * sizeof(float);
+	protected const int VALUE_BLOCK_SIZE = VALUE_HEADER_SIZE + VALUE_DATA_SIZE;
+	private const int VALUE_OID_OFFSET = 0, VALUE_INDEX_OFFSET = 1;
 
 	protected int socketID = -1;
 	protected int eventChannel = -1, dataChannel = -1;
 	protected byte connectionError = 0;
 
+	protected float networkDelay = 0.0f;
+
 	protected byte[] inputBuffer = new byte[ PACKET_SIZE ];
 	protected byte[] outputBuffer = new byte[ PACKET_SIZE ];
+	private int lastInputPacketIndex = 0, outputPacketsCount = 0;
 
-	public GameConnectionBase()
+	protected Dictionary<KeyValuePair<byte,byte>,float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
+	protected Dictionary<KeyValuePair<byte,byte>,float[]> localValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
+	private List<KeyValuePair<byte,byte>> updatedLocalKeys = new List<KeyValuePair<byte,byte>>();
+
+	public GameConnection()
 	{
 		GlobalConfig networkConfig = new GlobalConfig();
 		networkConfig.MaxPacketSize = PACKET_SIZE;
@@ -46,113 +51,76 @@ public abstract class GameConnectionBase
 
 	public abstract void Connect();
 
-	public abstract void SetLocalValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType, float value );
-	public abstract bool HasRemoteKey( int elementID, NetworkAxis axisIndex );
-	public abstract float GetRemoteValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType );
-
-	public abstract float UpdateData( float updateTime );
-
-	public abstract int GetNetworkDelay();
-}
-
-public abstract class GameConnection<CompensatorType> : GameConnectionBase where CompensatorType : NetworkCompensator, new()
-{
-	public class NetworkOperator 
+	public void SetLocalValue( int objectID, int valueType, int valueIndex, float value ) 
 	{
-		public float[] outputValues = new float[ (int) NetworkValue.VALUES_NUMBER ];
-		public bool outputValuesUpdated = true;
-		public float[] inputValues = new float[ (int) NetworkValue.VALUES_NUMBER ];
+		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( (byte) objectID, (byte) valueType );
 
-		public CompensatorType compensator = new CompensatorType();
+		if( !localValues.ContainsKey( localKey ) ) localValues[ localKey ] = new float[ TYPE_VALUES_NUMBER ];
+
+		if( Math.Abs( localValues[ localKey ][ valueType ] - value ) > 0.1f )
+		{
+			localValues[ localKey ][ (int) valueType ] = value;
+			updatedLocalKeys.Add( localKey );
+		}
 	}
 
-	protected Dictionary<KeyValuePair<byte,byte>, NetworkOperator> networkOperators = new Dictionary<KeyValuePair<byte,byte>, NetworkOperator>();
-
-	public override void SetLocalValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType, float value ) 
-    {
-		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex );
-
-		if( !networkOperators.ContainsKey( localKey ) ) networkOperators[ localKey ] = new NetworkOperator();
-
-		if( Math.Abs( networkOperators[ localKey ].outputValues[ (int) valueType ] - value ) > 0.1f )
-        {
-			networkOperators[ localKey ].outputValues[ (int) valueType ] = value;
-			networkOperators[ localKey ].outputValuesUpdated = true;
-
-          	//Debug.Log( "Setting " + localKey.ToString() + " position" );
-        }
-    }
-
-	public override bool HasRemoteKey( int elementID, NetworkAxis axisIndex )
-    {
-		return networkOperators.ContainsKey( new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex ) );
-    }
-
-	public override float GetRemoteValue( int elementID, NetworkAxis axisIndex, NetworkValue valueType )
-    {
-		NetworkOperator networkOperator;
-
-		if( networkOperators.TryGetValue( new KeyValuePair<byte,byte>( (byte) elementID, (byte) axisIndex ), out networkOperator ) ) 
-			return networkOperator.inputValues[ (int) valueType ];
-
-        return 0.0f;
-    }
-
-	public override float UpdateData( float updateTime )
+	public float GetRemoteValue( int objectID, int valueType, int valueIndex )
 	{
-		int outputMessageLength = 1;
+		KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( (byte) objectID, (byte) valueType );
+
+		if( remoteValues.ContainsKey( remoteKey ) ) return remoteValues[ remoteKey ][ valueType ];
+
+		return 0.0f;
+	}
+
+	public void UpdateData( float updateTime )
+	{
+		int outputMessageLength = PACKET_HEADER_LENGTH;
 
 		if( socketID == -1 ) return updateTime;
 
-		foreach( KeyValuePair<byte,byte> localKey in networkOperators.Keys ) 
+		foreach( KeyValuePair<byte,byte> localKey in updatedLocalKeys ) 
 		{
-			NetworkOperator networkOperator = networkOperators[ localKey ];
+			outputBuffer[ outputMessageLength + VALUE_OID_OFFSET ] = localKey.Key;
+			outputBuffer[ outputMessageLength + VALUE_INDEX_OFFSET ] = localKey.Value;
+			outputMessageLength += VALUE_HEADER_SIZE;
 
-			if( networkOperator.outputValuesUpdated )
-            {
-    			outputBuffer[ outputMessageLength ] = localKey.Key;
-    			outputBuffer[ outputMessageLength + 1 ] = localKey.Value;
-    			
-				networkOperator.compensator.EncodeOutputData( networkOperator.outputValues, outputBuffer, outputMessageLength + 2 );
+			for( int valueIndex = 0; valueIndex < TYPE_VALUES_NUMBER; valueIndex++ ) 
+			{
+				int dataOffset = outputMessageLength + valueIndex * sizeof(float);
+				Buffer.BlockCopy( BitConverter.GetBytes( localValues[ localKey ][ valueIndex ] ), 0, outputBuffer, dataOffset, sizeof(float) );
+			}
 
-    			outputMessageLength += DATA_SIZE;
-
-				networkOperator.outputValuesUpdated = false;
-            }
-
-            //Debug.Log( "Sending " + localKey.ToString() + " position: " + localValues[ localKey ].ToString() );
+			outputMessageLength += VALUE_DATA_SIZE;
 		}
 
-		outputBuffer[ 0 ] = (byte) outputMessageLength;
+		updatedLocalKeys.Clear();
 
-		if( outputMessageLength > 1 ) SendUpdateMessage();
+		Buffer.BlockCopy( BitConverter.GetBytes( outputMessageLength ), 0, outputBuffer, 0, sizeof(int) );
+
+		if( outputMessageLength > PACKET_HEADER_LENGTH ) SendUpdateMessage();
 
 		if( ReceiveUpdateMessage() )
 		{
-			int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], AxisClient.BUFFER_SIZE - DATA_SIZE );
+			int inputMessageLength = Math.Min( BitConverter.ToInt32( inputBuffer, 0 ), InputAxisClient.BUFFER_SIZE - VALUE_BLOCK_SIZE );
 
-	        for( int dataOffset = 1; dataOffset < inputMessageLength; dataOffset += DATA_SIZE )
+			for( int dataOffset = PACKET_HEADER_LENGTH; dataOffset < inputMessageLength; dataOffset += VALUE_BLOCK_SIZE )
 			{
-				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( inputBuffer[ dataOffset ], inputBuffer[ dataOffset + 1 ] );
-	            //Debug.Log( "Received values for key " + remoteKey.ToString() );
-				if( !networkOperators.ContainsKey( remoteKey ) ) networkOperators[ remoteKey ] = new NetworkOperator();
+				byte objectID = inputBuffer[ dataOffset + VALUE_OID_OFFSET ];
+				byte axisIndex = inputBuffer[ dataOffset + VALUE_INDEX_OFFSET ];
+				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( objectID, axisIndex );
+				//Debug.Log( "Received values for key " + remoteKey.ToString() );
+				if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ TYPE_VALUES_NUMBER ];
 
-				networkOperators[ remoteKey ].compensator.DecodeInputData( networkOperators[ remoteKey ].inputValues, inputBuffer, dataOffset + 2 );
-
-	            //Debug.Log( "Received axis " + ( dataOffset / DATA_SIZE ).ToString() + ": " + remoteKey.ToString() + ": " + remoteValues[ remoteKey ].ToString() );
+				for( int valueIndex = 0; valueIndex < TYPE_VALUES_NUMBER; valueIndex++ )
+					remoteValues[ remoteKey ][ valueIndex ] = BitConverter.ToSingle( inputBuffer, dataOffset + valueIndex * sizeof(float) );
 			}
 		}
-		else
-		{
-			foreach( NetworkOperator networkOperator in networkOperators.Values )
-				networkOperator.compensator.UpdateData( networkOperator.inputValues, networkOperator.outputValues, updateTime );
-		}
-
-		return GetNetworkDelay();
 	}
 
 	protected abstract void SendUpdateMessage();
 
 	protected abstract bool ReceiveUpdateMessage();
-}
 
+	public float GetNetworkDelay() { return networkDelay; }
+}

@@ -2,38 +2,49 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public abstract class GameState : MonoBehaviour
+public abstract class GameState : MonoBehaviour 
 {
-	protected GameConnectionBase connection = null;
+	public abstract GameConnection GetConnection();
 
-	public GameConnectionBase GetConnection() 
-	{ 
-		return connection; 
-	}
-
-	IEnumerator UpdateNetworkData()
+	public virtual void FixedUpdate()
 	{
-		float networkDelay = 0.0f;
-
-		while( Application.isPlaying )
-		{
-			networkDelay = connection.UpdateData( networkDelay );
-			yield return new WaitForSecondsRealtime( networkDelay );
-		}
+		GetConnection().UpdateData( Time.fixedDeltaTime );
 	}
+}
+
+public abstract class GameServer : GameState 
+{
+	protected GameServerConnection connection = null;
+
+	public virtual void Start()
+	{
+		connection = new GameServerConnection();
+		Debug.Log( "Created connection " + connection.ToString() );
+	}
+
+	public override GameConnection GetConnection() { return connection; }
 }
 
 public abstract class GameClient : GameState
 {
 	public Camera gameCamera;
 
-	public Text playerScoreText, machineScoreText, lazyScoreText; 	// UI Scores
+	public Text infoText;
 
 	public Slider setpointSlider;
 	protected Image sliderHandle;
+
+	protected GameClientConnection connection = null;
+
+	public virtual void Start()
+	{
+		connection = new GameClientConnection();
+		Debug.Log( "Created connection " + connection.ToString() );
+	}
+
+	public override GameConnection GetConnection() { return connection; }
 }
 
-public abstract class GameServer : GameState {}
 
 public class GameManager : MonoBehaviour 
 {
@@ -44,22 +55,36 @@ public class GameManager : MonoBehaviour
 
 	private static GameState game = null;
 
-	void Start () 
+	void Start() 
 	{
-		//game = isMaster ? server : client;
-		if( isMaster ) game = server;
-		else game = client;
+		game = isMaster ? server : client;
 
 		game.enabled = true;
 	}
 
-	public static GameConnectionBase GetConnection()
+	/*void FixedUpdate()
+	{
+		game.GetConnection().UpdateData( Time.fixedDeltaTime );
+	}*/
+
+	/*IEnumerator UpdateNetworkData()
+	{
+		float networkDelay = 0.0f;
+
+		while( Application.isPlaying )
+		{
+			networkDelay = connection.UpdateData( networkDelay );
+			yield return new WaitForSecondsRealtime( networkDelay );
+		}
+	}*/
+
+	public static GameConnection GetConnection()
 	{
 		return game.GetConnection();
 	}
 
 	void OnApplicationQuit()
 	{
-		GameConnectionBase.Shutdown();
+		GameConnection.Shutdown();
 	}
 }

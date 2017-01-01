@@ -1,17 +1,14 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameServerConnection.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameConnection.cs">
     <Files>
-      <File FileName="Assets\Scripts\SlaveController.cs" Line="30" Column="5" />
-      <File FileName="Assets\Scripts\NetworkCompensator.cs" Line="50" Column="63" />
-      <File FileName="Assets\Scripts\Controller.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\BallController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\BatController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameServerConnection.cs" Line="27" Column="3" />
-      <File FileName="Assets\Scripts\GameClientConnection.cs" Line="23" Column="113" />
-      <File FileName="Assets\Scripts\DoublePongClient.cs" Line="23" Column="2" />
-      <File FileName="Assets\Scripts\GameConnection.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameClientConnection.cs" Line="14" Column="1" />
+      <File FileName="Assets/Scripts/DoublePongClient.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SlaveController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameServerConnection.cs" Line="19" Column="45" />
+      <File FileName="Assets/Scripts/GameAxisSynchronizer.cs" Line="14" Column="2" />
+      <File FileName="Assets/Scripts/GameConnection.cs" Line="108" Column="46" />
+      <File FileName="Assets/Scripts/InputAxisClient.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

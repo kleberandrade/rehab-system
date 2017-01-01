@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum GameAxis : byte { X, Y, Z };
+
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(Collider) ) ]
 public abstract class Controller : MonoBehaviour 

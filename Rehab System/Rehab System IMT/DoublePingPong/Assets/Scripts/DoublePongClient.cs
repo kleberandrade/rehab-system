@@ -9,6 +9,8 @@ public class DoublePongClient : GameClient
 	public SlaveController ball;
 	private Vector3 lastBallPosition;
 
+	public Text localPlayerScoreText, remotePlayerScoreText;
+
 	public Controller[] verticalBats = new Controller[ 2 ];
 	public Controller[] horizontalBats = new Controller[ 2 ];
 	private PlayerController[] playerBats = new PlayerController[ 2 ];
@@ -18,8 +20,6 @@ public class DoublePongClient : GameClient
 	private float error = 0.0f;
 
 	private int clientID = -1;
-
-	private float gameTime = 0.0f;
 
 	void Awake()
 	{
@@ -31,20 +31,11 @@ public class DoublePongClient : GameClient
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
 
 		lastBallPosition = ball.transform.position;
-
-		connection = new GameClientConnection<MotionPredictor>();
-
-		Debug.Log( "Created connection " + connection.ToString() );
 	}
 
-	void Start()
+	public override void FixedUpdate()
 	{
-		
-	}
-
-	void FixedUpdate()
-	{
-		connection.UpdateData( Time.fixedDeltaTime );
+		base.FixedUpdate();
 
 		Vector3 impactPoint = ball.FindImpactPoint( targetMask );
 
@@ -68,22 +59,21 @@ public class DoublePongClient : GameClient
 
 		while( Application.isPlaying )
 		{
-			ConnectionInfo currentConnectionInfo = ((GameClientConnection<MotionPredictor>) connection).GetConnectionInfo();
+			ConnectionInfo currentConnectionInfo = connection.GetConnectionInfo();
 
 			int networkDelay = connection.GetNetworkDelay();
 
-			lazyScoreText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s Last Delay: {2}ms\nSend: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms Lost Packets: {6}", clientID, gameTime,
-				                                 networkDelay, currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
+			infoText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s Last Delay: {2}ms\nSend: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms Lost Packets: {6}", clientID, gameTime,
+				                            networkDelay, currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
 
 			if( ball.transform.position != lastBallPosition )
 			{
+				float gameTime = DateTime.Now.TimeOfDay.TotalSeconds;
 				verticalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, verticalBats[ 0 ].transform.position.z ) );
 				horizontalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, horizontalBats[ 0 ].transform.position.x ) );
 				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, ball.transform.position.x, ball.transform.position.z ) );
 				networkLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, currentConnectionInfo.rtt, networkDelay ) );
 			}
-
-			gameTime += Time.fixedDeltaTime;
 
 			yield return new WaitForFixedUpdate();
 		}
@@ -98,7 +88,7 @@ public class DoublePongClient : GameClient
 	{
 		while( clientID == -1 && Application.isPlaying )
 		{
-			clientID = ((GameClientConnection<MotionPredictor>) connection).GetClientID();
+			clientID = connection.GetClientID();
 			yield return new WaitForSeconds( 0.1f );
 		}
 
@@ -121,8 +111,6 @@ public class DoublePongClient : GameClient
 			playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PlayerController>();
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
 		}
-
-		gameTime = ((GameClientConnection<MotionPredictor>) connection).GetClientTime();
 
 		ball.enabled = true;
 		StartCoroutine( RegisterValues() );

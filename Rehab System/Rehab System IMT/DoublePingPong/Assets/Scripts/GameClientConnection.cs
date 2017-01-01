@@ -5,13 +5,20 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public class GameClientConnection<CompensatorType> : GameConnection<CompensatorType> where CompensatorType : NetworkCompensator, new()
+public struct ConnectionInfo
+{
+	public int socketID, connectionID, channel;
+	public float sendRate, receiveRate;
+	public int rtt, ioTime, lostPackets;
+}
+
+public class GameClientConnection : GameConnection
 {
 	private int connectionID;
 	private int clientID = -1;
 	private float clientTime = 0.0f;
 
-	private int networkDelay = 0;
+	private int networkDelayMS = 0;
 
 	public override void Connect()
     {
@@ -45,10 +52,7 @@ public class GameClientConnection<CompensatorType> : GameConnection<CompensatorT
 				}
 				else if( channel == dataChannel ) 
 				{
-					int inputMessageLength = Math.Min( (int) inputBuffer[ 0 ], AxisClient.BUFFER_SIZE - DATA_SIZE );
-					int networkTimeStamp = BitConverter.ToInt32( inputBuffer, inputMessageLength ); 
-
-					networkDelay = NetworkTransport.GetRemoteDelayTimeMS( socketID, connectionID, networkTimeStamp, out connectionError );
+					networkDelay = NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
 
 					return true;
 				}
@@ -58,11 +62,6 @@ public class GameClientConnection<CompensatorType> : GameConnection<CompensatorT
 		return false;
 	}
 
-	public override int GetNetworkDelay()
-	{
-		return networkDelay;
-	}
-
 	public int GetClientID()
 	{
 		return clientID;
@@ -70,7 +69,7 @@ public class GameClientConnection<CompensatorType> : GameConnection<CompensatorT
 
 	public float GetClientTime()
 	{
-		return clientTime - (float) ( networkDelay / 1000.0f );
+		return clientTime - networkDelay;
 	}
 
 	public ConnectionInfo GetConnectionInfo()

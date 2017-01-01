@@ -7,6 +7,8 @@ using System.Text;
 [ RequireComponent( typeof(Collider) ) ]
 public class BallController : Controller 
 {
+	const int POSITION = 0, VELOCITY = 1;
+
 	public float speed;	// Ball speed
 
 	void FixedUpdate()
@@ -21,15 +23,15 @@ public class BallController : Controller
 		body.MovePosition( newPosition );
 		body.velocity = newVelocity;
 
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, POSITION, body.position.x );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, VELOCITY, body.velocity.x );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, POSITION, body.position.z );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, VELOCITY, body.velocity.z );
     }
 
     void OnTriggerExit( Collider collider )
 	{
-		if( collider.tag == "Boundary" ) UpdateMasterValues( new Vector3( 0.0f, body.position.y, 0.0f ), GenerateStartVector() * speed );
+		if( collider.tag == "Boundary" ) UpdateMasterValues( initialPosition, GenerateStartVector() * speed );
 	}
 
     void OnTriggerEnter( Collider collider )
@@ -49,7 +51,8 @@ public class BallController : Controller
 
 	public void OnEnable()
 	{
-		UpdateMasterValues( initialPosition, GenerateStartVector() * speed );
+		body.position = initialPosition;
+		body.velocity = GenerateStartVector() * speed;
 	}
 
 	public void OnDisable()

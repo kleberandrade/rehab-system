@@ -12,20 +12,20 @@ public class BatController : Controller
 {
 	void FixedUpdate()
 	{
-		Vector3 masterPosition = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.POSITION ),
-											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.POSITION ) );
+		Vector3 masterPosition = new Vector3( GameManager.GetConnection().GetRemoteAxisValue( elementID, GameAxis.X, GameAxisValue.POSITION ),
+											  0.0f, GameManager.GetConnection().GetRemoteAxisValue( elementID, GameAxis.Z, GameAxisValue.POSITION ) );
 
-		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY ),
-											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY ) );
+		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteAxisValue( elementID, GameAxis.X, GameAxisValue.VELOCITY ),
+											  0.0f, GameManager.GetConnection().GetRemoteAxisValue( elementID, GameAxis.Z, GameAxisValue.VELOCITY ) );
 
 		body.MovePosition( masterPosition );
 		body.velocity = masterVelocity;
 
 		// Send locally controlled object position over network
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.POSITION, body.position.x );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.POSITION, body.position.z );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.X, NetworkValue.VELOCITY, body.velocity.x );
-		GameManager.GetConnection().SetLocalValue( elementID, NetworkAxis.Z, NetworkValue.VELOCITY, body.velocity.z );
+		GameManager.GetConnection().SetLocalAxisValue( elementID, GameAxis.X, GameAxisValue.POSITION, body.position.x );
+		GameManager.GetConnection().SetLocalAxisValue( elementID, GameAxis.Z, GameAxisValue.POSITION, body.position.z );
+		GameManager.GetConnection().SetLocalAxisValue( elementID, GameAxis.X, GameAxisValue.VELOCITY, body.velocity.x );
+		GameManager.GetConnection().SetLocalAxisValue( elementID, GameAxis.Z, GameAxisValue.VELOCITY, body.velocity.z );
 	}
 }
 
