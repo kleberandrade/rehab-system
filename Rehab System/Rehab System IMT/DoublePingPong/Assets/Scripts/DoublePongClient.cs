@@ -59,20 +59,18 @@ public class DoublePongClient : GameClient
 
 		while( Application.isPlaying )
 		{
-			ConnectionInfo currentConnectionInfo = connection.GetConnectionInfo();
+			ConnectionInfo currentConnectionInfo = connection.GetCurrentInfo();
 
-			int networkDelay = connection.GetNetworkDelay();
-
-			infoText.text =  string.Format( "Client: {0} Server Uptime: {1:F1}s Last Delay: {2}ms\nSend: {3,2}KB/s Receive: {4,2}KB/s RTT: {5,3}ms Lost Packets: {6}", clientID, gameTime,
-				                            networkDelay, currentConnectionInfo.sendRate, currentConnectionInfo.receiveRate, currentConnectionInfo.rtt, currentConnectionInfo.lostPackets );
+			infoText.text =  string.Format( "Client: {0} Sent: {1} Received: {2} Lost Packets: {3} RTT: {4,3}ms", clientID,
+											currentConnectionInfo.sentPackets, currentConnectionInfo.receivedPackets, currentConnectionInfo.lostPackets, currentConnectionInfo.rtt );
 
 			if( ball.transform.position != lastBallPosition )
 			{
-				float gameTime = DateTime.Now.TimeOfDay.TotalSeconds;
+				double gameTime = DateTime.Now.TimeOfDay.TotalSeconds;
 				verticalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, verticalBats[ 0 ].transform.position.z ) );
 				horizontalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, horizontalBats[ 0 ].transform.position.x ) );
 				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, ball.transform.position.x, ball.transform.position.z ) );
-				networkLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, currentConnectionInfo.rtt, networkDelay ) );
+				networkLog.WriteLine( string.Format( "{0}\t{1}", gameTime, currentConnectionInfo.rtt / 2.0f ) );
 			}
 
 			yield return new WaitForFixedUpdate();
@@ -88,7 +86,7 @@ public class DoublePongClient : GameClient
 	{
 		while( clientID == -1 && Application.isPlaying )
 		{
-			clientID = connection.GetClientID();
+			clientID = connection.GetID();
 			yield return new WaitForSeconds( 0.1f );
 		}
 

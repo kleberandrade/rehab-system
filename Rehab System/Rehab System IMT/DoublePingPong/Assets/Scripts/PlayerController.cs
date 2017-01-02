@@ -27,12 +27,17 @@ public class PlayerController : Controller
 	private InputAxis controlAxis = null;
 	private bool helperEnabled = false;
 
+	void Start()
+	{
+		initialMoveBoxScale = transform.lossyScale;
+	}
+
 	void FixedUpdate()
 	{
 		if( controlAxis != null )
 		{
 			float input = controlAxis.NormalizedPosition;
-			//Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
+			Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
 			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
 
 			// Send locally controlled object position over network

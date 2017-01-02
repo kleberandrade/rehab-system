@@ -57,7 +57,8 @@ public class GameManager : MonoBehaviour
 
 	void Start() 
 	{
-		game = isMaster ? server : client;
+		if( isMaster ) game = server;
+		else game = client;
 
 		game.enabled = true;
 	}

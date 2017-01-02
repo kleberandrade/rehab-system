@@ -6,15 +6,13 @@ using System.Collections.Generic;
 
 public abstract class GameConnection
 {
-	public const string GAME_SERVER_HOST_ID = "Game Server Host";
-
 	protected ConnectionConfig connectionConfig = new ConnectionConfig();
 
 	protected const int GAME_SERVER_PORT = 50004;
 	protected const int PACKET_SIZE = 512;
 	private const int PACKET_HEADER_LENGTH = sizeof(int);
 
-	public const int TYPE_VALUES_NUMBER = 4;
+	public const int TYPE_VALUES_NUMBER = 3;
 	private const int VALUE_HEADER_SIZE = 2;
 	private const int VALUE_DATA_SIZE = TYPE_VALUES_NUMBER * sizeof(float);
 	protected const int VALUE_BLOCK_SIZE = VALUE_HEADER_SIZE + VALUE_DATA_SIZE;
@@ -28,17 +26,22 @@ public abstract class GameConnection
 
 	protected byte[] inputBuffer = new byte[ PACKET_SIZE ];
 	protected byte[] outputBuffer = new byte[ PACKET_SIZE ];
-	private int lastInputPacketIndex = 0, outputPacketsCount = 0;
 
-	protected Dictionary<KeyValuePair<byte,byte>,float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
-	protected Dictionary<KeyValuePair<byte,byte>,float[]> localValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
+	private Dictionary<KeyValuePair<byte,byte>,float[]> remoteValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
+	private Dictionary<KeyValuePair<byte,byte>,float[]> localValues = new Dictionary<KeyValuePair<byte,byte>,float[]>();
+
 	private List<KeyValuePair<byte,byte>> updatedLocalKeys = new List<KeyValuePair<byte,byte>>();
+
+	private Dictionary<byte,float> inputDelays = new Dictionary<byte,float>();
 
 	public GameConnection()
 	{
 		GlobalConfig networkConfig = new GlobalConfig();
-		networkConfig.MaxPacketSize = PACKET_SIZE;
+		networkConfig.MaxPacketSize = 2 * PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
+
+		connectionConfig.PacketSize = 2 * PACKET_SIZE - 1;
+		connectionConfig.FragmentSize = PACKET_SIZE;
 
 		eventChannel = connectionConfig.AddChannel( QosType.Reliable );
 		dataChannel = connectionConfig.AddChannel( QosType.StateUpdate ); // QosType.Unreliable sending just most recent
@@ -77,7 +80,7 @@ public abstract class GameConnection
 	{
 		int outputMessageLength = PACKET_HEADER_LENGTH;
 
-		if( socketID == -1 ) return updateTime;
+		if( socketID == -1 ) return;
 
 		foreach( KeyValuePair<byte,byte> localKey in updatedLocalKeys ) 
 		{
@@ -112,8 +115,11 @@ public abstract class GameConnection
 				//Debug.Log( "Received values for key " + remoteKey.ToString() );
 				if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ TYPE_VALUES_NUMBER ];
 
+				dataOffset += VALUE_HEADER_SIZE;
 				for( int valueIndex = 0; valueIndex < TYPE_VALUES_NUMBER; valueIndex++ )
 					remoteValues[ remoteKey ][ valueIndex ] = BitConverter.ToSingle( inputBuffer, dataOffset + valueIndex * sizeof(float) );
+
+				inputDelays[ objectID ] = networkDelay;
 			}
 		}
 	}
@@ -122,5 +128,10 @@ public abstract class GameConnection
 
 	protected abstract bool ReceiveUpdateMessage();
 
-	public float GetNetworkDelay() { return networkDelay; }
+	public float GetNetworkDelay( int objectID ) 
+	{ 
+		if( inputDelays.ContainsKey( (byte) objectID ) ) return inputDelays[ (byte) objectID ];
+
+		return 0.0f; 
+	}
 }

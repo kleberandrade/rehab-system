@@ -45,7 +45,6 @@ public class GameServerConnection : GameConnection
 			else if( networkEvent == NetworkEventType.DataEvent ) 
 			{
 				networkDelay = NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;
-
 				return true;
 			}
 			

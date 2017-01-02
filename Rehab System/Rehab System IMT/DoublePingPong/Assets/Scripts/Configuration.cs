@@ -43,7 +43,7 @@ public class Configuration : MonoBehaviour
         SetSelectedAxis( 0 );
 
 		axisServerEntry.text = PlayerPrefs.GetString( RemoteInputAxis.AXIS_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
-		gameServerEntry.text = PlayerPrefs.GetString( GameConnectionBase.GAME_SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
+		gameServerEntry.text = PlayerPrefs.GetString( GameClientConnection.SERVER_HOST_ID, Configuration.DEFAULT_IP_HOST );
 
 		infoStateClient = new InputAxisInfoClient();
 	}
@@ -81,7 +81,7 @@ public class Configuration : MonoBehaviour
 	public void SetGameServer( string serverHost )
 	{
 		Debug.Log( "Setting game server host as " + serverHost );
-		PlayerPrefs.SetString( GameConnectionBase.GAME_SERVER_HOST_ID, serverHost );
+		PlayerPrefs.SetString( GameClientConnection.SERVER_HOST_ID, serverHost );
 	}
 
     public void SetSelectedAxis( Int32 typeIndex )
