@@ -3,9 +3,8 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
     <ProjectGuid>{CDC21C26-6846-666C-611D-C20CC36F8010}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -34,65 +33,67 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine">
-      <HintPath>/opt/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
-      <HintPath>/opt/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\GameAxisSynchronizer.cs" />
-     <Compile Include="Assets\NTPClient.cs" />
-     <Compile Include="Assets\Scripts\BallController.cs" />
-     <Compile Include="Assets\Scripts\BatController.cs" />
-     <Compile Include="Assets\Scripts\Configuration.cs" />
-     <Compile Include="Assets\Scripts\Controller.cs" />
-     <Compile Include="Assets\Scripts\DoublePongClient.cs" />
-     <Compile Include="Assets\Scripts\DoublePongServer.cs" />
-     <Compile Include="Assets\Scripts\GameClientConnection.cs" />
-     <Compile Include="Assets\Scripts\GameConnection.cs" />
-     <Compile Include="Assets\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\GameServerConnection.cs" />
-     <Compile Include="Assets\Scripts\InputAxis.cs" />
-     <Compile Include="Assets\Scripts\InputAxisClient.cs" />
-     <Compile Include="Assets\Scripts\InputAxisDataClient.cs" />
-     <Compile Include="Assets\Scripts\InputAxisInfoClient.cs" />
-     <Compile Include="Assets\Scripts\InputAxisManager.cs" />
-     <Compile Include="Assets\Scripts\PlayerController.cs" />
-     <Compile Include="Assets\Scripts\PositionController.cs" />
-     <Compile Include="Assets\Scripts\SimpleJSON.cs" />
-     <Compile Include="Assets\Scripts\SlaveController.cs" />
-     <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader2.shader" />
-     <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader1.shader" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Networking">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.PlaymodeTestsRunner">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.HoloLens">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Purchasing">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/UnityPurchasing/UnityEngine.Purchasing.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.VR">
- <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
- </Reference>
+    <Compile Include="Assets\GameAxisSynchronizer.cs" />
+    <Compile Include="Assets\NTPClient.cs" />
+    <Compile Include="Assets\Scripts\BallController.cs" />
+    <Compile Include="Assets\Scripts\BatController.cs" />
+    <Compile Include="Assets\Scripts\Configuration.cs" />
+    <Compile Include="Assets\Scripts\Controller.cs" />
+    <Compile Include="Assets\Scripts\DoublePongClient.cs" />
+    <Compile Include="Assets\Scripts\DoublePongServer.cs" />
+    <Compile Include="Assets\Scripts\GameClientConnection.cs" />
+    <Compile Include="Assets\Scripts\GameConnection.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GameServerConnection.cs" />
+    <Compile Include="Assets\Scripts\InputAxis.cs" />
+    <Compile Include="Assets\Scripts\InputAxisClient.cs" />
+    <Compile Include="Assets\Scripts\InputAxisDataClient.cs" />
+    <Compile Include="Assets\Scripts\InputAxisInfoClient.cs" />
+    <Compile Include="Assets\Scripts\InputAxisManager.cs" />
+    <Compile Include="Assets\Scripts\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\PositionController.cs" />
+    <Compile Include="Assets\Scripts\SimpleJSON.cs" />
+    <Compile Include="Assets\Scripts\SlaveController.cs" />
+    <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader2.shader" />
+    <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader1.shader" />
+    <Reference Include="UnityEngine.Advertisements">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\Advertisements\UnityEngine.Advertisements.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\Networking\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PlaymodeTestsRunner">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\PlaymodeTestsRunner\UnityEngine.PlaymodeTestsRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\UnityAnalytics\UnityEngine.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HoloLens">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\UnityHoloLens\RuntimeEditor\UnityEngine.HoloLens.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\UnityPurchasing\UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VR">
+      <HintPath>..\..\..\..\..\..\..\..\opt\Unity\Editor\Data\UnityExtensions\Unity\UnityVR\RuntimeEditor\UnityEngine.VR.dll</HintPath>
+    </Reference>
+    <Compile Include="Assets\Scripts\WaveMasterController.cs" />
+    <Compile Include="Assets\Scripts\WaveSlaveController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -102,5 +103,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  
 </Project>
