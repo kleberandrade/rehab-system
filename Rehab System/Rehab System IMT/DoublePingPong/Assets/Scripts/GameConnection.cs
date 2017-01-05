@@ -1,4 +1,5 @@
-﻿using UnityEngine.Networking;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -37,11 +38,11 @@ public abstract class GameConnection
 	public GameConnection()
 	{
 		GlobalConfig networkConfig = new GlobalConfig();
-		networkConfig.MaxPacketSize = 2 * PACKET_SIZE;
+		//networkConfig.MaxPacketSize = 2 * PACKET_SIZE;
 		NetworkTransport.Init( networkConfig );
 
-		connectionConfig.PacketSize = 2 * PACKET_SIZE - 1;
-		connectionConfig.FragmentSize = PACKET_SIZE;
+		//connectionConfig.PacketSize = 2 * PACKET_SIZE - 1;
+		//connectionConfig.FragmentSize = PACKET_SIZE;
 
 		eventChannel = connectionConfig.AddChannel( QosType.Reliable );
 		dataChannel = connectionConfig.AddChannel( QosType.StateUpdate ); // QosType.Unreliable sending just most recent
@@ -60,9 +61,10 @@ public abstract class GameConnection
 
 		if( !localValues.ContainsKey( localKey ) ) localValues[ localKey ] = new float[ TYPE_VALUES_NUMBER ];
 
-		if( Math.Abs( localValues[ localKey ][ valueType ] - value ) > 0.1f )
+		if( Math.Abs( localValues[ localKey ][ valueIndex ] - value ) > 0.1f )
 		{
-			localValues[ localKey ][ (int) valueType ] = value;
+			//Debug.Log( "updating value [" + localKey.ToString() + "," + valueIndex.ToString() + "]: " + localValues[ localKey ][ valueIndex ].ToString() + " -> " + value.ToString() );
+			localValues[ localKey ][ valueIndex ] = value;
 			updatedLocalKeys.Add( localKey );
 		}
 	}
@@ -71,7 +73,7 @@ public abstract class GameConnection
 	{
 		KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( (byte) objectID, (byte) valueType );
 
-		if( remoteValues.ContainsKey( remoteKey ) ) return remoteValues[ remoteKey ][ valueType ];
+		if( remoteValues.ContainsKey( remoteKey ) ) return remoteValues[ remoteKey ][ valueIndex ];
 
 		return 0.0f;
 	}
@@ -96,17 +98,20 @@ public abstract class GameConnection
 
 			outputMessageLength += VALUE_DATA_SIZE;
 		}
+			
+		if( updatedLocalKeys.Count > 0 ) 
+		{
+			Buffer.BlockCopy( BitConverter.GetBytes( outputMessageLength ), 0, outputBuffer, 0, PACKET_HEADER_LENGTH );
+			Debug.Log( "sending " + updatedLocalKeys.Count.ToString() + " blocks (" + BitConverter.ToInt32( outputBuffer, 0 ).ToString() + " bytes)" );
+			SendUpdateMessage();
+		}
 
 		updatedLocalKeys.Clear();
 
-		Buffer.BlockCopy( BitConverter.GetBytes( outputMessageLength ), 0, outputBuffer, 0, sizeof(int) );
-
-		if( outputMessageLength > PACKET_HEADER_LENGTH ) SendUpdateMessage();
-
 		if( ReceiveUpdateMessage() )
 		{
-			int inputMessageLength = Math.Min( BitConverter.ToInt32( inputBuffer, 0 ), InputAxisClient.BUFFER_SIZE - VALUE_BLOCK_SIZE );
-
+			int inputMessageLength = Math.Min( BitConverter.ToInt32( inputBuffer, 0 ), PACKET_SIZE - VALUE_BLOCK_SIZE );
+			Debug.Log( "receiving " + inputMessageLength.ToString() + " bytes" );
 			for( int dataOffset = PACKET_HEADER_LENGTH; dataOffset < inputMessageLength; dataOffset += VALUE_BLOCK_SIZE )
 			{
 				byte objectID = inputBuffer[ dataOffset + VALUE_OID_OFFSET ];

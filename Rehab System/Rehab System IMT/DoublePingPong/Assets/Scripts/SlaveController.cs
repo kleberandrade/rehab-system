@@ -18,6 +18,8 @@ public class SlaveController : Controller
 
 		Vector3 trackingError = masterPosition + masterVelocity * inputDelay - body.position;
 
+		//Debug.Log( "master pos: " + masterPosition.ToString() + " - vel: " + masterVelocity.ToString() + " - err: " + trackingError.ToString() );
+
 		if( trackingError.magnitude > rangeLimits.magnitude / 2.0f ) body.MovePosition( masterPosition );
 		else masterVelocity += trackingError;
 

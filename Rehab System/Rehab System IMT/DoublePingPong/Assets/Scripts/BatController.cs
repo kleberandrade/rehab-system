@@ -4,7 +4,8 @@
 [ RequireComponent( typeof(BoxCollider) ) ]
 public class BatController : Controller 
 {
-	const int POSITION = 0, VELOCITY = 1;
+	const int POSITION = 0;
+	const int VELOCITY = 1;
 
 	void FixedUpdate()
 	{
@@ -16,7 +17,7 @@ public class BatController : Controller
 		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.X, VELOCITY ),
 											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, VELOCITY ) );
 
-		Debug.Log( "position: " + masterPosition.ToString() + " - velocity: " + masterVelocity.ToString() );
+		//Debug.Log( "position: " + masterPosition.ToString() + " - velocity: " + masterVelocity.ToString() );
 		body.MovePosition( masterPosition + masterVelocity * inputDelay );
 		body.velocity = masterVelocity;
 

@@ -38,7 +38,7 @@ public class GameServerConnection : GameConnection
 			if( networkEvent == NetworkEventType.ConnectEvent ) 
 			{
 				inputBuffer[ 0 ] = (byte) clientConnections.Count;
-				Buffer.BlockCopy( BitConverter.GetBytes( Time.realtimeSinceStartup ), 0, inputBuffer, 1, sizeof(float) );
+				//Buffer.BlockCopy( BitConverter.GetBytes( Time.realtimeSinceStartup ), 0, inputBuffer, 1, sizeof(float) );
 				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1 + sizeof(double), out connectionError );
 				clientConnections.Add( connectionID ); 
 			} 
