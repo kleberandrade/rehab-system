@@ -78,6 +78,7 @@ public class MouseInputAxis : InputAxis
 	{
 		velocity = Input.GetAxis( id ) / updateTime;
 		position += velocity * updateTime;
+		force = velocity;
 	}
 }
 
@@ -96,10 +97,11 @@ public class KeyboardInputAxis : InputAxis
 
 	public override void Update( float updateTime )
 	{
-		if( ! Mathf.Approximately( feedbackPosition, position ) ) position = feedbackPosition;
+		//if( ! Mathf.Approximately( feedbackPosition, position ) ) position = feedbackPosition;
 		velocity = Input.GetAxis( id );
 		position += velocity * updateTime;
-		feedbackPosition = position;
+		//feedbackPosition = position;
+		force = velocity;
 	}
 }
 

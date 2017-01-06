@@ -6,6 +6,11 @@ public class WaveMasterController : Controller
 
 	private InputAxis controlAxis = null;
 
+	void Start()
+	{
+		body.isKinematic = false;
+	}
+
 	void FixedUpdate()
 	{
 		float inputWaveVariable = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );

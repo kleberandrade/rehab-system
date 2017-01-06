@@ -9,6 +9,11 @@ public class WaveSlaveController : Controller
 
 	protected float waveImpedance = 10.0f;
 
+	void Start()
+	{
+		body.isKinematic = false;
+	}
+
 	void FixedUpdate()
 	{
 		Vector3 inputWaveVariable = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.X, 0 ),

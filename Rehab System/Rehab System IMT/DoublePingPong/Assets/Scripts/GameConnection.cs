@@ -112,17 +112,19 @@ public abstract class GameConnection
 		{
 			int inputMessageLength = Math.Min( BitConverter.ToInt32( inputBuffer, 0 ), PACKET_SIZE - VALUE_BLOCK_SIZE );
 			Debug.Log( "receiving " + inputMessageLength.ToString() + " bytes" );
-			for( int dataOffset = PACKET_HEADER_LENGTH; dataOffset < inputMessageLength; dataOffset += VALUE_BLOCK_SIZE )
+			for( int blockOffset = PACKET_HEADER_LENGTH; blockOffset < inputMessageLength; blockOffset += VALUE_BLOCK_SIZE )
 			{
-				byte objectID = inputBuffer[ dataOffset + VALUE_OID_OFFSET ];
-				byte axisIndex = inputBuffer[ dataOffset + VALUE_INDEX_OFFSET ];
+				byte objectID = inputBuffer[ blockOffset + VALUE_OID_OFFSET ];
+				byte axisIndex = inputBuffer[ blockOffset + VALUE_INDEX_OFFSET ];
 				KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( objectID, axisIndex );
-				//Debug.Log( "Received values for key " + remoteKey.ToString() );
+				Debug.Log( "Received values for key " + remoteKey.ToString() );
 				if( !remoteValues.ContainsKey( remoteKey ) ) remoteValues[ remoteKey ] = new float[ TYPE_VALUES_NUMBER ];
 
-				dataOffset += VALUE_HEADER_SIZE;
-				for( int valueIndex = 0; valueIndex < TYPE_VALUES_NUMBER; valueIndex++ )
-					remoteValues[ remoteKey ][ valueIndex ] = BitConverter.ToSingle( inputBuffer, dataOffset + valueIndex * sizeof(float) );
+				for( int valueIndex = 0; valueIndex < TYPE_VALUES_NUMBER; valueIndex++ ) 
+				{
+					int dataOffset = blockOffset + VALUE_HEADER_SIZE + valueIndex * sizeof(float);
+					remoteValues[ remoteKey ][ valueIndex ] = BitConverter.ToSingle( inputBuffer, dataOffset );
+				}
 
 				inputDelays[ objectID ] = networkDelay;
 			}

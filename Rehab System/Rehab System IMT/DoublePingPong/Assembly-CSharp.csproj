@@ -49,6 +49,8 @@
      <Compile Include="Assets\NTPClient.cs" />
      <Compile Include="Assets\Scripts\BallController.cs" />
      <Compile Include="Assets\Scripts\BatController.cs" />
+     <Compile Include="Assets\Scripts\BoxClashClient.cs" />
+     <Compile Include="Assets\Scripts\BoxClashServer.cs" />
      <Compile Include="Assets\Scripts\Configuration.cs" />
      <Compile Include="Assets\Scripts\Controller.cs" />
      <Compile Include="Assets\Scripts\DoublePongClient.cs" />
