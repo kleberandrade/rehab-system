@@ -109,13 +109,11 @@ public class PlayerController : Controller
 
     void OnTriggerEnter( Collider collider )
     {
-        //Debug.Log( "Trigger on " + collider.tag );
-		if( controlAxis != null ) controlAxis.Stiffness = 60.0f;
+		controlAxis.NormalizedForce = -body.velocity.normalized.magnitude;
     }
 
     void OnTriggerExit( Collider collider )
     {
-        //Debug.Log( "Trigger off " + collider.tag );
-		if( controlAxis != null ) controlAxis.Stiffness = 60.0f;
+		controlAxis.NormalizedForce = 0.0f;
     }
 }

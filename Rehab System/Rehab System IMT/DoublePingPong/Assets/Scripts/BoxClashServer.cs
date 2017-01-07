@@ -4,7 +4,7 @@ using System.IO;
 
 public class BoxClashServer : GameServer 
 {
-	public WaveSlaveController[] boxes = new WaveSlaveController[ 2 ];
+	public WaveMasterController[] boxes = new WaveMasterController[ 2 ];
 
 	public override void Start()
 	{
@@ -12,7 +12,7 @@ public class BoxClashServer : GameServer
 
 		connection.Connect();
 
-		foreach( WaveSlaveController box in boxes )
+		foreach( WaveMasterController box in boxes )
 			box.enabled = true;
 	}
 }

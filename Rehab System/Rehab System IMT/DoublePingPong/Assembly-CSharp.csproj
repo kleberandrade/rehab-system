@@ -68,6 +68,7 @@
      <Compile Include="Assets\Scripts\SimpleJSON.cs" />
      <Compile Include="Assets\Scripts\SlaveController.cs" />
      <Compile Include="Assets\Scripts\WaveMasterController.cs" />
+     <Compile Include="Assets\Scripts\WavePlayerController.cs" />
      <Compile Include="Assets\Scripts\WaveSlaveController.cs" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader2.shader" />
      <None Include="Assets\Textures\10+1 StandartMaterials\Shaders\Shader1.shader" />

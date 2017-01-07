@@ -8,7 +8,7 @@ public class BoxClashClient : GameClient
 
 	public Controller[] boxes = new Controller[ 2 ];
 
-	private WaveMasterController player = null;
+	private WavePlayerController player = null;
 
 	private int targetMask;
 
@@ -20,7 +20,7 @@ public class BoxClashClient : GameClient
 	{
 		targetMask = LayerMask.GetMask( "Target" );
 
-		player = boxes[ 0 ].GetComponent<WaveMasterController>();
+		player = boxes[ 0 ].GetComponent<WavePlayerController>();
 
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
 	}
@@ -79,15 +79,15 @@ public class BoxClashClient : GameClient
 
 		if( clientID == 0 ) 
 		{
-			boxes[ 0 ].GetComponent<WaveMasterController>().enabled = true;
-			boxes[ 1 ].GetComponent<WaveMasterController>().enabled = true;
-			player = boxes[ 0 ].GetComponent<WaveMasterController>();
+			boxes[ 0 ].GetComponent<WavePlayerController>().enabled = true;
+			boxes[ 1 ].GetComponent<WaveSlaveController>().enabled = true;
+			player = boxes[ 0 ].GetComponent<WavePlayerController>();
 		} 
 		else if( clientID == 1 ) 
 		{
-			boxes[ 0 ].GetComponent<WaveMasterController>().enabled = true;
-			boxes[ 1 ].GetComponent<WaveMasterController>().enabled = true;
-			player = boxes[ 1 ].GetComponent<WaveMasterController>();
+			boxes[ 0 ].GetComponent<WaveSlaveController>().enabled = true;
+			boxes[ 1 ].GetComponent<WavePlayerController>().enabled = true;
+			player = boxes[ 1 ].GetComponent<WavePlayerController>();
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 180.0f );
 		}
 

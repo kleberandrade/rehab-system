@@ -54,7 +54,8 @@ public class InputAxis
 									  set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ (int) AxisVariable.POSITION ] = true; } }
 	public float NormalizedVelocity { get { return ( 2 * velocity / range ); } 
 									  set { feedbackVelocity = ( value * range / 2.0f ); setpointsMask[ (int) AxisVariable.VELOCITY ] = true; } }
-	public float NormalizedForce { get { return ( 2 * ( force - minValue ) / range - 1.0f ); } }
+	public float NormalizedForce { get { return ( 2 * ( force - minValue ) / range - 1.0f ); } 
+								   set { feedbackForce = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ (int) AxisVariable.FORCE ] = true; } }
 
     public float MaxValue { get { return maxValue; } set { maxValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
     public float MinValue { get { return minValue; } set { minValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }

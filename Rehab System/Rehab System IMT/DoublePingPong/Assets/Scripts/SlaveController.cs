@@ -31,6 +31,7 @@ public class SlaveController : Controller
 		body.position = initialPosition;
 		body.velocity = Vector3.zero;
 	}
+
 	public void OnDisable()
 	{
 		body.position = initialPosition;
