@@ -20,14 +20,15 @@ public class SlaveController : Controller
 
 		//Debug.Log( "master pos: " + masterPosition.ToString() + " - vel: " + masterVelocity.ToString() + " - err: " + trackingError.ToString() );
 
-		if( trackingError.magnitude > rangeLimits.magnitude / 2.0f ) body.MovePosition( masterPosition );
-		else masterVelocity += trackingError;
+		if( trackingError.magnitude > 0.5f * rangeLimits.magnitude ) body.MovePosition( masterPosition );
+		else if( body.position.magnitude < 0.4f * rangeLimits.magnitude ) masterVelocity += trackingError;
 
 		body.velocity = masterVelocity;
 	}
 
 	public void OnEnable()
 	{
+		body.isKinematic = false;
 		body.position = initialPosition;
 		body.velocity = Vector3.zero;
 	}

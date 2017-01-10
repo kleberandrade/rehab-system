@@ -1929,8 +1929,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boxes:
-  - {fileID: 1608433775}
-  - {fileID: 1818957274}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &1464675929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1964,6 +1964,7 @@ GameObject:
   - component: {fileID: 1608433776}
   - component: {fileID: 1608433780}
   - component: {fileID: 1608433775}
+  - component: {fileID: 1608433781}
   m_Layer: 11
   m_Name: Bottom Block
   m_TagString: Horizontal
@@ -2067,6 +2068,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   elementID: 0
   boundaries: {fileID: 1464675926}
+--- !u!145 &1608433781
+SpringJoint:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1608433774}
+  m_ConnectedBody: {fileID: 1818957270}
+  m_Anchor: {x: 0, y: 0, z: 0.5}
+  m_AutoConfigureConnectedAnchor: 1
+  m_ConnectedAnchor: {x: 0, y: 0, z: -0.5}
+  serializedVersion: 2
+  m_Spring: 10
+  m_Damper: 0.2
+  m_MinDistance: 0
+  m_MaxDistance: 0
+  m_Tolerance: 0.025
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 1
+  m_EnablePreprocessing: 1
 --- !u!1 &1648382676
 GameObject:
   m_ObjectHideFlags: 0

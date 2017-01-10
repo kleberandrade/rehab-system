@@ -34,7 +34,7 @@ public class BallController : Controller
 		if( collider.tag == "Boundary" ) UpdateMasterValues( initialPosition, GenerateStartVector() * speed );
 	}
 
-    void OnTriggerEnter( Collider collider )
+	void OnTriggerEnter( Collider collider )
     {
 		Debug.Log( "Colliding with " + collider.tag + " on layer " + collider.gameObject.layer );
 
@@ -49,13 +49,13 @@ public class BallController : Controller
 		return new Vector3( Mathf.Cos( rand ), 0.0f, Mathf.Sin( rand ) ); 
 	}
 
-	public void OnEnable()
+	void OnEnable()
 	{
 		body.position = initialPosition;
 		body.velocity = GenerateStartVector() * speed;
 	}
 
-	public void OnDisable()
+	void OnDisable()
 	{
 		UpdateMasterValues( initialPosition, Vector3.zero );
 	}

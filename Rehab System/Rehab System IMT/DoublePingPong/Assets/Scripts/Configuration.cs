@@ -213,11 +213,11 @@ public class Configuration : MonoBehaviour
 		else if( calibrationSliders[ 2 ].interactable ) controlAxis.Force = setpoint;
 	}
 
-    public void EndConfiguration()
+	public void EndConfiguration( int gameSceneIndex )
     {
 		infoStateClient.Disconnect();
 		GameManager.isMaster = false;
-        SceneManager.LoadScene( 1 );
+		SceneManager.LoadScene( gameSceneIndex );
     }
 }
 

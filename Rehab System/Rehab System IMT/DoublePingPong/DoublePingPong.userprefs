@@ -1,23 +1,25 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/BoxClashClient.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SlaveController.cs">
     <Files>
-      <File FileName="Assets/Scripts/GameConnection.cs" Line="126" Column="97" />
-      <File FileName="Assets/Scripts/GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/BatController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SlaveController.cs" Line="26" Column="34" />
-      <File FileName="Assets/Scripts/GameServerConnection.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameClientConnection.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PlayerController.cs" Line="112" Column="68" />
-      <File FileName="Assets/Scripts/Controller.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/DoublePongClient.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/DoublePongServer.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/InputAxis.cs" Line="71" Column="23" />
-      <File FileName="Assets/Scripts/WavePlayerController.cs" Line="23" Column="3" />
-      <File FileName="Assets/Scripts/BoxClashClient.cs" Line="23" Column="60" />
-      <File FileName="Assets/Scripts/BoxClashServer.cs" Line="15" Column="32" />
-      <File FileName="Assets/Scripts/WaveMasterController.cs" Line="14" Column="20" />
-      <File FileName="Assets/Scripts/WaveSlaveController.cs" Line="16" Column="53" />
+      <File FileName="Assets\Scripts\GameConnection.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\BatController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SlaveController.cs" Line="37" Column="3" />
+      <File FileName="Assets\Scripts\GameServerConnection.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameClientConnection.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Controller.cs" Line="31" Column="3" />
+      <File FileName="Assets\Scripts\DoublePongClient.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\DoublePongServer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\InputAxis.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\WavePlayerController.cs" Line="5" Column="1" />
+      <File FileName="Assets\Scripts\BoxClashClient.cs" Line="20" Column="3" />
+      <File FileName="Assets\Scripts\BoxClashServer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\WaveMasterController.cs" Line="12" Column="43" />
+      <File FileName="Assets\Scripts\WaveSlaveController.cs" Line="13" Column="55" />
+      <File FileName="Assets\Scripts\Configuration.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\BallController.cs" Line="37" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
