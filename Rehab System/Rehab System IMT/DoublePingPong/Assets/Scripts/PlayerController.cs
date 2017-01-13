@@ -10,7 +10,7 @@ using System.Text;
 [ RequireComponent( typeof(BoxCollider) ) ]
 public class PlayerController : Controller 
 {
-	const int POSITION = 0, VELOCITY = 1;
+	const int POSITION = 0, VELOCITY = 1, ACCELERATION = 2;
 	public const float ERROR_THRESHOLD = 0.35f;
 
 	public MeshRenderer moveBoxRenderer;
@@ -37,14 +37,22 @@ public class PlayerController : Controller
 		if( controlAxis != null )
 		{
 			float input = controlAxis.NormalizedPosition;
-			Debug.Log( "Input position: " + ( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) ).ToString () );
-			body.MovePosition( transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition );
+			Vector3 newPosition = transform.right * ( Mathf.Clamp( input, -1.0f, 1.0f ) * rangeLimits.x ) + initialPosition;
+			Vector3 newVelocity = ( newPosition - body.position ) / Time.fixedDeltaTime;
+			Vector3 newAcceleration = ( newVelocity - body.velocity ) / Time.fixedDeltaTime;
+
+			body.MovePosition( newPosition );
+			body.velocity = newVelocity;
+			if( newVelocity.magnitude > body.velocity.magnitude ) newAcceleration = Vector3.zero;
+			else if( newAcceleration.magnitude > body.velocity.magnitude ) newAcceleration = newAcceleration.normalized * body.velocity.magnitude;
 
 			// Send locally controlled object position over network
 			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, POSITION, body.position.x );
 			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, POSITION, body.position.z );
 			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, VELOCITY, body.velocity.x );
 			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, VELOCITY, body.velocity.z );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, ACCELERATION, newAcceleration.x );
+			GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, ACCELERATION, newAcceleration.z );
 		}
 	}       
 
@@ -109,11 +117,11 @@ public class PlayerController : Controller
 
     void OnTriggerEnter( Collider collider )
     {
-		controlAxis.NormalizedForce = -body.velocity.normalized.magnitude;
+		if( enabled ) controlAxis.NormalizedForce = -body.velocity.normalized.magnitude;
     }
 
-    void OnTriggerExit( Collider collider )
+	void OnTriggerExit( Collider collider )
     {
-		controlAxis.NormalizedForce = 0.0f;
+		if( enabled ) controlAxis.NormalizedForce = 0.0f;
     }
 }

@@ -477,7 +477,7 @@ GameObject:
   - component: {fileID: 364177281}
   - component: {fileID: 364177280}
   - component: {fileID: 364177279}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Northwest Tower
   m_TagString: Tower
   m_Icon: {fileID: 0}
@@ -1047,7 +1047,7 @@ GameObject:
   - component: {fileID: 679087811}
   - component: {fileID: 679087810}
   - component: {fileID: 679087809}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Northeast Tower
   m_TagString: Tower
   m_Icon: {fileID: 0}
@@ -2390,7 +2390,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1491532017}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.03, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2526,7 +2526,7 @@ GameObject:
   - component: {fileID: 1648382680}
   - component: {fileID: 1648382679}
   - component: {fileID: 1648382678}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Southest Tower
   m_TagString: Tower
   m_Icon: {fileID: 0}
@@ -3218,7 +3218,7 @@ GameObject:
   - component: {fileID: 2022830670}
   - component: {fileID: 2022830669}
   - component: {fileID: 2022830668}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Southweast Tower
   m_TagString: Tower
   m_Icon: {fileID: 0}

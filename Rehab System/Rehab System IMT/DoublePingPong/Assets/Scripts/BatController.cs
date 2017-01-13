@@ -4,7 +4,7 @@
 [ RequireComponent( typeof(BoxCollider) ) ]
 public class BatController : Controller 
 {
-	const int POSITION = 0, VELOCITY = 1;
+	const int POSITION = 0, VELOCITY = 1, ACCELERATION = 2;
 
 	void FixedUpdate()
 	{
@@ -16,9 +16,23 @@ public class BatController : Controller
 		Vector3 masterVelocity = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.X, VELOCITY ),
 											  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, VELOCITY ) );
 
+		Vector3 masterAcceleration = new Vector3( GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.X, ACCELERATION ),
+												  0.0f, GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, ACCELERATION ) );
+
+		masterPosition += masterVelocity * inputDelay + masterAcceleration * inputDelay * inputDelay / 2.0f;
+
 		//Debug.Log( "element " + elementID.ToString() + " position: " + masterPosition.ToString() + " - velocity: " + masterVelocity.ToString() );
-		body.MovePosition( masterPosition + masterVelocity * inputDelay );
-		body.velocity = masterVelocity;
+
+		if( masterPosition.magnitude > rangeLimits.magnitude )
+		{
+			body.MovePosition( masterPosition.normalized * rangeLimits.magnitude );
+			body.velocity = Vector3.zero;
+		}
+		else
+		{
+			body.MovePosition( masterPosition );
+			body.velocity = masterVelocity;
+		}
 
 		// Send locally controlled object position over network
 		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.X, POSITION, body.position.x );

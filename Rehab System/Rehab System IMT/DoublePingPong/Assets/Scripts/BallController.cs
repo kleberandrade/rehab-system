@@ -31,11 +31,15 @@ public class BallController : Controller
 
     void OnTriggerExit( Collider collider )
 	{
+		if( !enabled ) return; 
+
 		if( collider.tag == "Boundary" ) UpdateMasterValues( initialPosition, GenerateStartVector() * speed );
 	}
 
 	void OnTriggerEnter( Collider collider )
     {
+		if( !enabled ) return; 
+
 		Debug.Log( "Colliding with " + collider.tag + " on layer " + collider.gameObject.layer );
 
 		if( collider.tag == "Vertical" ) UpdateMasterValues( body.position, new Vector3( -body.velocity.x, 0.0f, body.velocity.z ) );
@@ -45,7 +49,7 @@ public class BallController : Controller
 
 	Vector3 GenerateStartVector()
 	{
-		float rand = Random.Range( 0.0f, Mathf.PI * 2 );
+		float rand = Random.Range( 0.0f, Mathf.PI * 2.0f );
 		return new Vector3( Mathf.Cos( rand ), 0.0f, Mathf.Sin( rand ) ); 
 	}
 

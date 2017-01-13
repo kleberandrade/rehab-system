@@ -26,7 +26,12 @@ public abstract class Controller : MonoBehaviour
 		body.velocity = Vector3.zero;
 
 		size = GetComponent<Collider>().bounds.size;
-		rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
+		//rangeLimits = boundaries.bounds.extents - Vector3.one * GetComponent<Collider>().bounds.extents.magnitude;
+		Vector3 bodyExtents = transform.rotation * GetComponent<Collider>().bounds.extents;
+		rangeLimits = new Vector3( boundaries.bounds.extents.x - Mathf.Abs( bodyExtents.x ), 
+			                       boundaries.bounds.extents.y - Mathf.Abs( bodyExtents.y ), 
+			                       boundaries.bounds.extents.z - Mathf.Abs( bodyExtents.z ) );
+		
 		initialPosition = transform.position;
 	}
 }

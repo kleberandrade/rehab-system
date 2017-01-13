@@ -10,7 +10,7 @@ public class BoxClashClient : GameClient
 
 	private WavePlayerController player = null;
 
-	private int targetMask;
+	//private int targetMask;
 
 	private float error = 0.0f;
 
@@ -18,7 +18,7 @@ public class BoxClashClient : GameClient
 
 	void Awake()
 	{
-		targetMask = LayerMask.GetMask( "Target" );
+		//targetMask = LayerMask.GetMask( "Target" );
 
 		player = boxes[ 0 ].GetComponent<WavePlayerController>();
 

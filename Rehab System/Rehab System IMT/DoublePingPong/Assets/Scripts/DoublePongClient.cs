@@ -61,7 +61,7 @@ public class DoublePongClient : GameClient
 		{
 			ConnectionInfo currentConnectionInfo = connection.GetCurrentInfo();
 
-			infoText.text =  string.Format( "Client: {0} Sent: {1} Received: {2} Lost Packets: {3} RTT: {4,3}ms", clientID,
+			infoText.text =  string.Format( "Client: {0} Sent: {1} Received: {2}\nLost Packets: {3} RTT: {4,3}ms", clientID,
 											currentConnectionInfo.sentPackets, currentConnectionInfo.receivedPackets, currentConnectionInfo.lostPackets, currentConnectionInfo.rtt );
 
 			if( ball.transform.position != lastBallPosition )
