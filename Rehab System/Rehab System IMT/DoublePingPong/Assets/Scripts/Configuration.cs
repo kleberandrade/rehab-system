@@ -13,21 +13,20 @@ public class Configuration : MonoBehaviour
 {
 	public const string DEFAULT_IP_HOST = "127.0.0.1";
 
+	private const AxisVariable[] CONTROL_VARIABLES = new AxisVariable[ 3 ] { AxisVariable.POSITION, AxisVariable.STIFFNESS, AxisVariable.FORCE };
+
 	public InputField axisServerEntry, gameServerEntry;
 
-	public Toggle[] controlToggles = new Toggle[ 3 ];
-	public Slider[] calibrationSliders = new Slider[ 3 ];
-	public Text[] valueDisplays = new Text[ 3 ];
-	private float[] currentAbsoluteValues = new float[ 3 ];
+	public Toggle setpointToggle;
+	public Slider calibrationSlider;
+	public Text valueDisplay;
 
-	public int calibratedVariableIndex = 0;
+	private AxisVariable calibratedVariable = AxisVariable.POSITION;
 
 	private static InputAxis controlAxis = null;
 	private InputAxisManager axisManager = null;
 
 	public Dropdown axisSelector;
-
-	public float CurrentAbsoluteValue { get { return currentAbsoluteValues[ calibratedVariableIndex ]; } }
 
 	private InputAxisInfoClient infoStateClient;
 
@@ -51,24 +50,14 @@ public class Configuration : MonoBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		if( controlAxis != null ) 
-		{
-			currentAbsoluteValues[ 0 ] = controlAxis.Position;
-			//currentAbsoluteValues[ 1 ] = controlAxis.Velocity;
-			currentAbsoluteValues[ 1 ] = controlAxis.Stiffness;
-			currentAbsoluteValues[ 2 ] = controlAxis.Force;
-		}
-		else
-		{
-			for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
-				currentAbsoluteValues[ variableIndex ] = 0.0f;
-		}
+		float currentAbsoluteValue = 0.0f;
 
-		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
+		if( controlAxis != null ) currentAbsoluteValue = controlAxis.GetValue( calibratedVariable );
+
+		for( int variableIndex = 0; variableIndex < CONTROL_VARIABLES.Length; variableIndex++ ) 
 		{
-			calibrationSliders[ variableIndex ].interactable = controlToggles[ variableIndex ].isOn;
-			if( ! calibrationSliders[ variableIndex ].interactable ) calibrationSliders[ variableIndex ].value = currentAbsoluteValues[ variableIndex ];
-			valueDisplays[ variableIndex ].text = currentAbsoluteValues[ variableIndex ].ToString( "+#0.000;-#0.000; #0.000" );
+			if( ! calibrationSlider.interactable ) calibrationSlider.value = currentAbsoluteValue;
+			valueDisplay.text = currentAbsoluteValue.ToString( "+#0.000;-#0.000; #0.000" );
 		}
 	}
 
@@ -125,36 +114,46 @@ public class Configuration : MonoBehaviour
 
 	}
 
-	public void SetSelectedAxisMax( int sliderIndex )
+	public void SetAxisMax()
 	{
 		Debug.Log( "Set axis Max" );
 		if( controlAxis != null ) 
 		{
-			controlAxis.MaxValue = calibrationSliders[ sliderIndex ].value;
-			if( controlAxis.MaxValue >= calibrationSliders[ sliderIndex ].minValue )
-				calibrationSliders[ sliderIndex ].maxValue = controlAxis.MaxValue;
-			else
-			{
-				calibrationSliders[ sliderIndex ].maxValue = calibrationSliders[ sliderIndex ].minValue;
-				calibrationSliders[ sliderIndex ].minValue = controlAxis.MaxValue;
-			}
+			controlAxis.SetMaxValue( calibratedVariable, calibrationSlider.value );
+			SetSliderLimits();
 		}
 	}
 
-	public void SetSelectedAxisMin( int sliderIndex )
+	public void SetAxisMin()
 	{
 		Debug.Log( "Set axis Min" );
 		if( controlAxis != null ) 
 		{
-			controlAxis.MinValue = calibrationSliders[ sliderIndex ].value;
-			if( controlAxis.MinValue <= calibrationSliders[ sliderIndex ].maxValue )
-				calibrationSliders[ sliderIndex ].minValue = controlAxis.MinValue;
-			else
-			{
-				calibrationSliders[ sliderIndex ].minValue = calibrationSliders[ sliderIndex ].maxValue;
-				calibrationSliders[ sliderIndex ].maxValue = controlAxis.MinValue;
-			}
+			controlAxis.SetMinValue( calibratedVariable, calibrationSlider.value );
+			SetSliderLimits();
 		}
+	}
+
+	private void SetSliderLimits()
+	{
+		float maxValue = controlAxis.GetMaxValue( calibratedVariable );
+		float minValue = controlAxis.GetMinValue( calibratedVariable );
+		if( maxValue > minValue )
+		{
+			calibrationSlider.maxValue = maxValue;
+			calibrationSlider.minValue = minValue;
+		}
+		else
+		{
+			calibrationSlider.maxValue = minValue;
+			calibrationSlider.minValue = maxValue;
+		}
+	}
+
+	public void SetCalibratedVariable( Int32 variableIndex )
+	{
+		calibratedVariable = (AxisVariable) variableIndex;
+		if( controlAxis != null ) SetSliderLimits();
 	}
 
 	private IEnumerator WaitForOffset()
@@ -163,54 +162,34 @@ public class Configuration : MonoBehaviour
 
 		Debug.Log( "Offset end" );
 		if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 4 } );
-		if( controlAxis != null )
-		{
-			controlAxis.PositionOffset = calibrationSliders[ 0 ].value;
-			controlAxis.ForceOffset = calibrationSliders[ 2 ].value;
-		}
+		controlAxis.SetOffset();
 	}
 
 	public void GetAxisOffset()
 	{
 		Debug.Log( "Offset begin" );
-		if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 5 } );
+		if( controlAxis != null )
+		{
+			if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 5 } );
 
-		StartCoroutine( WaitForOffset() );
+			StartCoroutine( WaitForOffset() );
+		}
 	}
 
-	public void SetAxisOffset( bool enabled )
+	public void ResetAxisValues()
 	{
-		if( enabled ) 
-		{
-			Debug.Log( "Offset begin" );
-			if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 5 } );
-		}
-		else 
-		{
-			Debug.Log( "Offset end" );
-			if( controlAxis.GetType() == typeof(RemoteInputAxis) ) infoStateClient.SendData( new byte[] { 1, 0, 4 } );
-			if( controlAxis != null )
-			{
-				controlAxis.PositionOffset = calibrationSliders[ 0 ].value;
-				controlAxis.ForceOffset = calibrationSliders[ 2 ].value;
-			}
-		}
+		if( controlAxis != null ) controlAxis.Reset();
 	}
 
 	public void SetControl()
 	{
-		for( int variableIndex = 0; variableIndex < currentAbsoluteValues.Length; variableIndex++ ) 
-			calibrationSliders[ variableIndex ].interactable = controlToggles[ variableIndex ].isOn;
+		calibrationSlider.interactable = setpointToggle.isOn;
 	}
 
 	public void SetSetpoint( float setpoint )
 	{
 		//Debug.Log( "Setting setpoint: " + setpoint.ToString() );
-
-		if( calibrationSliders[ 0 ].interactable ) controlAxis.Position = setpoint;
-		//if( controlToggles[ 1 ].isOn && ! Mathf.Approximately( controlAxis.Velocity, setpoint ) ) controlAxis.Velocity = setpoint;
-		else if( calibrationSliders[ 1 ].interactable ) controlAxis.Stiffness = setpoint;
-		else if( calibrationSliders[ 2 ].interactable ) controlAxis.Force = setpoint;
+		if( calibrationSlider.interactable ) controlAxis.SetValue( calibratedVariable, setpoint );
 	}
 
 	public void EndConfiguration( int gameSceneIndex )

@@ -20,6 +20,7 @@ public class WavePlayerController : Controller
 		float feedbackForce = waveImpedance * body.velocity.z - Mathf.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
 
 		body.AddForce( ( playerForce + feedbackForce ) * transform.forward, ForceMode.Force );
+		controlAxis.Force = feedbackForce;
 
 		float outputWaveVariable = -inputWaveVariable + Mathf.Sqrt( 2.0f * waveImpedance ) * body.velocity.z;
 		float outputWaveIntegral = -inputWaveIntegral + Mathf.Sqrt( 2.0f * waveImpedance ) * body.position.z;

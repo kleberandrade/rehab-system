@@ -11,19 +11,19 @@ public class InputAxis
 	protected string id;
 	public string ID { get { return id; } }
 
-	protected float position = 0.0f, velocity = 0.0f, force = 0.0f;
-	private float positionOffset = 0.0f, forceOffset = 0.0f;
-	private float maxValue = 0.0f, minValue = 0.0f, range = 1.0f;
+	private struct InputVariable
+	{
+		public float value = 0.0f, setpoint = 0.0f;
+		public float max = 0.0f, min = 0.0f, range = 1.0f;
+		public float offset = 0.0f;
+	}
 
-	protected float feedbackPosition = 0.0f, feedbackVelocity = 0.0f, feedbackForce = 0.0f;
-	protected float stiffness = 0.0f, damping = 0.0f;
-
+	protected InputVariable[] inputVariables = new InputVariable[ Enum.GetValues(typeof(AxisVariable)).Length ];
     protected BitArray setpointsMask = new BitArray( 8, false );
 
 	public virtual bool Init( string axisID )
 	{
 		id = axisID;
-
 		return true;
 	}
 
@@ -31,34 +31,61 @@ public class InputAxis
 
 	public void Reset()
 	{
-		positionOffset = 0.0f;
-		forceOffset = 0.0f;
-		maxValue = 0.0f;
-		minValue = 0.0f;
-		range = 1.0f;
+		foreach( InputVariable variable in inputVariables )
+		{
+			variable.max = variable.min = 0.0f;
+			variable.range = 1.0f;
+			variable.offset = 0.0f;
+		}
 	}
 
 	public virtual void Update( float updateTime ) {}
 
-	public float Position { get { return position - positionOffset; } set { feedbackPosition = value + positionOffset; setpointsMask[ (int) AxisVariable.POSITION ] = true; } }
-	public float Velocity { get { return velocity; } set { feedbackVelocity = value; setpointsMask[ (int) AxisVariable.VELOCITY ] = true; } }
-	public float Force { get { return force - forceOffset; } set { feedbackForce = value + forceOffset; setpointsMask[ (int) AxisVariable.FORCE ] = true; } }
+	public float GetValue( AxisVariable axis ) { return inputVariables[ (int) axis ].value - inputVariables[ (int) axis ].offset; }
+	public void SetValue( AxisVariable axis, float value ) 
+	{ 
+		inputVariables[ (int) axis ].setpoint = value + inputVariables[ (int) axis ].offset; 
+		setpointsMask[ (int) axis ] = true; 
+	}
 
-	public float PositionOffset { set { positionOffset = value; } }
-	public float ForceOffset { set { forceOffset = value; } }
+	public float GetNormalizedValue( AxisVariable axis ) 
+	{
+		InputVariable variable = inputVariables[ (int) axis ];
+		return ( 2.0f * ( variable.value - variable.offset - variable.min ) / variable.range - 1.0f ); 
+	}
+	public void SetNormalizedValue( AxisVariable axis, float value ) 
+	{ 
+		InputVariable variable = inputVariables[ (int) axis ];
+		variable.setpoint = ( ( variable.value + 1.0f ) * variable.range / 2.0f ) + variable.offset + variable.min; 
+		setpointsMask[ (int) axis ] = true;
+	}
 
-	public float Stiffness { get { return stiffness; } set { stiffness = value; setpointsMask[ (int) AxisVariable.STIFFNESS ] = true; } }
-	public float Damping { get { return damping; } set { damping = value; setpointsMask[ (int) AxisVariable.DAMPING ] = true; } }
+	public float GetMinValue( AxisVariable axis ) {	return inputVariables[ (int) axis ].min; }
+	public float GetMaxValue( AxisVariable axis ) {	return inputVariables[ (int) axis ].max; }
 
-	public float NormalizedPosition { get { return ( 2 * ( position - minValue ) / range - 1.0f ); } 
-									  set { feedbackPosition = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ (int) AxisVariable.POSITION ] = true; } }
-	public float NormalizedVelocity { get { return ( 2 * velocity / range ); } 
-									  set { feedbackVelocity = ( value * range / 2.0f ); setpointsMask[ (int) AxisVariable.VELOCITY ] = true; } }
-	public float NormalizedForce { get { return ( 2 * ( force - minValue ) / range - 1.0f ); } 
-								   set { feedbackForce = ( ( value + 1.0f ) * range / 2.0f ) + minValue; setpointsMask[ (int) AxisVariable.FORCE ] = true; } }
+	public void SetMinValue( AxisVariable axis, float value ) 
+	{ 
+		inputVariables[ (int) axis ].min = value;
+		Calibrate( axis );
+	}
+	public void SetMaxValue( AxisVariable axis, float value ) 
+	{ 
+		inputVariables[ (int) axis ].max = value;
+		Calibrate( axis );
+	}
 
-    public float MaxValue { get { return maxValue; } set { maxValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
-    public float MinValue { get { return minValue; } set { minValue = value; range = ( maxValue - minValue != 0.0f ) ? maxValue - minValue : 1.0f; } }
+	private void Calibrate( AxisVariable axis )
+	{
+		InputVariable variable = inputVariables[ (int) axis ];
+		variable.range = variable.max - variable.min;
+		if( Mathf.Approximately( variable.range ) ) variable.range = 1.0f;
+	}
+		
+	public void SetOffset() 
+	{ 
+		for( int variableIndex = 0; variableIndex < inputVariables.Length; variableIndex++ )
+			inputVariables[ variableIndex ].offset = inputVariables[ variableIndex ].value; 
+	}
 }
 
 
@@ -77,9 +104,9 @@ public class MouseInputAxis : InputAxis
 
 	public override void Update( float updateTime )
 	{
-		velocity = Input.GetAxis( id ) / updateTime;
-		position += velocity * updateTime;
-		force = velocity;
+		inputVariables[ (int) AxisVariable.VELOCITY ].value = Input.GetAxis( id ) / updateTime;
+		inputVariables[ (int) AxisVariable.POSITION ].value += inputVariables[ (int) AxisVariable.VELOCITY ].value * updateTime;
+		inputVariables[ (int) AxisVariable.FORCE ].value = inputVariables[ (int) AxisVariable.VELOCITY ].value;
 	}
 }
 
@@ -99,10 +126,10 @@ public class KeyboardInputAxis : InputAxis
 	public override void Update( float updateTime )
 	{
 		//if( ! Mathf.Approximately( feedbackPosition, position ) ) position = feedbackPosition;
-		velocity = Input.GetAxis( id );
-		position += velocity * updateTime;
+		inputVariables[ (int) AxisVariable.VELOCITY ].value = Input.GetAxis( id );
+		inputVariables[ (int) AxisVariable.POSITION ].value += inputVariables[ (int) AxisVariable.VELOCITY ].value * updateTime;
 		//feedbackPosition = position;
-		force = velocity;
+		inputVariables[ (int) AxisVariable.FORCE ].value = inputVariables[ (int) AxisVariable.VELOCITY ].value;
 	}
 }
 
@@ -179,12 +206,8 @@ public class RemoteInputAxis : InputAxis
 			{
 				int inputDataPosition = inputIDPosition + sizeof(byte);
 
-				position = -BitConverter.ToSingle( axis.inputBuffer, inputDataPosition ); 
-				velocity = -BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + sizeof(float) ); 
-				force = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + 2 * sizeof(float) ); 
-
-				// Debug
-				//if( index == 0 ) Debug.Log( string.Format( "Received data: p:{0} - v:{1} - f:{2}", position, velocity, force ) );
+				for( int variableIndex = 0; variableIndex < inputVariables.Length; variableIndex++ )
+					inputVariables[ variableIndex ].value = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + variableIndex * sizeof(float) );
 
 				int outputIDPosition = 1 + axisIndex * OUTPUT_DATA_LENGTH;
 				int outputMaskPosition = outputIDPosition + sizeof(byte);
@@ -196,18 +219,13 @@ public class RemoteInputAxis : InputAxis
 				if( axis.outputBuffer[ outputMaskPosition ] > 0 ) axis.outputUpdated = true;
 				setpointsMask.SetAll( false );
 
-				//if( ! Mathf.Approximately( feedbackPosition, position ) ) axis.outputUpdated = true;
-				//if( ! Mathf.Approximately( feedbackVelocity, velocity ) ) axis.outputUpdated = true;
-				//if( ! Mathf.Approximately( feedbackForce, force ) ) axis.outputUpdated = true;
-				//if( ! Mathf.Approximately( stiffness, 0.0f ) ) axis.outputUpdated = true;
+				//for( int variableIndex = 0; variableIndex < inputVariables.Length; variableIndex++ )
+				//	if( ! Mathf.Approximately( inputVariables[ variableIndex ].setpoint, inputVariables[ variableIndex ].value ) ) axis.outputUpdated = true;
 
 				if( axis.outputUpdated )
 				{
-					Buffer.BlockCopy( BitConverter.GetBytes( feedbackPosition ), 0, axis.outputBuffer, outputDataPosition, sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( feedbackVelocity ), 0, axis.outputBuffer, outputDataPosition + sizeof(float), sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( feedbackForce ), 0, axis.outputBuffer, outputDataPosition + 2 * sizeof(float), sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( stiffness ), 0, axis.outputBuffer, outputDataPosition + 4 * sizeof(float), sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( damping ), 0, axis.outputBuffer, outputDataPosition + 5 * sizeof(float), sizeof(float) );
+					for( int variableIndex = 0; variableIndex < inputVariables.Length; variableIndex++ )
+						Buffer.BlockCopy( BitConverter.GetBytes( inputVariables[ variableIndex ].setpoint ), 0, axis.outputBuffer, outputDataPosition + variableIndex * sizeof(float), sizeof(float) );
 				}
 
 				break;
