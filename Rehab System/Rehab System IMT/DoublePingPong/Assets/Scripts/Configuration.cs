@@ -13,8 +13,6 @@ public class Configuration : MonoBehaviour
 {
 	public const string DEFAULT_IP_HOST = "127.0.0.1";
 
-	private const AxisVariable[] CONTROL_VARIABLES = new AxisVariable[ 3 ] { AxisVariable.POSITION, AxisVariable.STIFFNESS, AxisVariable.FORCE };
-
 	public InputField axisServerEntry, gameServerEntry;
 
 	public Toggle setpointToggle;
@@ -54,11 +52,8 @@ public class Configuration : MonoBehaviour
 
 		if( controlAxis != null ) currentAbsoluteValue = controlAxis.GetValue( calibratedVariable );
 
-		for( int variableIndex = 0; variableIndex < CONTROL_VARIABLES.Length; variableIndex++ ) 
-		{
-			if( ! calibrationSlider.interactable ) calibrationSlider.value = currentAbsoluteValue;
-			valueDisplay.text = currentAbsoluteValue.ToString( "+#0.000;-#0.000; #0.000" );
-		}
+		if( ! calibrationSlider.interactable ) calibrationSlider.value = currentAbsoluteValue;
+		valueDisplay.text = currentAbsoluteValue.ToString( "+#0.000;-#0.000; #0.000" );
 	}
 
 	public void SetAxisServer( string serverHost )
@@ -154,6 +149,7 @@ public class Configuration : MonoBehaviour
 	{
 		calibratedVariable = (AxisVariable) variableIndex;
 		if( controlAxis != null ) SetSliderLimits();
+		setpointToggle.isOn = false;
 	}
 
 	private IEnumerator WaitForOffset()
@@ -181,9 +177,9 @@ public class Configuration : MonoBehaviour
 		if( controlAxis != null ) controlAxis.Reset();
 	}
 
-	public void SetControl()
+	public void SetAxisControl( bool enabled )
 	{
-		calibrationSlider.interactable = setpointToggle.isOn;
+		calibrationSlider.interactable = enabled;
 	}
 
 	public void SetSetpoint( float setpoint )
