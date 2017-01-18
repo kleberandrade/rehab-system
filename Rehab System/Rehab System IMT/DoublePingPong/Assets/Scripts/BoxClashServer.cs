@@ -12,6 +12,14 @@ public class BoxClashServer : GameServer
 
 		connection.Connect();
 
+		StartCoroutine( WaitClients() );
+	}
+
+	IEnumerator WaitClients()
+	{
+		while( connection.GetClientsNumber() < 2 ) 
+			yield return new WaitForFixedUpdate();
+
 		foreach( WaveMasterController box in boxes )
 			box.enabled = true;
 	}

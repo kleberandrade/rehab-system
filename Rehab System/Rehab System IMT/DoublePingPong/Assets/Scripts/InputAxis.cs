@@ -14,7 +14,7 @@ public class InputAxis
 	protected class InputAxisValue
 	{
 		public float current = 0.0f, setpoint = 0.0f;
-		public float max = 0.0f, min = 0.0f, range = 1.0f;
+		public float max = 1.0f, min = -1.0f, range = 2.0f;
 		public float offset = 0.0f;
 	}
 
@@ -37,8 +37,9 @@ public class InputAxis
 	{
 		foreach( InputAxisValue value in inputValues )
 		{
-			value.max = value.min = 0.0f;
-			value.range = 1.0f;
+			value.max = 1.0f;
+			value.min = -1.0f;
+			value.range = 2.0f;
 			value.offset = 0.0f;
 		}
 	}

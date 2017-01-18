@@ -10,16 +10,12 @@ public class BoxClashClient : GameClient
 
 	private WavePlayerController player = null;
 
-	//private int targetMask;
-
-	private float error = 0.0f;
+	//private float error = 0.0f;
 
 	private int clientID = -1;
 
 	void Awake()
 	{
-		//targetMask = LayerMask.GetMask( "Target" );
-
 		player = boxes[ 0 ].GetComponent<WavePlayerController>();
 
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
@@ -34,6 +30,9 @@ public class BoxClashClient : GameClient
 		//if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
 		//else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		//else sliderHandle.color = Color.green;
+
+		localPlayerScoreText.text = "Input:\n" + player.GetInputForce().ToString() + " N";
+		remotePlayerScoreText.text = "Interaction:\n" + player.GetInteractionForce().ToString() + " N";
 	}
 
 	/*IEnumerator RegisterValues()

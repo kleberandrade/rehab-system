@@ -2,17 +2,18 @@
 
 public class WavePlayerController : Controller
 {
-	public SpringJoint spring;
-
 	protected float waveImpedance = 10.0f;
 
+	public Transform other;
+
 	private InputAxis controlAxis = null;
+
+	private float playerForce = 0.0f, feedbackForce = 0.0f;
 
 	void Start()
 	{
 		body.isKinematic = false;
-		spring.spring = 0.0f;
-		spring.damper = 0.0f;
+		transform.LookAt( other );
 	}
 
 	void FixedUpdate()
@@ -20,9 +21,9 @@ public class WavePlayerController : Controller
 		float inputWaveVariable = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );
 		float inputWaveIntegral = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 1 );
 
-		float playerForce = controlAxis.GetNormalizedValue( AxisVariable.FORCE ) * 100.0f;
-		Debug.Log( "Player force: " + playerForce.ToString() );
+		playerForce = controlAxis.GetNormalizedValue( AxisVariable.FORCE ) * rangeLimits.z;
 		float feedbackForce = waveImpedance * body.velocity.z - Mathf.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
+		//feedbackForce = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );
 
 		body.AddForce( ( playerForce + feedbackForce ) * transform.forward, ForceMode.Force );
 		controlAxis.SetNormalizedValue( AxisVariable.FORCE, feedbackForce );
@@ -32,11 +33,16 @@ public class WavePlayerController : Controller
 
 		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 0, outputWaveVariable );
 		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, outputWaveIntegral );
+		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 0, body.velocity.z );
+		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, body.position.z );
 	}
 
 	public void OnEnable()
 	{
 		controlAxis = Configuration.GetSelectedAxis();
 	}
+
+	public float GetInputForce() { return playerForce; }
+	public float GetInteractionForce() { return feedbackForce; }
 }
 
