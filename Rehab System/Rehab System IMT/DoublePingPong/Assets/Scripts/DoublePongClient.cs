@@ -9,8 +9,6 @@ public class DoublePongClient : GameClient
 	public SlaveController ball;
 	private Vector3 lastBallPosition;
 
-	public Text localPlayerScoreText, remotePlayerScoreText;
-
 	public Controller[] verticalBats = new Controller[ 2 ];
 	public Controller[] horizontalBats = new Controller[ 2 ];
 	private PlayerController[] playerBats = new PlayerController[ 2 ];

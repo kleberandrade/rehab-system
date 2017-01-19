@@ -4,8 +4,6 @@ using System.Collections;
 
 public class BoxClashClient : GameClient 
 {
-	public Text localPlayerScoreText, remotePlayerScoreText;
-
 	public Controller[] boxes = new Controller[ 2 ];
 
 	private WavePlayerController player = null;
@@ -31,8 +29,9 @@ public class BoxClashClient : GameClient
 		//else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		//else sliderHandle.color = Color.green;
 
-		localPlayerScoreText.text = "Input:\n" + player.GetInputForce().ToString() + " N";
-		remotePlayerScoreText.text = "Interaction:\n" + player.GetInteractionForce().ToString() + " N";
+		Rigidbody playerBody = player.GetComponent<Rigidbody>();
+		localPlayerText.text = string.Format( "Input:{0:F3}N\nInteract:{1:F3}N", player.GetInputForce(), player.GetInteractionForce() );
+		remotePlayerText.text = string.Format( "Position:{0:F3}\nVelocity:{1:F3}", playerBody.position.z, playerBody.velocity.z );
 	}
 
 	/*IEnumerator RegisterValues()

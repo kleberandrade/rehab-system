@@ -30,11 +30,11 @@ public class WaveMasterController : Controller
 		//float inputVelocity = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );
 		//float inputPosition = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 1 );
 
-		body.MovePosition( inputPosition * transform.forward );
-		body.velocity = inputVelocity * transform.forward;
+		//body.MovePosition( inputPosition * Vector3.forward );
+		body.velocity = inputVelocity * Vector3.forward;
 
-		outputForce = Vector3.Distance( body.position, other.position ) - baseDistance;
-		if( body.position.magnitude > initialPosition.magnitude ) outputForce += Mathf.Abs( body.position.z - initialPosition.z );
+		outputForce = transform.forward.z * ( Vector3.Distance( body.position, other.position ) - baseDistance );
+		//if( body.position.magnitude > initialPosition.magnitude ) outputForce += Mathf.Abs( body.position.z - initialPosition.z );
 		outputForceIntegral += outputForce * Time.fixedDeltaTime;
 
 		float outputWaveVariable = inputWaveVariable - Mathf.Sqrt( 2.0f / waveImpedance ) * outputForce;
@@ -44,7 +44,7 @@ public class WaveMasterController : Controller
 		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, outputWaveIntegral );
 		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 0, outputForce );
 		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, outputForceIntegral );
-		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 2, body.position.z );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 2, body.velocity.z );
 	}
 }
 

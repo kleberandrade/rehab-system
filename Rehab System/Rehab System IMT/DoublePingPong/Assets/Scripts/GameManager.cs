@@ -4,6 +4,8 @@ using System.Collections;
 
 public abstract class GameState : MonoBehaviour 
 {
+	public Text infoText;
+
 	public abstract GameConnection GetConnection();
 
 	public virtual void FixedUpdate()
@@ -29,7 +31,7 @@ public abstract class GameClient : GameState
 {
 	public Camera gameCamera;
 
-	public Text infoText;
+	public Text localPlayerText, remotePlayerText;
 
 	public Slider setpointSlider;
 	protected Image sliderHandle;

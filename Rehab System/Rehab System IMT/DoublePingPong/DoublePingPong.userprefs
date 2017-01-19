@@ -1,6 +1,6 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\BoxClashServer.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\WaveMasterController.cs">
     <Files>
       <File FileName="Assets\Scripts\GameConnection.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
@@ -8,19 +8,20 @@
       <File FileName="Assets\Scripts\SlaveController.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GameServerConnection.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GameClientConnection.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="20" Column="1" />
-      <File FileName="Assets\Scripts\Controller.cs" Line="34" Column="3" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Controller.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\DoublePongClient.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\DoublePongServer.cs" Line="19" Column="3" />
-      <File FileName="Assets\Scripts\InputAxis.cs" Line="40" Column="21" />
-      <File FileName="Assets\Scripts\WavePlayerController.cs" Line="37" Column="98" />
-      <File FileName="Assets\Scripts\BoxClashClient.cs" Line="35" Column="51" />
-      <File FileName="Assets\Scripts\BoxClashServer.cs" Line="15" Column="35" />
-      <File FileName="Assets\Scripts\WaveMasterController.cs" Line="33" Column="58" />
+      <File FileName="Assets\Scripts\DoublePongServer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\InputAxis.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\WavePlayerController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\BoxClashClient.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\BoxClashServer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\WaveMasterController.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\WaveSlaveController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Configuration.cs" Line="140" Column="4" />
+      <File FileName="Assets\Scripts\Configuration.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\BallController.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\InputAxisManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SpringDeformation.cs" Line="15" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

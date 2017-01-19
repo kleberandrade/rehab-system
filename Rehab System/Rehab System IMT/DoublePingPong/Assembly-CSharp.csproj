@@ -67,6 +67,7 @@
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\SimpleJSON.cs" />
      <Compile Include="Assets\Scripts\SlaveController.cs" />
+     <Compile Include="Assets\Scripts\SpringDeformation.cs" />
      <Compile Include="Assets\Scripts\WaveMasterController.cs" />
      <Compile Include="Assets\Scripts\WavePlayerController.cs" />
      <Compile Include="Assets\Scripts\WaveSlaveController.cs" />
