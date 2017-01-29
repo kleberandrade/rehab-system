@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpringDeformation : MonoBehaviour 
 {
-	public Rigidbody[] endPoints = new Rigidbody[ 2 ];
+	public Transform[] endPoints = new Transform[ 2 ];
 
 	private float baseDistance = 0.0f;
 	private Vector3 baseScale = Vector3.one;
@@ -15,7 +15,7 @@ public class SpringDeformation : MonoBehaviour
 		baseScale = transform.localScale;
 	}
 	
-	void Update () 
+	void Update() 
 	{
 		transform.position = ( endPoints[ 0 ].position + endPoints[ 1 ].position ) / 2.0f;
 

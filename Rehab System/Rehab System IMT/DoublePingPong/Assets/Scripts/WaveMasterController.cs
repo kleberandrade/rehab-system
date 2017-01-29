@@ -4,11 +4,14 @@ using System.Collections;
 
 public class WaveMasterController : Controller
 {
-	public Rigidbody other;
+	const float INTERACTION_STIFFNESS = 5.0f;
+
+	private Transform localAttachment = null;
+	public Transform distantAttachment;
 
 	protected float waveImpedance = 10.0f;
 
-	private float baseDistance = 0.0f;
+	private float baseSpringLength = 0.0f;
 
 	private float outputForce = 0.0f;
 	private float outputForceIntegral = 0.0f;
@@ -16,7 +19,8 @@ public class WaveMasterController : Controller
 	void Start()
 	{
 		initialPosition = body.position;
-		baseDistance = Vector3.Distance( body.position, other.position );
+		localAttachment = GetComponentInChildren<Transform>();
+		baseSpringLength = localAttachment.position.z - distantAttachment.position.z;
 	}
 
 	void FixedUpdate()
@@ -33,8 +37,9 @@ public class WaveMasterController : Controller
 		//body.MovePosition( inputPosition * Vector3.forward );
 		body.velocity = inputVelocity * Vector3.forward;
 
-		outputForce = transform.forward.z * ( Vector3.Distance( body.position, other.position ) - baseDistance );
-		//if( body.position.magnitude > initialPosition.magnitude ) outputForce += Mathf.Abs( body.position.z - initialPosition.z );
+		float springLength = localAttachment.position.z - distantAttachment.position.z;
+		outputForce = -INTERACTION_STIFFNESS * ( springLength - baseSpringLength );
+		if( baseSpringLength * springLength < 0.0f ) outputForce *= 10.0f;
 		outputForceIntegral += outputForce * Time.fixedDeltaTime;
 
 		float outputWaveVariable = inputWaveVariable - Mathf.Sqrt( 2.0f / waveImpedance ) * outputForce;
@@ -44,7 +49,8 @@ public class WaveMasterController : Controller
 		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, outputWaveIntegral );
 		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 0, outputForce );
 		//GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 1, outputForceIntegral );
-		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 2, body.velocity.z );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 2, body.position.z );
+		GameManager.GetConnection().SetLocalValue( elementID, (int) GameAxis.Z, 3, body.velocity.z );
 	}
 }
 

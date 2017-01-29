@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.IO;
+using System;
 
 public class BoxClashClient : GameClient 
 {
@@ -34,12 +36,10 @@ public class BoxClashClient : GameClient
 		remotePlayerText.text = string.Format( "Position:{0:F3}\nVelocity:{1:F3}", playerBody.position.z, playerBody.velocity.z );
 	}
 
-	/*IEnumerator RegisterValues()
+	IEnumerator RegisterValues()
 	{
 		// Set log file names
-		StreamWriter verticalLog = new StreamWriter( "./vertical" + clientID.ToString() + ".log", false );
-		StreamWriter horizontalLog = new StreamWriter( "./horizontal" + clientID.ToString() + ".log", false );
-		StreamWriter ballLog = new StreamWriter( "./ball" + clientID.ToString() + ".log", false );
+		StreamWriter boxLog = new StreamWriter( "./box" + clientID.ToString() + ".log", false );
 		StreamWriter networkLog = new StreamWriter( "./network" + clientID.ToString() + ".log", false );
 
 		while( Application.isPlaying )
@@ -49,23 +49,17 @@ public class BoxClashClient : GameClient
 			infoText.text =  string.Format( "Client: {0} Sent: {1} Received: {2} Lost Packets: {3} RTT: {4,3}ms", clientID,
 				currentConnectionInfo.sentPackets, currentConnectionInfo.receivedPackets, currentConnectionInfo.lostPackets, currentConnectionInfo.rtt );
 
-			if( ball.transform.position != lastBallPosition )
-			{
-				double gameTime = DateTime.Now.TimeOfDay.TotalSeconds;
-				verticalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, verticalBats[ 0 ].transform.position.z ) );
-				horizontalLog.WriteLine( string.Format( "{0}\t{1}", gameTime, horizontalBats[ 0 ].transform.position.x ) );
-				ballLog.WriteLine( string.Format( "{0}\t{1}\t{2}", gameTime, ball.transform.position.x, ball.transform.position.z ) );
-				networkLog.WriteLine( string.Format( "{0}\t{1}", gameTime, currentConnectionInfo.rtt / 2.0f ) );
-			}
+			double gameTime = DateTime.Now.TimeOfDay.TotalSeconds;
+			Rigidbody playerBody = player.GetComponent<Rigidbody>();
+			boxLog.WriteLine( string.Format( "{0}\t{1}\t{2}\t{3}\t{4}", gameTime, player.GetInputForce(), player.GetInteractionForce(), playerBody.position.z, playerBody.velocity.z ) );
+			networkLog.WriteLine( string.Format( "{0}\t{1}", gameTime, currentConnectionInfo.rtt / 2.0f ) );
 
 			yield return new WaitForFixedUpdate();
 		}
-
-		verticalLog.Flush();
-		horizontalLog.Flush();
-		ballLog.Flush();
+			
+		boxLog.Flush();
 		networkLog.Flush();
-	}*/
+	}
 
 	IEnumerator HandleConnection()
 	{
@@ -89,7 +83,7 @@ public class BoxClashClient : GameClient
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 180.0f );
 		}
 
-		//StartCoroutine( RegisterValues() );
+		StartCoroutine( RegisterValues() );
 	}
 
 	public void StartPlay()

@@ -228,8 +228,8 @@ MonoBehaviour:
     y: 542
     width: 1531
     height: 405
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 102, y: 121}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
@@ -367,7 +367,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 6cf9ffff1afaffffd2faffffe4fafffffafaffff2afcffff00000000
+    m_ExpandedIDs: 0cdefaffbcdefaff74dffaff86dffaff9cdffaff16f7fcffbef7fcff76f8fcff88f8fcff9ef8fcffde15fdff8616fdff3e17fdff5017fdff6617fdff5a45fdff1246fdffca46fdffdc46fdfff246fdff86e0feff52e1feff0ae2feff1ce2feff32e2feff2afcffff000000008e270000442800004e280000882800008a3500003e36000060410000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -422,9 +422,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0.12653399, y: 1.3924124, z: 0.22417606}
+    m_Target: {x: 0.9940834, y: 3.4746556, z: 2.3634264}
     speed: 2
-    m_Value: {x: 0.12653399, y: 1.3924124, z: 0.22417606}
+    m_Value: {x: 0.9940834, y: 3.4746556, z: 2.3634264}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -451,9 +451,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0.16149291, y: 0.667889, z: -0.15180945, w: 0.7104915}
   m_Size:
-    m_Target: 12.124068
+    m_Target: 14.164351
     speed: 2
-    m_Value: 12.124068
+    m_Value: 14.164351
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -553,19 +553,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Scripts
+    - Assets/_Scenes
   m_ViewMode: 1
   m_StartGridSize: 56
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/_Scenes
   m_LastFoldersGridSize: 56
   m_LastProjectPath: C:\Users\Adriano\Documents\Leonardo Jose\rehab-system\Rehab System\Rehab
     System IMT\DoublePingPong
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: f4260000
-    m_LastClickedID: 9972
+    m_SelectedIDs: f4250000
+    m_LastClickedID: 9716
     m_ExpandedIDs: 0000000080250000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -619,8 +619,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: f0060000
-    m_LastClickedInstanceID: 1776
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 5e250000c0220000282800002c29000000000000
     m_RenameOverlay:

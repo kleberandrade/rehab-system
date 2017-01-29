@@ -13,7 +13,7 @@ public abstract class GameConnection
 	protected const int PACKET_SIZE = 512;
 	private const int PACKET_HEADER_LENGTH = sizeof(int);
 
-	public const int TYPE_VALUES_NUMBER = 3;
+	public const int TYPE_VALUES_NUMBER = 4;
 	private const int VALUE_HEADER_SIZE = 2;
 	private const int VALUE_DATA_SIZE = TYPE_VALUES_NUMBER * sizeof(float);
 	protected const int VALUE_BLOCK_SIZE = VALUE_HEADER_SIZE + VALUE_DATA_SIZE;

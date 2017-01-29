@@ -6,10 +6,10 @@ public class WaveSlaveController : Controller
 
 	void FixedUpdate()
 	{
-		//float inputDelay = GameManager.GetConnection().GetNetworkDelay( elementID );
+		float inputPosition = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 2 );
+		float inputVelocity = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 3 );
 
-		float inputVelocity = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 2 );
-
+		body.MovePosition( inputPosition * Vector3.forward );
 		body.velocity = inputVelocity * Vector3.forward;
 	}
 }

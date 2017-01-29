@@ -2,6 +2,8 @@
 
 public class WavePlayerController : Controller
 {
+	private const float DRAG_DAMPING = 0.1f;
+
 	protected float waveImpedance = 10.0f;
 
 	private InputAxis controlAxis = null;
@@ -14,10 +16,10 @@ public class WavePlayerController : Controller
 		float inputWaveIntegral = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 1 );
 
 		playerForce = controlAxis.GetNormalizedValue( AxisVariable.FORCE ) * rangeLimits.z * transform.forward.z;
-		float feedbackForce = waveImpedance * body.velocity.z - Mathf.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
+		feedbackForce = waveImpedance * body.velocity.z - Mathf.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
 		//feedbackForce = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );
 
-		body.AddForce( ( playerForce + feedbackForce ) * Vector3.forward, ForceMode.Force );
+		body.AddForce( ( playerForce + feedbackForce ) * Vector3.forward - body.velocity * DRAG_DAMPING, ForceMode.Force );
 		controlAxis.SetNormalizedValue( AxisVariable.FORCE, feedbackForce );
 
 		float outputWaveVariable = -inputWaveVariable + Mathf.Sqrt( 2.0f * waveImpedance ) * body.velocity.z;
