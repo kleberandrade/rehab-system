@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class WavePlayerController : Controller
+public class ForcePlayerController : Controller
 {
 	private const float DRAG_DAMPING = 0.1f;
 
@@ -16,11 +16,13 @@ public class WavePlayerController : Controller
 		float inputWaveIntegral = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 1 );
 
 		playerForce = controlAxis.GetNormalizedValue( AxisVariable.FORCE ) * rangeLimits.z * transform.forward.z;
+		//Debug.Log( "Input force: " + playerForce.ToString() );
 		feedbackForce = waveImpedance * body.velocity.z - Mathf.Sqrt( 2.0f * waveImpedance ) * inputWaveVariable;
 		//feedbackForce = GameManager.GetConnection().GetRemoteValue( elementID, (int) GameAxis.Z, 0 );
 
 		body.AddForce( ( playerForce + feedbackForce ) * Vector3.forward - body.velocity * DRAG_DAMPING, ForceMode.Force );
-		controlAxis.SetNormalizedValue( AxisVariable.FORCE, feedbackForce );
+		//controlAxis.SetNormalizedValue( AxisVariable.FORCE, feedbackForce );
+		controlAxis.SetNormalizedValue( AxisVariable.POSITION, body.position.z / rangeLimits.z / transform.forward.z );
 
 		float outputWaveVariable = -inputWaveVariable + Mathf.Sqrt( 2.0f * waveImpedance ) * body.velocity.z;
 		float outputWaveIntegral = -inputWaveIntegral + Mathf.Sqrt( 2.0f * waveImpedance ) * body.position.z;

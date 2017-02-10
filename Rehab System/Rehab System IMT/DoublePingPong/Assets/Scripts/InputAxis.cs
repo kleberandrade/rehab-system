@@ -19,7 +19,6 @@ public class InputAxis
 	}
 
 	protected InputAxisValue[] inputValues = new InputAxisValue[ Enum.GetValues(typeof(AxisVariable)).Length ];
-    protected BitArray setpointsMask = new BitArray( 8, false );
 
 	public virtual bool Init( string axisID )
 	{
@@ -50,7 +49,6 @@ public class InputAxis
 	public void SetValue( AxisVariable variable, float value ) 
 	{ 
 		inputValues[ (int) variable ].setpoint = value + inputValues[ (int) variable ].offset; 
-		setpointsMask[ (int) variable ] = true; 
 	}
 
 	public float GetNormalizedValue( AxisVariable variable ) 
@@ -62,7 +60,7 @@ public class InputAxis
 	{ 
 		InputAxisValue value = inputValues[ (int) variable ];
 		value.setpoint = ( ( normalizedValue + 1.0f ) * value.range / 2.0f ) + value.offset + value.min; 
-		setpointsMask[ (int) variable ] = true;
+		Debug.Log( "Returning setpoint: " + value.setpoint.ToString() );
 	}
 
 	public float GetMinValue( AxisVariable variable ) {	return inputValues[ (int) variable ].min; }
@@ -130,10 +128,8 @@ public class KeyboardInputAxis : InputAxis
 
 	public override void Update( float updateTime )
 	{
-		//if( ! Mathf.Approximately( feedbackPosition, position ) ) position = feedbackPosition;
 		inputValues[ (int) AxisVariable.VELOCITY ].current = Input.GetAxis( id );
 		inputValues[ (int) AxisVariable.POSITION ].current += inputValues[ (int) AxisVariable.VELOCITY ].current * updateTime;
-		//feedbackPosition = position;
 		inputValues[ (int) AxisVariable.FORCE ].current = inputValues[ (int) AxisVariable.VELOCITY ].current;
 	}
 }
@@ -148,7 +144,8 @@ public class RemoteInputAxis : InputAxis
 		public InputAxisDataClient dataClient = null;
 		public byte[] inputBuffer = new byte[ InputAxisClient.BUFFER_SIZE ];
 		public byte[] outputBuffer = new byte[ InputAxisClient.BUFFER_SIZE ];
-		public bool outputUpdated = false;
+		public int totalAxesNumber = 0, updatedAxesCount = 0;
+		public int changedOutputsCount = 0;
 
 		public AxisConnection( string hostID )
 		{
@@ -160,14 +157,12 @@ public class RemoteInputAxis : InputAxis
 
 	public const string AXIS_SERVER_HOST_ID = "Axis Server Host";
 
-	const int AXIS_DATA_LENGTH = 7 * sizeof(float);
-	const int INPUT_DATA_LENGTH = 2 * sizeof(byte) + AXIS_DATA_LENGTH;
-	const int OUTPUT_DATA_LENGTH = sizeof(byte) + AXIS_DATA_LENGTH;
+	const int AXIS_DATA_LENGTH = sizeof(byte) + 6 * sizeof(float);
 
 	private static List<AxisConnection> axisConnections = new List<AxisConnection>();
 
 	private byte index;
-	private AxisConnection axis;
+	private AxisConnection connection;
 
 	public override bool Init( string axisID )
 	{
@@ -179,12 +174,14 @@ public class RemoteInputAxis : InputAxis
 
 		if( byte.TryParse( axisID, out index ) )
         {
-			axis = axisConnections.Find( connection => connection.hostID == axisHost );
-			if( axis == null ) 
+			connection = axisConnections.Find( connection => connection.hostID == axisHost );
+			if( connection == null ) 
 			{
-				axis = new AxisConnection( axisHost );
-				axisConnections.Add( axis );
+				connection = new AxisConnection( axisHost );
+				axisConnections.Add( connection );
 			}
+			connection.totalAxesNumber++;
+
             return true;
         }
 
@@ -193,55 +190,61 @@ public class RemoteInputAxis : InputAxis
 
     public override void End()
     {
-		axis.dataClient.Disconnect();
+		connection.dataClient.Disconnect();
     }
 
 	public override void Update( float updateTime )
 	{
-		/*bool newDataReceived =*/ axis.dataClient.ReceiveData( axis.inputBuffer );
+		/*bool newDataReceived =*/ connection.dataClient.ReceiveData( connection.inputBuffer );
 
-		axis.outputBuffer[ 0 ] = axis.inputBuffer[ 0 ];
-
-		int axesNumber = (int) axis.inputBuffer[ 0 ];
+		int axesNumber = (int) connection.inputBuffer[ 0 ];
+		Debug.Log( "Received measures for " + axesNumber.ToString() + " axes" );
 		for( int axisIndex = 0; axisIndex < axesNumber; axisIndex++ ) 
 		{
-			int inputIDPosition = 1 + axisIndex * INPUT_DATA_LENGTH;
+			int inputIDPosition = 1 + axisIndex * AXIS_DATA_LENGTH;
 
-			if( axis.inputBuffer[ inputIDPosition ] == index ) 
+			if( connection.inputBuffer[ inputIDPosition ] == index ) 
 			{
 				int inputDataPosition = inputIDPosition + sizeof(byte);
 
 				for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
-					inputValues[ valueIndex ].current = BitConverter.ToSingle( axis.inputBuffer, inputDataPosition + valueIndex * sizeof(float) );
-
-				int outputIDPosition = 1 + axisIndex * OUTPUT_DATA_LENGTH;
-				int outputMaskPosition = outputIDPosition + sizeof(byte);
-				int outputDataPosition = inputIDPosition + 2 * sizeof(byte);
-
-				axis.outputBuffer[ outputIDPosition ] = index;
-
-				setpointsMask.CopyTo( axis.outputBuffer, outputMaskPosition );
-				if( axis.outputBuffer[ outputMaskPosition ] > 0 ) axis.outputUpdated = true;
-				setpointsMask.SetAll( false );
-
-				//for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
-				//	if( ! Mathf.Approximately( inputValues[ valueIndex ].setpoint, inputValues[ valueIndex ].value ) ) axis.outputUpdated = true;
-
-				if( axis.outputUpdated )
-				{
-					for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
-						Buffer.BlockCopy( BitConverter.GetBytes( inputValues[ valueIndex ].setpoint ), 0, axis.outputBuffer, outputDataPosition + valueIndex * sizeof(float), sizeof(float) );
-				}
+					inputValues[ valueIndex ].current = BitConverter.ToSingle( connection.inputBuffer, inputDataPosition + valueIndex * sizeof(float) );
 
 				break;
 			}
 		}
 
-		if( /*newDataReceived &&*/ axis.outputUpdated ) 
+		int outputIDPosition = 1 + connection.changedOutputsCount * AXIS_DATA_LENGTH;
+		int outputDataPosition = outputIDPosition + sizeof(byte);
+
+		bool hasOutputChanged = false;
+		for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
 		{
-			Debug.Log( "Sending setpoints with mask: " + axis.outputBuffer[ 2 ].ToString() );
-			axis.dataClient.SendData( axis.outputBuffer );
-			axis.outputUpdated = false;
+			int outputValuePosition = outputDataPosition + valueIndex * sizeof(float);
+			if( Mathf.Abs( inputValues[ valueIndex ].setpoint - BitConverter.ToSingle( connection.outputBuffer, outputValuePosition ) ) > 0.1f ) 
+				hasOutputChanged = true;
+		}
+
+		if( hasOutputChanged ) 
+		{
+			connection.outputBuffer[ outputIDPosition ] = index;
+			for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
+			{
+				int outputValuePosition = outputDataPosition + valueIndex * sizeof(float);
+				Buffer.BlockCopy( BitConverter.GetBytes( inputValues[ valueIndex ].setpoint ), 0, connection.outputBuffer, outputValuePosition, sizeof(float) );
+			}
+			connection.changedOutputsCount++;
+		}
+
+		connection.updatedAxesCount++;
+
+		if( connection.updatedAxesCount >= connection.totalAxesNumber && connection.changedOutputsCount > 0 ) 
+		{
+			Debug.Log( "Sending setpoints for " + connection.changedOutputsCount.ToString() + " axes" );
+			connection.outputBuffer[ 0 ] = (byte) connection.changedOutputsCount;
+			connection.dataClient.SendData( connection.outputBuffer );
+			connection.updatedAxesCount = 0;
+			connection.changedOutputsCount = 0;
 		}
 	}
 }

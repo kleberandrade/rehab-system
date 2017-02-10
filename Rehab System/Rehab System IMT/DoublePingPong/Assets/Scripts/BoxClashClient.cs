@@ -8,7 +8,7 @@ public class BoxClashClient : GameClient
 {
 	public Controller[] boxes = new Controller[ 2 ];
 
-	private WavePlayerController player = null;
+	private ForcePlayerController player = null;
 
 	//private float error = 0.0f;
 
@@ -16,7 +16,7 @@ public class BoxClashClient : GameClient
 
 	void Awake()
 	{
-		player = boxes[ 0 ].GetComponent<WavePlayerController>();
+		player = boxes[ 0 ].GetComponent<ForcePlayerController>();
 
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
 	}
@@ -27,8 +27,8 @@ public class BoxClashClient : GameClient
 
 		//setpointSlider.value = setpoint;
 
-		//if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
-		//else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
+		//if( error >= 2 * PositionPositionPlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
+		//else if( error >= PositionPositionPlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		//else sliderHandle.color = Color.green;
 
 		Rigidbody playerBody = player.GetComponent<Rigidbody>();
@@ -71,15 +71,15 @@ public class BoxClashClient : GameClient
 
 		if( clientID == 0 ) 
 		{
-			boxes[ 0 ].GetComponent<WavePlayerController>().enabled = true;
-			boxes[ 1 ].GetComponent<WaveSlaveController>().enabled = true;
-			player = boxes[ 0 ].GetComponent<WavePlayerController>();
+			boxes[ 0 ].GetComponent<ForcePlayerController>().enabled = true;
+			boxes[ 1 ].GetComponent<ForceSlaveController>().enabled = true;
+			player = boxes[ 0 ].GetComponent<ForcePlayerController>();
 		} 
 		else if( clientID == 1 ) 
 		{
-			boxes[ 0 ].GetComponent<WaveSlaveController>().enabled = true;
-			boxes[ 1 ].GetComponent<WavePlayerController>().enabled = true;
-			player = boxes[ 1 ].GetComponent<WavePlayerController>();
+			boxes[ 0 ].GetComponent<ForceSlaveController>().enabled = true;
+			boxes[ 1 ].GetComponent<ForcePlayerController>().enabled = true;
+			player = boxes[ 1 ].GetComponent<ForcePlayerController>();
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 180.0f );
 		}
 

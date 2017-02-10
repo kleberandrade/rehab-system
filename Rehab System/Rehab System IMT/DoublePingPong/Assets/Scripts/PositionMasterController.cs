@@ -2,7 +2,7 @@
 
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(BoxCollider) ) ]
-public class BatController : Controller 
+public class PositionMasterController : Controller 
 {
 	const int POSITION = 0, VELOCITY = 1, ACCELERATION = 2;
 

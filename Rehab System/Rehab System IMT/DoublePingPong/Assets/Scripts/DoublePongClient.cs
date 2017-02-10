@@ -6,12 +6,12 @@ using System;
 
 public class DoublePongClient : GameClient 
 {
-	public SlaveController ball;
+	public PositionSlaveController ball;
 	private Vector3 lastBallPosition;
 
 	public Controller[] verticalBats = new Controller[ 2 ];
 	public Controller[] horizontalBats = new Controller[ 2 ];
-	private PlayerController[] playerBats = new PlayerController[ 2 ];
+	private PositionPlayerController[] playerBats = new PositionPlayerController[ 2 ];
 
 	private int targetMask;
 
@@ -23,8 +23,8 @@ public class DoublePongClient : GameClient
 	{
 		targetMask = LayerMask.GetMask( "Target" );
 
-		playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PlayerController>();
-		playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PlayerController>();
+		playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PositionPlayerController>();
+		playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PositionPlayerController>();
 
 		sliderHandle = setpointSlider.handleRect.GetComponent<Image>();
 
@@ -42,8 +42,8 @@ public class DoublePongClient : GameClient
 
 		setpointSlider.value = setpoint;
 
-		if( error >= 2 * PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
-		else if( error >= PlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
+		if( error >= 2 * PositionPlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.red;
+		else if( error >= PositionPlayerController.ERROR_THRESHOLD ) sliderHandle.color = Color.yellow;
 		else sliderHandle.color = Color.green;
 	}
 
@@ -90,21 +90,21 @@ public class DoublePongClient : GameClient
 
 		if( clientID == 0 ) 
 		{
-			verticalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
-			verticalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
-			horizontalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
-			horizontalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
-			playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PlayerController>();
-			playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PlayerController>();
+			verticalBats[ 0 ].GetComponent<PositionPlayerController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<PositionPlayerController>().enabled = true;
+			horizontalBats[ 0 ].GetComponent<PositionSlaveController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<PositionSlaveController>().enabled = true;
+			playerBats[ 0 ] = verticalBats[ 0 ].GetComponent<PositionPlayerController>();
+			playerBats[ 1 ] = verticalBats[ 1 ].GetComponent<PositionPlayerController>();
 		} 
 		else if( clientID == 1 ) 
 		{
-			horizontalBats[ 0 ].GetComponent<PlayerController>().enabled = true;
-			horizontalBats[ 1 ].GetComponent<PlayerController>().enabled = true;
-			verticalBats[ 0 ].GetComponent<SlaveController>().enabled = true;
-			verticalBats[ 1 ].GetComponent<SlaveController>().enabled = true;
-			playerBats[ 0 ] = horizontalBats[ 0 ].GetComponent<PlayerController>();
-			playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PlayerController>();
+			horizontalBats[ 0 ].GetComponent<PositionPlayerController>().enabled = true;
+			horizontalBats[ 1 ].GetComponent<PositionPlayerController>().enabled = true;
+			verticalBats[ 0 ].GetComponent<PositionSlaveController>().enabled = true;
+			verticalBats[ 1 ].GetComponent<PositionSlaveController>().enabled = true;
+			playerBats[ 0 ] = horizontalBats[ 0 ].GetComponent<PositionPlayerController>();
+			playerBats[ 1 ] = horizontalBats[ 1 ].GetComponent<PositionPlayerController>();
 			gameCamera.transform.RotateAround( transform.position, Vector3.up, 90f );
 		}
 

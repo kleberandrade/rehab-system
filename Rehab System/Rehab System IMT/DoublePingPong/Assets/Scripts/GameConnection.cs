@@ -49,7 +49,7 @@ public abstract class GameConnection
 	}
 
 	public static void Shutdown()
-	{
+	{ 
 		NetworkTransport.Shutdown();
 	}
 
@@ -102,7 +102,7 @@ public abstract class GameConnection
 		if( updatedLocalKeys.Count > 0 ) 
 		{
 			Buffer.BlockCopy( BitConverter.GetBytes( outputMessageLength ), 0, outputBuffer, 0, PACKET_HEADER_LENGTH );
-			Debug.Log( "sending " + updatedLocalKeys.Count.ToString() + " blocks (" + BitConverter.ToInt32( outputBuffer, 0 ).ToString() + " bytes)" );
+			//Debug.Log( "sending " + updatedLocalKeys.Count.ToString() + " blocks (" + BitConverter.ToInt32( outputBuffer, 0 ).ToString() + " bytes)" );
 			SendUpdateMessage();
 		}
 

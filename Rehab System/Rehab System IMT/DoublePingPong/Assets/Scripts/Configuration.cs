@@ -92,19 +92,27 @@ public class Configuration : MonoBehaviour
 			axisSelector.ClearOptions();
 			axisSelector.AddOptions( InputAxisManager.DEFAULT_AXIS_NAMES );				
 
-			string infoString = Encoding.ASCII.GetString( infoBuffer );
-			var remoteInfo = JSON.Parse( infoString );
-			Debug.Log( "Received info: " + remoteInfo.ToString() );
-
-			List<string> remoteAxisNames = new List<string>();
-			var remoteAxesList = remoteInfo[ "axes" ].AsArray;
-			for( int remoteAxisIndex = 0; remoteAxisIndex < remoteAxesList.Count; remoteAxisIndex++ )
+			string infoString = Encoding.ASCII.GetString( infoBuffer ).Trim();
+			Debug.Log( "Received info string: " + infoString );
+			try
 			{
-				string remoteAxisName = remoteAxesList[ remoteAxisIndex ].Value;
-				axisManager.AddRemoteAxis( remoteAxisName, remoteAxisIndex.ToString() );
-				remoteAxisNames.Add( remoteAxisName );
+				var remoteInfo = JSON.Parse( infoString );
+				Debug.Log( "Received info: " + remoteInfo.ToString() );
+
+				List<string> remoteAxisNames = new List<string>();
+				var remoteAxesList = remoteInfo[ "axes" ].AsArray;
+				for( int remoteAxisIndex = 0; remoteAxisIndex < remoteAxesList.Count; remoteAxisIndex++ )
+				{
+					string remoteAxisName = remoteAxesList[ remoteAxisIndex ].Value;
+					axisManager.AddRemoteAxis( remoteAxisName, remoteAxisIndex.ToString() );
+					remoteAxisNames.Add( remoteAxisName );
+				}
+				axisSelector.AddOptions( remoteAxisNames );
 			}
-			axisSelector.AddOptions( remoteAxisNames );
+			catch( Exception e )
+			{
+				Debug.Log( e.ToString() );
+			}
 		}
 
 	}

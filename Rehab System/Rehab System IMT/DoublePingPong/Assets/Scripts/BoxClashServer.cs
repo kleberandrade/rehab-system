@@ -4,7 +4,7 @@ using System.IO;
 
 public class BoxClashServer : GameServer 
 {
-	public WaveMasterController[] boxes = new WaveMasterController[ 2 ];
+	public ForceMasterController[] boxes = new ForceMasterController[ 2 ];
 
 	public override void Start()
 	{
@@ -20,7 +20,7 @@ public class BoxClashServer : GameServer
 		while( connection.GetClientsNumber() < 2 ) 
 			yield return new WaitForFixedUpdate();
 
-		foreach( WaveMasterController box in boxes )
+		foreach( ForceMasterController box in boxes )
 			box.enabled = true;
 	}
 }

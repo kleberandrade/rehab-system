@@ -41,7 +41,12 @@ public class GameServerConnection : GameConnection
 				//Buffer.BlockCopy( BitConverter.GetBytes( Time.realtimeSinceStartup ), 0, inputBuffer, 1, sizeof(float) );
 				NetworkTransport.Send( socketID, connectionID, eventChannel, inputBuffer, 1 + sizeof(double), out connectionError );
 				clientConnections.Add( connectionID ); 
-			} 
+			}
+			else if( networkEvent == NetworkEventType.DisconnectEvent ) 
+			{
+				Debug.Log( "Client " + connectionID.ToString() + " disconnected" );
+				clientConnections.Remove( connectionID );
+			}
 			else if( networkEvent == NetworkEventType.DataEvent ) 
 			{
 				networkDelay = NetworkTransport.GetCurrentRtt( socketID, connectionID, out connectionError ) / 2000.0f;

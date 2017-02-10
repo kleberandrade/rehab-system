@@ -3,7 +3,7 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 10
+  serializedVersion: 11
   productGUID: 0998bbabecb2641a4992262ae98c1cb5
   AndroidProfiler: 0
   defaultScreenOrientation: 3
@@ -117,7 +117,6 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleIdentifier: com.inanegames.cyberBrickout
   bundleVersion: 1.0
   preloadedAssets: []
   metroInputSource: 0
@@ -135,14 +134,22 @@ PlayerSettings:
       depthFormat: 1
   protectGraphicsMemory: 0
   useHDRDisplay: 0
+  applicationIdentifier:
+    Android: com.inanegames.cyberBrickout
+    Standalone: unity.ReRob Laboratory.Double Ping-Pong
+    Tizen: com.inanegames.cyberBrickout
+    iOS: com.inanegames.cyberBrickout
+    tvOS: com.inanegames.cyberBrickout
+  buildNumber:
+    iOS: 0
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 16
+  AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 1
-  iPhoneBuildNumber: 0
   ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0

@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 
-public class WaveMasterController : Controller
+public class ForceMasterController : Controller
 {
 	const float INTERACTION_STIFFNESS = 5.0f;
 

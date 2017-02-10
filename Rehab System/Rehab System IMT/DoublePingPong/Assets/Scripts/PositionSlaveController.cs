@@ -2,7 +2,7 @@
 
 [ RequireComponent( typeof(Rigidbody) ) ]
 [ RequireComponent( typeof(Collider) ) ]
-public class SlaveController : Controller 
+public class PositionSlaveController : Controller 
 {
 	const int POSITION = 0, VELOCITY = 1;
 

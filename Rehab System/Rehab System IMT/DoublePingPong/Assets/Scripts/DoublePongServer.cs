@@ -5,7 +5,7 @@ using System.IO;
 public class DoublePongServer : GameServer 
 {
 	public BallController ball;
-	public BatController[] bats = new BatController[ 4 ];
+	public PositionMasterController[] bats = new PositionMasterController[ 4 ];
 
 	public override void Start()
 	{
@@ -13,7 +13,7 @@ public class DoublePongServer : GameServer
 
 		connection.Connect();
 
-		foreach( BatController bat in bats )
+		foreach( PositionMasterController bat in bats )
 			bat.enabled = true;
 
 		StartCoroutine( WaitClients() );

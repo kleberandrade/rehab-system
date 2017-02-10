@@ -71,5 +71,10 @@ public class GameClientConnection : GameConnection
 
 		return currentConnectionInfo;
 	}
+
+	void OnApplicationQuit()
+	{
+		NetworkTransport.Disconnect( socketID, connectionID, out connectionError );
+	}
 }
 

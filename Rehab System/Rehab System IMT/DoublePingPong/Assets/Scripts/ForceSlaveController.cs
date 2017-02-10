@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class WaveSlaveController : Controller
+public class ForceSlaveController : Controller
 {
 	protected float waveImpedance = 10.0f;
 
