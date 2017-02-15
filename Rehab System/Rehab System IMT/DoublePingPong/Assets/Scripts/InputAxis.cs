@@ -60,7 +60,7 @@ public class InputAxis
 	{ 
 		InputAxisValue value = inputValues[ (int) variable ];
 		value.setpoint = ( ( normalizedValue + 1.0f ) * value.range / 2.0f ) + value.offset + value.min; 
-		Debug.Log( "Returning setpoint: " + value.setpoint.ToString() );
+		//Debug.Log( "Returning setpoint: " + value.setpoint.ToString() );
 	}
 
 	public float GetMinValue( AxisVariable variable ) {	return inputValues[ (int) variable ].min; }
@@ -221,7 +221,8 @@ public class RemoteInputAxis : InputAxis
 		for( int valueIndex = 0; valueIndex < inputValues.Length; valueIndex++ )
 		{
 			int outputValuePosition = outputDataPosition + valueIndex * sizeof(float);
-			if( Mathf.Abs( inputValues[ valueIndex ].setpoint - BitConverter.ToSingle( connection.outputBuffer, outputValuePosition ) ) > 0.1f ) 
+			float valueDelta = inputValues[ valueIndex ].setpoint - BitConverter.ToSingle( connection.outputBuffer, outputValuePosition );
+			if( Mathf.Abs( valueDelta / inputValues[ valueIndex ].range ) > 0.05f )
 				hasOutputChanged = true;
 		}
 

@@ -55,9 +55,9 @@ public abstract class GameConnection
 
 	public abstract void Connect();
 
-	public void SetLocalValue( int objectID, int valueType, int valueIndex, float value ) 
+	public void SetLocalValue( byte objectID, byte valueType, int valueIndex, float value ) 
 	{
-		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( (byte) objectID, (byte) valueType );
+		KeyValuePair<byte,byte> localKey = new KeyValuePair<byte,byte>( objectID, valueType );
 
 		if( !localValues.ContainsKey( localKey ) ) localValues[ localKey ] = new float[ TYPE_VALUES_NUMBER ];
 
@@ -69,9 +69,9 @@ public abstract class GameConnection
 		}
 	}
 
-	public float GetRemoteValue( int objectID, int valueType, int valueIndex )
+	public float GetRemoteValue( byte objectID, byte valueType, int valueIndex )
 	{
-		KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( (byte) objectID, (byte) valueType );
+		KeyValuePair<byte,byte> remoteKey = new KeyValuePair<byte,byte>( objectID, valueType );
 
 		if( remoteValues.ContainsKey( remoteKey ) ) return remoteValues[ remoteKey ][ valueIndex ];
 
